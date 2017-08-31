@@ -72,7 +72,7 @@ int main(void)
 		printf("Enter server IP or hit enter for 127.0.0.1\n");
 		fgets(str, 512, stdin);
 		// check if the string is empty
-		if (str[0] != 0) {
+		if (str[0] == '\n') {
 			strcpy(str, "127.0.0.1");
 		}
 		printf("Starting the client, connecting to %s.\n", str);
@@ -128,6 +128,12 @@ int main(void)
 				else
 				{
 					printf("We have been disconnected.\n");
+
+					// say bye
+					BitStream bsOut;
+					bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
+					bsOut.Write("Goodbye!");
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 				}
 				break;
 			case ID_CONNECTION_LOST:
@@ -148,7 +154,7 @@ int main(void)
 				bsIn.Read(rs);
 				printf("%s\n", rs.C_String());
 
-				// say bye
+				// say bye, never triggers with current setup
 				BitStream bsOut;
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
 				bsOut.Write("Goodbye!");
