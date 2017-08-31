@@ -59,11 +59,11 @@ int main(void)
 	{
 		printf("Enter server IP or hit enter for 127.0.0.1\n");
 		fgets(str, 512, stdin);
-
-		if (str[0] == 0) {
+		// check if the string is empty
+		if (str[0] != 0) {
 			strcpy(str, "127.0.0.1");
 		}
-		printf("Starting the client.\n");
+		printf("Starting the client, connecting to %s.\n", str);
 		peer->Connect(str, serverPort, 0, 0);
 
 	}
