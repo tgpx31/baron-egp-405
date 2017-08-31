@@ -103,13 +103,20 @@ int main(void)
 				// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
 				BitStream bsOut;
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
-				bsOut.Write("Hello world");
+				bsOut.Write("Hello!");
 				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			}
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
+			{
 				printf("A connection is incoming.\n");
+				BitStream bsOut;
+				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
+				bsOut.Write("Hello to you too!");
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+				
 				break;
+			}
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
 				printf("The server is full.\n");
 				break;
@@ -134,6 +141,21 @@ int main(void)
 				}
 				break;
 			case ID_GAME_MESSAGE_1:
+			{
+				RakString rs;
+				BitStream bsIn(packet->data, packet->length, false);
+				bsIn.IgnoreBytes(sizeof(MessageID));
+				bsIn.Read(rs);
+				printf("%s\n", rs.C_String());
+
+				// say bye
+				BitStream bsOut;
+				bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
+				bsOut.Write("Goodbye!");
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+			}
+			break;
+			case ID_GAME_MESSAGE_2:
 			{
 				RakString rs;
 				BitStream bsIn(packet->data, packet->length, false);
