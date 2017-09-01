@@ -24,18 +24,27 @@ enum GameMessages
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
 	ID_GAME_MESSAGE_2,
 	ID_SET_TIMED_DISCONNECT,
+	ID_CLIENT_CONNECTING,
 };
 
 // struct to replace bitstream
 #pragma pack(push, 1)
-struct MessageStruct
+struct ScreamingMessageStruct
 {
-	unsigned char mTimeStampID;		// Assign ID based on timestamp
-	Time mTimeStamp;				// Assigned by GetTime()
-	unsigned char mTypeId;			// Type here
+	unsigned char mTypeId;	// Game Messages type
 
 	// string containing message
-	char mMessage[512];
+	char mMessage[64] = "Goodbye peasant";
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+struct DisgustedMessageStruct
+{
+	unsigned char mTypeId;	// Game Messages type
+
+	// string containing message
+	char mMessage[64] = "Please sir, can I have some packets";
 };
 #pragma pack(pop)
 
@@ -124,18 +133,20 @@ int main(void)
 				// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
 				BitStream bsOut;
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
-				bsOut.Write("Hello!");
+				bsOut.Write("Hello server!");
 				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			}
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
 			{
 				printf("A connection is incoming.\n");
-				/*BitStream bsOut;
-				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
-				bsOut.Write("Hello to you too!");
-				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);*/
-				
+
+				ScreamingMessageStruct msOut;
+				msOut.mTypeId = (MessageID)ID_CLIENT_CONNECTING;
+				BitStream bsOut;
+				bsOut.Write((char*)&msOut, sizeof(msOut));
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
 				break;
 			}
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -175,11 +186,11 @@ int main(void)
 				bsIn.Read(rs);
 				printf("%s\n", rs.C_String());
 
-				// say bye
-				BitStream bsOut;
-				bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
-				bsOut.Write("Goodbye!");
-				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+				//// say bye
+				//BitStream bsOut;
+				//bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
+				//bsOut.Write("Goodbye!");
+				//peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			}
 			break;
 			case ID_GAME_MESSAGE_2:
@@ -195,6 +206,28 @@ int main(void)
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
 				bsOut.Write("Hello!");
 				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+			}
+			break;
+			case ID_CLIENT_CONNECTING:
+			{
+				ScreamingMessageStruct msIn;
+				BitStream bsIn(packet->data, packet->length, false);
+				bsIn.IgnoreBytes(sizeof(MessageID));
+				bsIn.Read(msIn);
+
+				printf("%s\n", msIn.mMessage);
+
+				// Say goodbye
+				DisgustedMessageStruct msOut;
+				msOut.mTypeId = (MessageID)ID_SET_TIMED_DISCONNECT;
+				BitStream bsOut;
+				bsOut.Write((char*)&msOut, sizeof(msOut));
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+			}
+			break;
+			case ID_SET_TIMED_DISCONNECT:
+			{
+
 			}
 			break;
 			default:
