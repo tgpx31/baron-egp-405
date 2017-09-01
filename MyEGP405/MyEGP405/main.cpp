@@ -110,10 +110,10 @@ int main(void)
 			case ID_NEW_INCOMING_CONNECTION:
 			{
 				printf("A connection is incoming.\n");
-				BitStream bsOut;
+				/*BitStream bsOut;
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
 				bsOut.Write("Hello to you too!");
-				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);*/
 				
 				break;
 			}
@@ -129,7 +129,7 @@ int main(void)
 				{
 					printf("We have been disconnected.\n");
 
-					// say bye
+					// say bye, never triggers this switch case though
 					BitStream bsOut;
 					bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
 					bsOut.Write("Goodbye!");
@@ -154,7 +154,7 @@ int main(void)
 				bsIn.Read(rs);
 				printf("%s\n", rs.C_String());
 
-				// say bye, never triggers with current setup
+				// say bye
 				BitStream bsOut;
 				bsOut.Write((MessageID)ID_GAME_MESSAGE_2);
 				bsOut.Write("Goodbye!");
@@ -168,6 +168,12 @@ int main(void)
 				bsIn.IgnoreBytes(sizeof(MessageID));
 				bsIn.Read(rs);
 				printf("%s\n", rs.C_String());
+
+				// Say hi again to keep a loop
+				BitStream bsOut;
+				bsOut.Write((MessageID)ID_GAME_MESSAGE_1);
+				bsOut.Write("Hello!");
+				peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			}
 			break;
 			default:
