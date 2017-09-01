@@ -12,11 +12,32 @@
 // Using namespace to avoid doing Raknet:: a lot
 using namespace RakNet;
 
+// My 'hi, goodbye' loop
+// TODO:	client says hi to server
+//			server says they'll remove the client in x seconds
+//			after x seconds, say bye between both
+//			wait one second
+//			force client disconnect
+
 enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-	ID_GAME_MESSAGE_2
+	ID_GAME_MESSAGE_2,
+	ID_SET_TIMED_DISCONNECT,
 };
+
+// struct to replace bitstream
+#pragma pack(push, 1)
+struct MessageStruct
+{
+	unsigned char mTimeStampID;		// Assign ID based on timestamp
+	Time mTimeStamp;				// Assigned by GetTime()
+	unsigned char mTypeId;			// Type here
+
+	// string containing message
+	char mMessage[512];
+};
+#pragma pack(pop)
 
 int main(void)
 {
