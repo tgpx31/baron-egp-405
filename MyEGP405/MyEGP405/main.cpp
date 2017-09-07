@@ -1,86 +1,68 @@
-// Brian Baron	0974390
-// EGP 405-02	Lab 1: Hello, RakNet	2017/09/01 (YYYY/MM/DD)
-//
-//
-//--------------------------------------------------------------------------------------------------------------------------------
-//		 We certify that this work is entirely our own.The assessor of this project may reproduce this project
-//		 and provide copies to other academic staff, and/or communicate a copy of this project to a plagiarism-checking service,
-//		 which may retain a copy of the project on its database
-//--------------------------------------------------------------------------------------------------------------------------------
-//
-//
-// This file was modified by Brian Baron with permission from author
-// (I put this because of the tutorial source code just in case)
-// Since this was not a team effort, all code modified/written for this Lab was Brian Baron
-//
-// Repository Link: https://github.com/tgpx31/baron-egp-405
-//
-//
-// Sources for tutorials listed in the Lab 1 assignment document:
-// http://www.jenkinssoftware.com/raknet/manual/tutorialsample1.html
-// http://www.jenkinssoftware.com/raknet/manual/tutorialsample2.html
-// http://www.jenkinssoftware.com/raknet/manual/tutorialsample3.html
-// http://www.raknet.net/raknet/manual/creatingpackets.html
-//
-
 #include <stdio.h>
 #include <string.h>
 #include "RakNet\RakPeerInterface.h"
-
-// Part b
 #include "RakNet\MessageIdentifiers.h"
-
-// Part c
 #include "RakNet\BitStream.h"
-#include "RakNet\RakNetTypes.h"
+#include "RakNet\RakNetTypes.h"  // MessageID
 
-// Using namespace to avoid doing Raknet:: a lot
 using namespace RakNet;
 
 enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-	// Custom Message Identifiers for identifying packets
-	ID_DISDAIN_FOR_THE_PEOPLE,
-	ID_KICK_PEASANT,
+
+	// Handshake exchange
+	ID_USERNAME,			// Client responds to connection by sending its username to server, server assigns username to your address
+	ID_NEW_CLIENT_JOIN,		// server broadcasts welcome message to all clients
+	ID_CLIENT_NUMBER,		// server associates username with client number
+
+	// Messaging exchange
+	ID_CHAT_MESSAGE,		// send request by anyone
+
+	// Misc.
+	ID_SEND_ALL,			// sent by client, all current usernames
+
 };
 
-// struct to replace bitstream
-#pragma pack(push, 1)
-struct ScreamingMessageStruct
+
+#pragma pack (push, 1)
+//struct MessageStruct
+//{
+//	unsigned char typeId;
+//	char message[512];
+//};
+struct UsernameMessage		// this structure can be used for multiple message ids
 {
-	unsigned char mTypeId;	// Used to ID the type of message
-
-	// string containing message
-	char mMessage[64] = "Goodbye peasant";
+	char messageID;
+	char username[31];
 };
-#pragma pack(pop)
 
-// Container functions for ease of use to recieve and send messages
-void recieveMessage(Packet* packet);
-void sendMessage(const char* msg, MessageID id, RakPeerInterface *peer, Packet *packet);
+struct ClientNumberMessage
+{
+	char messageID;
+	unsigned int clientNumber;
+};
 
-//---------------------
+struct ChatMessage
+{
+	char messageID;
+	char destination[31];
+	char message[512];
+};
+#pragma pack (pop)
+
 int main(void)
 {
 	char str[512];
-	RakPeerInterface *peer = RakPeerInterface::GetInstance();
+	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 	bool isServer;
 
-	unsigned int maxClients;
-	unsigned short serverPort;
-	Packet *packet;
+	unsigned int maxClients = 10;
+	unsigned int serverPort = 1111;
+	RakNet::Packet *packet;
 
-	// Prompt for the port
-	printf("\nInput Port Number: ");
-	fgets(str, 512, stdin);
-
-	// Grab the port number from the input
-	sscanf(str, "%hi", &serverPort);
-	printf("\nPort Number: %hi \n", serverPort);
-
-	// Server or client?
 	printf("(C) or (S)erver?\n");
+	//gets(str);
 	fgets(str, 512, stdin);
 
 	if ((str[0] == 'c') || (str[0] == 'C'))
@@ -89,39 +71,27 @@ int main(void)
 		peer->Startup(1, &sd, 1);
 		isServer = false;
 	}
-	else
-	{
-		// If server, initialize maxClients
-		printf("\nInput Max Clients: ");
-		fgets(str, 512, stdin);
-
-		// Grab the max clients from input
-		sscanf(str, "%i", &maxClients);
-		printf("\nMax Clients: %i \n", maxClients);
-
+	else {
 		SocketDescriptor sd(serverPort, 0);
 		peer->Startup(maxClients, &sd, 1);
 		isServer = true;
 	}
 
+
+	// TODO - Add code body here
 	if (isServer)
 	{
 		printf("Starting the server.\n");
-		// Set client limit
+		// We need to let the server accept incoming connections from the clients
 		peer->SetMaximumIncomingConnections(maxClients);
 	}
-	else
-	{
+	else {
 		printf("Enter server IP or hit enter for 127.0.0.1\n");
-		fgets(str, 512, stdin);
-
-		// check if the string is empty
-		if (str[0] == '\n') {
+		//fgets(str, 512, stdin);
+		//if (str[0] == '\n') {
 			strcpy(str, "127.0.0.1");
-		}
-
-		// attempt connection
-		printf("Starting the client, connecting to %s.\n", str);
+		//}
+		printf("Starting the client.\n");
 		peer->Connect(str, serverPort, 0, 0);
 
 	}
@@ -135,83 +105,112 @@ int main(void)
 			case ID_REMOTE_DISCONNECTION_NOTIFICATION:
 				printf("Another client has disconnected.\n");
 				break;
-
 			case ID_REMOTE_CONNECTION_LOST:
 				printf("Another client has lost the connection.\n");
 				break;
-
 			case ID_REMOTE_NEW_INCOMING_CONNECTION:
 				printf("Another client has connected.\n");
 				break;
 
+			// Client successfully joins server
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
 				printf("Our connection request has been accepted.\n");
-				sendMessage("Please sir, can I have some packets", (MessageID)ID_DISDAIN_FOR_THE_PEOPLE, peer, packet);
-				break;
+				/*
+				// client recieves
+				// Use a BitStream to write a custom user message
+				// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
+				
+				// METHOD 1: pack using bitstream
+				RakNet::BitStream bsOut;
+				bsOut.Write((RakNet::MessageID)ID_HELLO_MESSAGE);
+				bsOut.Write("Hello world from client");
+				//peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+				// METHOD 2
+				MessageStruct ms = { ID_HELLO_MESSAGE, "Hello from client" };
+				peer->Send((char*)&ms, sizeof(ms), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+				*/
+
+				// prompt for username input
+				// temp hardcode
+				UsernameMessage username[1] = { ID_USERNAME, "HardCodedName" };
+				peer->Send((char*)username, sizeof(username), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			}
+				break;
+
+			case ID_USERNAME:
+			{
+				// we are server
+				// store UN in dict
+				// broadcast client entry to all other clients
+				UsernameMessage *username = (UsernameMessage*)packet->data;
+				username->messageID = ID_NEW_CLIENT_JOIN;
+				// send entry message to all except the client that joined
+				peer->Send((char*)username, sizeof(username), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, true);
+
+				// send new client their id
+				// should set ID based on clients currently connected
+				ClientNumberMessage clientNumber[1] = { ID_CLIENT_NUMBER, 0 };
+				peer->Send((char*)clientNumber, sizeof(clientNumber), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+			}
+			break;
 
 			case ID_NEW_INCOMING_CONNECTION:
-			{
 				printf("A connection is incoming.\n");
 				break;
-			}
-
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
 				printf("The server is full.\n");
 				break;
-
 			case ID_DISCONNECTION_NOTIFICATION:
-				if (isServer)
-				{
+				if (isServer) {
 					printf("A client has disconnected.\n");
-					break;
 				}
-				else
-				{
-					printf("\tWe have been disconnected.\n");
-					break;
+				else {
+					printf("We have been disconnected.\n");
 				}
-
+				break;
 			case ID_CONNECTION_LOST:
-				if (isServer)
-				{
+				if (isServer) {
 					printf("A client lost the connection.\n");
-					break;
 				}
-				else
-				{
+				else {
 					printf("Connection lost.\n");
-					break;
-				}
-
-			case ID_DISDAIN_FOR_THE_PEOPLE:
-			{
-				recieveMessage(packet);
-				sendMessage("Gross, peasants!", (MessageID)ID_GAME_MESSAGE_1, peer, packet);
-				break;
-			}
-
-			case ID_GAME_MESSAGE_1:
-			{
-				recieveMessage(packet);
-				sendMessage("Down with the bourgeoisie!", (MessageID)ID_KICK_PEASANT, peer, packet);
-				break;
-			}
-
-			case ID_KICK_PEASANT:
-				recieveMessage(packet);
-
-				if (isServer)
-				{
-					// disconnect the peasants
-					sendMessage("Die, peasants!", (MessageID)ID_DISCONNECTION_NOTIFICATION, peer, packet);
-					printf("\tKicking the clients.\n");
-
-					peer->CloseConnection(packet->systemAddress, true, 0, HIGH_PRIORITY);
 				}
 				break;
+			/*
+			//case ID_HELLO_MESSAGE:
+			//{
+			//	// anyone can recieve this message
+			//	RakNet::RakString rs;
+			//	RakNet::BitStream bsIn(packet->data, packet->length, false);
+			//	bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			//	bsIn.Read(rs);
+			//	printf("%s\n", rs.C_String());
 
+			//	// METHOD 1: pack using bitstream
+			//	//RakNet::BitStream bsOut;
+			//	//bsOut.Write((RakNet::MessageID)ID_HELLO_MESSAGE);
+			//	//if (isServer)
+			//	//	bsOut.Write("Hello world from server");
+			//	//else
+			//	//	bsOut.Write("Hello world from client");
+			//	//// emulating TCP
+			//	//peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+			//	MessageStruct* pmsIn;
+			//	pmsIn = (MessageStruct*)packet->data;
+			//	printf("%s\n", pmsIn->message);
+
+			//	MessageStruct ms;
+			//	if (isServer)
+			//		ms = { ID_HELLO_MESSAGE, "Hello from the server" };
+			//	else
+			//		ms = { ID_HELLO_MESSAGE, "Hello from the client" };
+			//	peer->Send((char*)&ms, sizeof(ms), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+			//}
+			//break;
+				*/
 			default:
 				printf("Message with identifier %i has arrived.\n", packet->data[0]);
 				break;
@@ -222,22 +221,4 @@ int main(void)
 	RakNet::RakPeerInterface::DestroyInstance(peer);
 
 	return 0;
-}
-//---------------------
-void recieveMessage(Packet* packet)
-{
-	ScreamingMessageStruct *pmsIn;
-	pmsIn = (ScreamingMessageStruct*)packet->data;
-	printf("Them: %s\n", pmsIn->mMessage);
-}
-
-void sendMessage(const char* msg, MessageID id, RakPeerInterface *peer, Packet *packet)
-{
-	ScreamingMessageStruct msOut;
-	strcpy(msOut.mMessage, msg);
-	msOut.mTypeId = id;
-	printf("Me: %s\n", msOut.mMessage);
-
-	// cast that struct, better way for this lab
-	peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 }
