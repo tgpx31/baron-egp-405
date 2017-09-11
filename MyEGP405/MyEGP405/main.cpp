@@ -20,7 +20,7 @@ enum GameMessages
 	ID_CHAT_MESSAGE,		// send request by anyone
 
 	// Misc.
-	ID_SEND_ALL,			// sent by client, all current usernames
+	ID_SEND_ALL,			// sent by client, all current usernames!
 
 };
 
