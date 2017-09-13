@@ -1,55 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include "RakNet\RakPeerInterface.h"
-#include "RakNet\MessageIdentifiers.h"
 #include "RakNet\BitStream.h"
-#include "RakNet\RakNetTypes.h"  // MessageID
+#include "RakNet\RakNetTypes.h" 
 
-using namespace RakNet;
-
-enum GameMessages
-{
-	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-
-	// Handshake exchange
-	ID_USERNAME,			// Client responds to connection by sending its username to server, server assigns username to your address
-	ID_NEW_CLIENT_JOIN,		// server broadcasts welcome message to all clients
-	ID_CLIENT_NUMBER,		// server associates username with client number
-
-	// Messaging exchange
-	ID_CHAT_MESSAGE,		// send request by anyone
-
-	// Misc.
-	ID_SEND_ALL,			// sent by client, all current usernames!
-
-};
-
-
-#pragma pack (push, 1)
-//struct MessageStruct
-//{
-//	unsigned char typeId;
-//	char message[512];
-//};
-struct UsernameMessage		// this structure can be used for multiple message ids
-{
-	char messageID;
-	char username[31];
-};
-
-struct ClientNumberMessage
-{
-	char messageID;
-	unsigned int clientNumber;
-};
-
-struct ChatMessage
-{
-	char messageID;
-	char destination[31];
-	char message[512];
-};
-#pragma pack (pop)
+#include "ChatClient.h"
+#include "Messages.h"
 
 int main(void)
 {
@@ -62,23 +18,20 @@ int main(void)
 	RakNet::Packet *packet;
 
 	printf("(C) or (S)erver?\n");
-	//gets(str);
 	fgets(str, 512, stdin);
 
 	if ((str[0] == 'c') || (str[0] == 'C'))
 	{
-		SocketDescriptor sd;
+		RakNet::SocketDescriptor sd;
 		peer->Startup(1, &sd, 1);
 		isServer = false;
 	}
 	else {
-		SocketDescriptor sd(serverPort, 0);
+		RakNet::SocketDescriptor sd(serverPort, 0);
 		peer->Startup(maxClients, &sd, 1);
 		isServer = true;
 	}
 
-
-	// TODO - Add code body here
 	if (isServer)
 	{
 		printf("Starting the server.\n");
@@ -86,14 +39,16 @@ int main(void)
 		peer->SetMaximumIncomingConnections(maxClients);
 	}
 	else {
+		/*
 		printf("Enter server IP or hit enter for 127.0.0.1\n");
-		//fgets(str, 512, stdin);
-		//if (str[0] == '\n') {
+		fgets(str, 512, stdin);
+		if (str[0] == '\n') {
 			strcpy(str, "127.0.0.1");
-		//}
+		}
+		*/
+		strcpy(str, "127.0.0.1");
 		printf("Starting the client.\n");
 		peer->Connect(str, serverPort, 0, 0);
-
 	}
 
 	while (1)
