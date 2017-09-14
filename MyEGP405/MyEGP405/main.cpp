@@ -26,7 +26,8 @@ int main(void)
 		peer->Startup(1, &sd, 1);
 		isServer = false;
 	}
-	else {
+	else 
+	{
 		RakNet::SocketDescriptor sd(serverPort, 0);
 		peer->Startup(maxClients, &sd, 1);
 		isServer = true;
