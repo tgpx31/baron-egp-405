@@ -151,12 +151,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChatClient.cpp" />
+    <ClCompile Include="ClientState.cpp" />
+    <ClCompile Include="LobbyState.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ServerState.cpp" />
+    <ClCompile Include="State.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChatClient.h" />
+    <ClInclude Include="ClientState.h" />
+    <ClInclude Include="LobbyState.h" />
     <ClInclude Include="Messages.h" />
+    <ClInclude Include="ServerState.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

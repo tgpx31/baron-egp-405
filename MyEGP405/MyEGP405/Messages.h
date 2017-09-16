@@ -19,13 +19,6 @@ enum GameMessages
 	ID_SEND_ALL,			// sent by client, all current usernames!
 };
 
-enum ServerStates
-{
-	LOBBY_STATE,
-	CLIENT_STATE,
-	SERVER_STATE
-};
-
 #pragma pack (push, 1)
 struct UsernameMessage		// this structure can be used for multiple message ids
 {
