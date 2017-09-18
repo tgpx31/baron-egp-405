@@ -26,6 +26,14 @@ void State::render()
 	std::cout << mData.buffer;
 }
 
+void State::init(State * prev, State * nextL, State * nextR, State ** currentState)
+{
+	mPrev = prev;
+	mNextL = nextL;
+	mNextR = nextR;
+	mCurrentState = currentState;
+}
+
 // Update current input state
 void State::updateInput()
 {
@@ -79,4 +87,15 @@ void State::processBuffer()
 {
 	mData.buffer[0] = '\0';
 	mData.bufferIndex = 0;
+}
+
+void State::GoToNextState(State* nextState)
+{
+	*mCurrentState = nextState;
+	nextState->ArriveFromPreviousState(&mData);
+}
+
+void State::ArriveFromPreviousState(StateData * data)
+{
+	mData = *data;
 }

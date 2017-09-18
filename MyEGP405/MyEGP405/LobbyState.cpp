@@ -1,5 +1,11 @@
 #include "LobbyState.h"
 
+void LobbyState::update()
+{
+	updateInput();
+	updateData();
+}
+
 // Render information to screen
 void LobbyState::render()
 {
@@ -7,6 +13,10 @@ void LobbyState::render()
 
 // Update data based on input and anything else
 void LobbyState::updateData()
+{
+}
+
+void LobbyState::updateNetworking()
 {
 }
 

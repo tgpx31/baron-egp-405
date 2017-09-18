@@ -6,10 +6,12 @@
 class LobbyState : public State
 {
 public:
+	void update();
 	void render();
 
 private:
 	void updateData();
+	void updateNetworking();
 	void processBuffer();
 };
 

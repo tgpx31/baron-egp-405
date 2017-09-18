@@ -1,6 +1,6 @@
 // Brian Baron		0974390
-// Colin Brady		???????
-// Justin Mulkin	???????
+// Colin Brady		0979605
+// Justin Mulkin	0952465
 //
 // EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
 //
@@ -17,18 +17,30 @@
 #include <stdio.h>
 #include "State.h"
 #include "Timer.h"
-
+#include "LobbyState.h"
+#include "ClientState.h"
+#include "ServerState.h"
 
 
 int main()
 {
-	State ApplicationState[1];	// Starts in the Lobby State by default
+	State *CurrentState;	// Starts in the Lobby State by default
+	LobbyState lobby[1];
+	ClientState client[1];
+	ServerState server[1];
+
+	lobby->init(nullptr, client, server, &CurrentState);
+	client->init(lobby, nullptr, nullptr, &CurrentState);
+	server->init(lobby, nullptr, nullptr, &CurrentState);
+
+	CurrentState = lobby;
+
 	Timer timer;
 	char str[512];
 
 	const float framerate = 1.0f / 30.0f;
 
-	ApplicationState->mData.running = 1;
+	//ApplicationState->mData.running = 1;
 	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 	unsigned int maxClients;
 
@@ -38,7 +50,7 @@ int main()
 	// ... or exit
 	printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
 
-	while (ApplicationState->mData.running && ApplicationState->mData.state == LOBBY_STATE)
+	while (1)
 	{
 		fgets(str, 512, stdin);
 
@@ -78,7 +90,7 @@ int main()
 		{
 			// Server
 			printf("Server selected\n");
-			ApplicationState->mData.state = SERVER_STATE;
+			//ApplicationState->mData.state = SERVER_STATE;
 
 			// Ask for port and max clients
 

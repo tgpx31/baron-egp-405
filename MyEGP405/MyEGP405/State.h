@@ -15,8 +15,6 @@ struct StateData
 {
 	int running; //Whether or not the application is running
 
-	ServerStates state; //Application's current state
-
 	char connectionAddress[512]; // IP of connection to connect to
 	unsigned int port; //Port the server will be connecting to
 	char username[31]; //Username of the user
@@ -26,20 +24,27 @@ struct StateData
 	unsigned int bufferIndex; //Index to end of buffer
 };
 
-class State
+class State abstract
 {
 	public: 
-		StateData mData;
-
 		State();
 
-		void update();
-		void render();
+		virtual void update() = 0;
+		virtual void render() = 0;
+		void init(State* prev, State* nextL, State* nextR, State** currentState);
 
 	protected:
+		StateData mData;
+		State *mPrev, *mNextL, *mNextR;
+		State **mCurrentState;
+
 		void updateInput();
-		void updateData();
-		void processBuffer();
+		virtual void updateData() = 0;
+		virtual void updateNetworking() = 0;
+		virtual void processBuffer() = 0;
+
+		void GoToNextState(State* nextState);
+		void ArriveFromPreviousState(StateData *data);
 };
 
 #endif
