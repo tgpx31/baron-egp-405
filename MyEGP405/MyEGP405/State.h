@@ -1,6 +1,8 @@
 #ifndef STATE_H
 #define STATE_H
 
+#include "RakNet\RakPeerInterface.h"
+
 enum ServerStates
 {
 	LOBBY_STATE,
@@ -15,6 +17,7 @@ struct StateData
 
 	ServerStates state; //Application's current state
 
+	char connectionAddress[512]; // IP of connection to connect to
 	unsigned int port; //Port the server will be connecting to
 	char username[31]; //Username of the user
 

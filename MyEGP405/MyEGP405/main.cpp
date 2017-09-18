@@ -1,6 +1,6 @@
-// Brian Baron	0974390
-// Colin Brady
-// Justin Mulkin
+// Brian Baron		0974390
+// Colin Brady		???????
+// Justin Mulkin	???????
 //
 // EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
 //
@@ -18,6 +18,8 @@
 #include "State.h"
 #include "Timer.h"
 
+
+
 int main()
 {
 	State ApplicationState[1];	// Starts in the Lobby State by default
@@ -27,6 +29,8 @@ int main()
 	const float framerate = 1.0f / 30.0f;
 
 	ApplicationState->mData.running = 1;
+	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
+	unsigned int maxClients;
 
 	// Lobby State
 	// Start server
@@ -45,16 +49,61 @@ int main()
 		else if (str[0] == 'C' || str[0] == 'c')
 		{
 			// Client
+			RakNet::SocketDescriptor sd;
+			peer->Startup(1, &sd, 1);
+
 			printf("Client selected\n");
 			ApplicationState->mData.state = CLIENT_STATE;
+
+			// Ask for IP and Port
+			printf("Enter server IP or hit enter for 127.0.0.1\n");
+			fgets(ApplicationState->mData.connectionAddress, 512, stdin);
+
+			if (str[0] == '\n')
+				strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
+
+			// Prompt for the port
+			printf("\nInput Port Number: ");
+			fgets(str, 512, stdin);
+
+			// Grab the port number from the input
+			sscanf(str, "%i", &ApplicationState->mData.port);
+			printf("\nPort Number: %i \n", ApplicationState->mData.port);
+
+			// attempt connection
+			printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
+			peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
 		}
 		else if (str[0] == 'S' || str[0] == 's')
 		{
 			// Server
 			printf("Server selected\n");
 			ApplicationState->mData.state = SERVER_STATE;
+
+			// Ask for port and max clients
+
+			// Prompt for the port
+			printf("\nInput Port Number: ");
+			fgets(str, 512, stdin);
+
+			// Grab the port number from the input
+			sscanf(str, "%i", &ApplicationState->mData.port);
+			printf("\nPort Number: %i \n", ApplicationState->mData.port);
+
+			// If server, initialize maxClients
+			printf("\nInput Max Clients: ");
+			fgets(str, 512, stdin);
+
+			// Grab the max clients from input
+			sscanf(str, "%i", &maxClients);
+			printf("\nMax Clients: %i \n", maxClients);
+
+			RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
+			peer->Startup(maxClients, &sd, 1);
+
+			peer->SetMaximumIncomingConnections(maxClients);
 		}
-		else
+		else // Invalid inputs
 		{
 			printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
 		}
