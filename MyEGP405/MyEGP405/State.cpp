@@ -17,33 +17,6 @@ State::State()
 	mData.doesDisplay = 0;
 }
 
-// Update input and data
-void State::update()
-{
-	// update input
-	// update networking
-	// update state data
-	// display
-	if (mData.doesUpdateInput)
-		updateInput();
-
-	if (mData.doesUpdateNetworking)
-		updateNetworking();
-	
-	if (mData.doesUpdateState)
-		updateData();
-
-	if (mData.doesDisplay)
-		render();
-}
-
-// Render information to the screen
-void State::render()
-{
-	system("CLS");
-	std::cout << mData.promptBuffer << mData.buffer;
-}
-
 void State::init(State * prev, State * nextL, State * nextR)
 {
 	mPrev = prev;
@@ -53,7 +26,6 @@ void State::init(State * prev, State * nextL, State * nextR)
 
 	mData.running = 1;
 }
-
 State * State::operator=(State * other)
 {
 	// Point to the other state
@@ -79,7 +51,6 @@ void State::updateInput()
 		mData.keyboard[i] = GetAsyncKeyState(i);
 	}
 }
-
 // Update data based on input and anything else
 void State::updateData()
 {
@@ -117,24 +88,50 @@ void State::updateData()
 	if (mData.keyboard[VK_RETURN])
 	{
 		processBuffer();
-		render();
 	}
 }
-
 // Process data currently in the input buffer, in the base state it just clears the buffer
 void State::processBuffer()
 {
-	/*mData.buffer[0] = '\0';
-	mData.bufferIndex = 0;*/
+	mData.buffer[0] = '\0';
+	mData.bufferIndex = 0;
 }
+
+// Update input and data
+void State::update()
+{
+	// update input
+	// update networking
+	// update state data
+	// display
+	if (mData.doesUpdateInput)
+		updateInput();
+
+	if (mData.doesUpdateNetworking)
+		updateNetworking();
+	
+	if (mData.doesUpdateState)
+		updateData();
+
+	if (mData.doesDisplay)
+		render();
+}
+// Render information to the screen
+void State::render()
+{
+	system("CLS");
+	std::cout << mData.promptBuffer << mData.buffer;
+}
+
+
 
 void State::GoToNextState(State* nextState)
 {
-	*mCurrentState = nextState;
+	mCurrentState = &nextState;
 	nextState->ArriveFromPreviousState(&mData);
 }
-
 void State::ArriveFromPreviousState(StateData * data)
 {
+	printf("YOU MADE IT");
 	mData = *data;
 }

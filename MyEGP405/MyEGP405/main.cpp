@@ -49,7 +49,7 @@ int main()
 	// Start server
 	// Or client?
 	// ... or exit
-	while (!CurrentState->isRunning())
+	while (CurrentState->isRunning())
 	{
 		CurrentState->update();
 	}

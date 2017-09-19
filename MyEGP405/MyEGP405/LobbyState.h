@@ -11,9 +11,10 @@ public:
 
 private:
 	void updateNetworking();
-	void processBuffer();
 
 	virtual void ArriveFromPreviousState(StateData *data) override;
+
+	virtual void processBuffer() override;
 };
 
 #endif
