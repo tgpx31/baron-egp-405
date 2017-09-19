@@ -1,20 +1,20 @@
 #include "LobbyState.h"
 #include <stdio.h>
 
-void LobbyState::update()
+void LobbyState::init(State * prev, State * nextL, State * nextR)
 {
-	updateInput();
-	updateData();
-}
+	State::init(prev, nextL, nextR);
 
-// Render information to screen
-void LobbyState::render()
-{
-}
+	mData.running = 0;
+	mData.port = 0;
+	mData.bufferIndex = 0;
+	mData.buffer[0] = '\0';
+	strcpy(mData.promptBuffer, "Welcome to the Lobby.\n(C)lient, (S)erver, or (E)xit?\n");
 
-// Update data based on input and anything else
-void LobbyState::updateData()
-{
+	mData.doesUpdateInput = 1;
+	mData.doesUpdateNetworking = 0;
+	mData.doesUpdateState = 1;
+	mData.doesDisplay = 0;
 }
 
 void LobbyState::updateNetworking()
@@ -28,5 +28,5 @@ void LobbyState::processBuffer()
 
 void LobbyState::ArriveFromPreviousState(StateData * data)
 {
-	printf("Welcome to the Lobby.\n(C)lient, (S)erver, or (E)xit?\n");
+	render();
 }

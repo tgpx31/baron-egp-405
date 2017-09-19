@@ -24,24 +24,24 @@
 
 int main()
 {
-	State *CurrentState;	// Starts in the Lobby State by default
+	
 	LobbyState lobby[1];
 	ClientState client[1];
 	ServerState server[1];
 
-	lobby->init(nullptr, client, server, &CurrentState);
-	client->init(lobby, nullptr, nullptr, &CurrentState);
-	server->init(lobby, nullptr, nullptr, &CurrentState);
+	lobby->init(nullptr, client, server);
+	client->init(lobby, nullptr, nullptr);
+	server->init(lobby, nullptr, nullptr);
 
+	State *CurrentState = lobby;	// Starts in the Lobby State by default
 	CurrentState->operator=(lobby);
-	
+
 
 	Timer timer;
 	char str[512];
 
 	const float framerate = 1.0f / 30.0f;
 
-	//ApplicationState->mData.running = 1;
 	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 	unsigned int maxClients;
 
@@ -49,103 +49,101 @@ int main()
 	// Start server
 	// Or client?
 	// ... or exit
-	//while (CurrentState->isRunning())
-	//{
-	//	CurrentState->update();
-	//	CurrentState->render();
-	//}
+	while (!CurrentState->isRunning())
+	{
+		CurrentState->update();
+	}
 
+	{
+		//printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
 
+		//while (1)
+		//{
+		//	fgets(str, 512, stdin);
 
+		//	if (str[0] == 'E' || str[0] == 'e')
+		//	{
+		//		ApplicationState->mData.running = 0;
+		//	}
+		//	else if (str[0] == 'C' || str[0] == 'c')
+		//	{
+		//		// Client
+		//		RakNet::SocketDescriptor sd;
+		//		peer->Startup(1, &sd, 1);
 
-	//printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
+		//		printf("Client selected\n");
+		//		ApplicationState->mData.state = CLIENT_STATE;
 
-	//while (1)
-	//{
-	//	fgets(str, 512, stdin);
+		//		// Ask for IP and Port
+		//		printf("Enter server IP or hit enter for 127.0.0.1\n");
+		//		fgets(ApplicationState->mData.connectionAddress, 512, stdin);
 
-	//	if (str[0] == 'E' || str[0] == 'e')
-	//	{
-	//		ApplicationState->mData.running = 0;
-	//	}
-	//	else if (str[0] == 'C' || str[0] == 'c')
-	//	{
-	//		// Client
-	//		RakNet::SocketDescriptor sd;
-	//		peer->Startup(1, &sd, 1);
+		//		if (str[0] == '\n')
+		//			strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
 
-	//		printf("Client selected\n");
-	//		ApplicationState->mData.state = CLIENT_STATE;
+		//		// Prompt for the port
+		//		printf("\nInput Port Number: ");
+		//		fgets(str, 512, stdin);
 
-	//		// Ask for IP and Port
-	//		printf("Enter server IP or hit enter for 127.0.0.1\n");
-	//		fgets(ApplicationState->mData.connectionAddress, 512, stdin);
+		//		// Grab the port number from the input
+		//		sscanf(str, "%i", &ApplicationState->mData.port);
+		//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
 
-	//		if (str[0] == '\n')
-	//			strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
+		//		// attempt connection
+		//		printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
+		//		peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
+		//	}
+		//	else if (str[0] == 'S' || str[0] == 's')
+		//	{
+		//		// Server
+		//		printf("Server selected\n");
+		//		//ApplicationState->mData.state = SERVER_STATE;
 
-	//		// Prompt for the port
-	//		printf("\nInput Port Number: ");
-	//		fgets(str, 512, stdin);
+		//		// Ask for port and max clients
 
-	//		// Grab the port number from the input
-	//		sscanf(str, "%i", &ApplicationState->mData.port);
-	//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
+		//		// Prompt for the port
+		//		printf("\nInput Port Number: ");
+		//		fgets(str, 512, stdin);
 
-	//		// attempt connection
-	//		printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
-	//		peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
-	//	}
-	//	else if (str[0] == 'S' || str[0] == 's')
-	//	{
-	//		// Server
-	//		printf("Server selected\n");
-	//		//ApplicationState->mData.state = SERVER_STATE;
+		//		// Grab the port number from the input
+		//		sscanf(str, "%i", &ApplicationState->mData.port);
+		//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
 
-	//		// Ask for port and max clients
+		//		// If server, initialize maxClients
+		//		printf("\nInput Max Clients: ");
+		//		fgets(str, 512, stdin);
 
-	//		// Prompt for the port
-	//		printf("\nInput Port Number: ");
-	//		fgets(str, 512, stdin);
+		//		// Grab the max clients from input
+		//		sscanf(str, "%i", &maxClients);
+		//		printf("\nMax Clients: %i \n", maxClients);
 
-	//		// Grab the port number from the input
-	//		sscanf(str, "%i", &ApplicationState->mData.port);
-	//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
+		//		RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
+		//		peer->Startup(maxClients, &sd, 1);
 
-	//		// If server, initialize maxClients
-	//		printf("\nInput Max Clients: ");
-	//		fgets(str, 512, stdin);
+		//		peer->SetMaximumIncomingConnections(maxClients);
+		//	}
+		//	else // Invalid inputs
+		//	{
+		//		printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
+		//	}
 
-	//		// Grab the max clients from input
-	//		sscanf(str, "%i", &maxClients);
-	//		printf("\nMax Clients: %i \n", maxClients);
+		//	// If it changes out of lobby state, it'll go into the network loop
+		//	// Otherwise it will return to the Lobby State loop
 
-	//		RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
-	//		peer->Startup(maxClients, &sd, 1);
+		//	// Networking Loop
+		//	while (ApplicationState->mData.running && ApplicationState->mData.state != LOBBY_STATE)
+		//	{
+		//		timer.start();
 
-	//		peer->SetMaximumIncomingConnections(maxClients);
-	//	}
-	//	else // Invalid inputs
-	//	{
-	//		printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
-	//	}
+		//		ApplicationState->update();
+		//		ApplicationState->render();
 
-	//	// If it changes out of lobby state, it'll go into the network loop
-	//	// Otherwise it will return to the Lobby State loop
+		//		timer.sleepUntilElapsed(framerate * 1000);
+		//		timer.stop();
+		//	}
 
-	//	// Networking Loop
-	//	while (ApplicationState->mData.running && ApplicationState->mData.state != LOBBY_STATE)
-	//	{
-	//		timer.start();
-
-	//		ApplicationState->update();
-	//		ApplicationState->render();
-
-	//		timer.sleepUntilElapsed(framerate * 1000);
-	//		timer.stop();
-	//	}
-
-	//}
+		//}
+	}
 	system("pause");
 	return 0;
 }

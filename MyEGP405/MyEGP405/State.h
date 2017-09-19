@@ -17,18 +17,20 @@ class State abstract
 	public: 
 		State();
 
-		virtual void update() = 0;
-		virtual void render() = 0;
-		void init(State* prev, State* nextL, State* nextR, State** currentState);
+		virtual void update();
+		virtual void render();
+		virtual void init(State* prev, State* nextL, State* nextR);
 		inline int isRunning() { return mData.running; };
 
-		State* operator=(State* other);
+		State* operator=(State*other);
 
 	protected:
 		// All data that every state will have in common
 		struct StateData
 		{
 			int running; //Whether or not the application is running
+			int doesUpdateInput, doesUpdateNetworking, doesUpdateState, doesDisplay;
+
 
 			char connectionAddress[512]; // IP of connection to connect to
 			unsigned int port; //Port the server will be connecting to
@@ -36,6 +38,8 @@ class State abstract
 
 			unsigned char keyboard[256]; //Keyboard state array
 			char buffer[256]; //Buffer to store input
+			char promptBuffer[256];
+
 			unsigned int bufferIndex; //Index to end of buffer
 		} mData;
 
@@ -43,7 +47,7 @@ class State abstract
 		State **mCurrentState;
 
 		void updateInput();
-		virtual void updateData() = 0;
+		virtual void updateData();
 		virtual void updateNetworking() = 0;
 		virtual void processBuffer() = 0;
 

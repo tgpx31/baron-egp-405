@@ -5,45 +5,63 @@
 
 State::State()
 {
-	mData.running = 1;
+	mData.running = 0;
 	mData.port = 0;
 	mData.bufferIndex = 0;
 	mData.buffer[0] = '\0';
+	strcpy(mData.promptBuffer, "");
+
+	mData.doesUpdateInput = 0;
+	mData.doesUpdateNetworking = 0;
+	mData.doesUpdateState = 0;
+	mData.doesDisplay = 0;
 }
 
 // Update input and data
 void State::update()
 {
 	// update input
-	// process buffer
 	// update networking
 	// update state data
 	// display
-	updateInput();
-	processBuffer();
-	updateNetworking();
-	updateData();
+	if (mData.doesUpdateInput)
+		updateInput();
+
+	if (mData.doesUpdateNetworking)
+		updateNetworking();
+	
+	if (mData.doesUpdateState)
+		updateData();
+
+	if (mData.doesDisplay)
+		render();
 }
 
 // Render information to the screen
 void State::render()
 {
 	system("CLS");
-	std::cout << mData.buffer;
+	std::cout << mData.promptBuffer << mData.buffer;
 }
 
-void State::init(State * prev, State * nextL, State * nextR, State ** currentState)
+void State::init(State * prev, State * nextL, State * nextR)
 {
 	mPrev = prev;
 	mNextL = nextL;
 	mNextR = nextR;
-	mCurrentState = currentState;
+	mCurrentState = (State**)this;
 
 	mData.running = 1;
 }
 
 State * State::operator=(State * other)
 {
+	// Point to the other state
+	mData.running = other->mData.running;
+	mData.port = other->mData.port;
+	mData.bufferIndex = other->mData.bufferIndex;
+	strcpy(mData.buffer, other->mData.buffer);
+
 	// Run Arrival
 	other->ArriveFromPreviousState(&mData);
 	return other;
@@ -84,25 +102,30 @@ void State::updateData()
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
+			render();
 		}
 	}
 
 	if (mData.keyboard[VK_BACK])
 	{
+		if (mData.bufferIndex == 0)
+			return;
 		mData.buffer[--mData.bufferIndex] = '\0';
+		render();
 	}
 
 	if (mData.keyboard[VK_RETURN])
 	{
 		processBuffer();
+		render();
 	}
 }
 
 // Process data currently in the input buffer, in the base state it just clears the buffer
 void State::processBuffer()
 {
-	mData.buffer[0] = '\0';
-	mData.bufferIndex = 0;
+	/*mData.buffer[0] = '\0';
+	mData.bufferIndex = 0;*/
 }
 
 void State::GoToNextState(State* nextState)
