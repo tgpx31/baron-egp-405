@@ -6,15 +6,11 @@
 class LobbyState : public State
 {
 public:
-
 	virtual void init(State* prev, State* nextL, State* nextR) override;
-
 private:
-	void updateNetworking();
-
 	virtual void ArriveFromPreviousState(StateData *data) override;
-
 	virtual void processBuffer() override;
+	virtual void updateNetworking() {};
 };
 
 #endif

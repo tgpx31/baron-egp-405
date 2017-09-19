@@ -17,10 +17,6 @@ void LobbyState::init(State * prev, State * nextL, State * nextR)
 	mData.doesDisplay = 0;
 }
 
-void LobbyState::updateNetworking()
-{
-}
-
 // Process data currently in the input buffer
 void LobbyState::processBuffer()
 {
