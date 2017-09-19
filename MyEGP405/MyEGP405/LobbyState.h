@@ -13,6 +13,9 @@ private:
 	void updateData();
 	void updateNetworking();
 	void processBuffer();
+
+	void GoToNextState(State* nextState);
+	virtual void ArriveFromPreviousState(StateData *data) override;
 };
 
 #endif

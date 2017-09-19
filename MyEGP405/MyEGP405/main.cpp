@@ -33,7 +33,8 @@ int main()
 	client->init(lobby, nullptr, nullptr, &CurrentState);
 	server->init(lobby, nullptr, nullptr, &CurrentState);
 
-	CurrentState = lobby;
+	CurrentState->operator=(lobby);
+	
 
 	Timer timer;
 	char str[512];
@@ -48,94 +49,103 @@ int main()
 	// Start server
 	// Or client?
 	// ... or exit
-	printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
+	//while (CurrentState->isRunning())
+	//{
+	//	CurrentState->update();
+	//	CurrentState->render();
+	//}
 
-	while (1)
-	{
-		fgets(str, 512, stdin);
 
-		if (str[0] == 'E' || str[0] == 'e')
-		{
-			ApplicationState->mData.running = 0;
-		}
-		else if (str[0] == 'C' || str[0] == 'c')
-		{
-			// Client
-			RakNet::SocketDescriptor sd;
-			peer->Startup(1, &sd, 1);
 
-			printf("Client selected\n");
-			ApplicationState->mData.state = CLIENT_STATE;
 
-			// Ask for IP and Port
-			printf("Enter server IP or hit enter for 127.0.0.1\n");
-			fgets(ApplicationState->mData.connectionAddress, 512, stdin);
+	//printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
 
-			if (str[0] == '\n')
-				strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
+	//while (1)
+	//{
+	//	fgets(str, 512, stdin);
 
-			// Prompt for the port
-			printf("\nInput Port Number: ");
-			fgets(str, 512, stdin);
+	//	if (str[0] == 'E' || str[0] == 'e')
+	//	{
+	//		ApplicationState->mData.running = 0;
+	//	}
+	//	else if (str[0] == 'C' || str[0] == 'c')
+	//	{
+	//		// Client
+	//		RakNet::SocketDescriptor sd;
+	//		peer->Startup(1, &sd, 1);
 
-			// Grab the port number from the input
-			sscanf(str, "%i", &ApplicationState->mData.port);
-			printf("\nPort Number: %i \n", ApplicationState->mData.port);
+	//		printf("Client selected\n");
+	//		ApplicationState->mData.state = CLIENT_STATE;
 
-			// attempt connection
-			printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
-			peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
-		}
-		else if (str[0] == 'S' || str[0] == 's')
-		{
-			// Server
-			printf("Server selected\n");
-			//ApplicationState->mData.state = SERVER_STATE;
+	//		// Ask for IP and Port
+	//		printf("Enter server IP or hit enter for 127.0.0.1\n");
+	//		fgets(ApplicationState->mData.connectionAddress, 512, stdin);
 
-			// Ask for port and max clients
+	//		if (str[0] == '\n')
+	//			strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
 
-			// Prompt for the port
-			printf("\nInput Port Number: ");
-			fgets(str, 512, stdin);
+	//		// Prompt for the port
+	//		printf("\nInput Port Number: ");
+	//		fgets(str, 512, stdin);
 
-			// Grab the port number from the input
-			sscanf(str, "%i", &ApplicationState->mData.port);
-			printf("\nPort Number: %i \n", ApplicationState->mData.port);
+	//		// Grab the port number from the input
+	//		sscanf(str, "%i", &ApplicationState->mData.port);
+	//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
 
-			// If server, initialize maxClients
-			printf("\nInput Max Clients: ");
-			fgets(str, 512, stdin);
+	//		// attempt connection
+	//		printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
+	//		peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
+	//	}
+	//	else if (str[0] == 'S' || str[0] == 's')
+	//	{
+	//		// Server
+	//		printf("Server selected\n");
+	//		//ApplicationState->mData.state = SERVER_STATE;
 
-			// Grab the max clients from input
-			sscanf(str, "%i", &maxClients);
-			printf("\nMax Clients: %i \n", maxClients);
+	//		// Ask for port and max clients
 
-			RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
-			peer->Startup(maxClients, &sd, 1);
+	//		// Prompt for the port
+	//		printf("\nInput Port Number: ");
+	//		fgets(str, 512, stdin);
 
-			peer->SetMaximumIncomingConnections(maxClients);
-		}
-		else // Invalid inputs
-		{
-			printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
-		}
+	//		// Grab the port number from the input
+	//		sscanf(str, "%i", &ApplicationState->mData.port);
+	//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
 
-		// If it changes out of lobby state, it'll go into the network loop
-		// Otherwise it will return to the Lobby State loop
+	//		// If server, initialize maxClients
+	//		printf("\nInput Max Clients: ");
+	//		fgets(str, 512, stdin);
 
-		// Networking Loop
-		while (ApplicationState->mData.running && ApplicationState->mData.state != LOBBY_STATE)
-		{
-			timer.start();
+	//		// Grab the max clients from input
+	//		sscanf(str, "%i", &maxClients);
+	//		printf("\nMax Clients: %i \n", maxClients);
 
-			ApplicationState->update();
-			ApplicationState->render();
+	//		RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
+	//		peer->Startup(maxClients, &sd, 1);
 
-			timer.sleepUntilElapsed(framerate * 1000);
-			timer.stop();
-		}
+	//		peer->SetMaximumIncomingConnections(maxClients);
+	//	}
+	//	else // Invalid inputs
+	//	{
+	//		printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
+	//	}
 
-	}
+	//	// If it changes out of lobby state, it'll go into the network loop
+	//	// Otherwise it will return to the Lobby State loop
 
+	//	// Networking Loop
+	//	while (ApplicationState->mData.running && ApplicationState->mData.state != LOBBY_STATE)
+	//	{
+	//		timer.start();
+
+	//		ApplicationState->update();
+	//		ApplicationState->render();
+
+	//		timer.sleepUntilElapsed(framerate * 1000);
+	//		timer.stop();
+	//	}
+
+	//}
+	system("pause");
 	return 0;
 }

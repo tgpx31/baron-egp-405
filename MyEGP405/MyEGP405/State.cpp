@@ -5,8 +5,7 @@
 
 State::State()
 {
-	mData.running = 0;
-	mData.state = LOBBY_STATE;
+	mData.running = 1;
 	mData.port = 0;
 	mData.bufferIndex = 0;
 	mData.buffer[0] = '\0';
@@ -15,7 +14,14 @@ State::State()
 // Update input and data
 void State::update()
 {
+	// update input
+	// process buffer
+	// update networking
+	// update state data
+	// display
 	updateInput();
+	processBuffer();
+	updateNetworking();
 	updateData();
 }
 
@@ -32,7 +38,17 @@ void State::init(State * prev, State * nextL, State * nextR, State ** currentSta
 	mNextL = nextL;
 	mNextR = nextR;
 	mCurrentState = currentState;
+
+	mData.running = 1;
 }
+
+State * State::operator=(State * other)
+{
+	// Run Arrival
+	other->ArriveFromPreviousState(&mData);
+	return other;
+}
+
 
 // Update current input state
 void State::updateInput()

@@ -13,6 +13,8 @@ private:
 	void updateData();
 	void updateNetworking();
 	void processBuffer();
+
+	RakNet::RakPeerInterface *peer;
 };
 
 #endif
