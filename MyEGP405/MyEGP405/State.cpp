@@ -16,7 +16,7 @@ State::State()
 	mData.doesUpdateState = 0;
 	mData.doesDisplay = 0;
 
-	strcpy(mData.connectionAddress, "");
+	strcpy(mData.connectionAddress, "default");
 }
 
 void State::init(State * prev, State * nextL, State * nextR, State **currentState)

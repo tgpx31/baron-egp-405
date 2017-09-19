@@ -52,7 +52,8 @@ void ClientState::updateData()
 void ClientState::processBuffer()
 {
 	//If the connection address is still the default
-	if (mData.connectionAddress == "")
+	if (strcmp(mData.connectionAddress, "default\n") && ipSet == 0)
+	//if (mData.connectionAddress == "default")
 	{
 		//If this is an endline character, pick default IP
 		if (mData.buffer[0] == '\n')
@@ -62,11 +63,21 @@ void ClientState::processBuffer()
 
 		//Set the prompt to ask for the port number
 		strcpy(mData.promptBuffer, "Please enter server port number: \n");
+
+		// Clear the buffer
+		memset(mData.buffer, 0, sizeof(char) * 256);
+		mData.buffer[0] = '\0';
+		mData.bufferIndex = 0;
+
+		render();
+
+		ipSet = 1;
 	}
 	//Else if the port number is still the default value
-	else if(mData.port == 0)
+	else if(mData.port == 0 && ipSet == 1)
 	{
 		sscanf(mData.buffer, "%i", &mData.port);
+		printf("\nIP Address: %s \n", mData.connectionAddress);
 		printf("\nPort Number: %i \n", mData.port);
 	}
 
@@ -100,4 +111,6 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	mData.doesUpdateNetworking = 0;
 	mData.doesUpdateState = 1;
 	mData.doesDisplay = 0;
+
+	ipSet = 0;
 }
