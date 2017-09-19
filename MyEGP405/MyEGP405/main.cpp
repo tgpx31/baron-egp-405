@@ -28,13 +28,14 @@ int main()
 	LobbyState lobby[1];
 	ClientState client[1];
 	ServerState server[1];
+	
+	State *CurrentState;	// Starts in the Lobby State by default
 
-	lobby->init(nullptr, client, server);
-	client->init(lobby, nullptr, nullptr);
-	server->init(lobby, nullptr, nullptr);
+	lobby->init(nullptr, client, server, &CurrentState);
+	client->init(lobby, nullptr, nullptr, &CurrentState);
+	server->init(lobby, nullptr, nullptr, &CurrentState);
 
-	State *CurrentState = lobby;	// Starts in the Lobby State by default
-	CurrentState->operator=(lobby);
+	CurrentState = lobby;
 
 
 	Timer timer;

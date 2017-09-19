@@ -19,12 +19,12 @@ State::State()
 	strcpy(mData.connectionAddress, "");
 }
 
-void State::init(State * prev, State * nextL, State * nextR)
+void State::init(State * prev, State * nextL, State * nextR, State **currentState)
 {
 	mPrev = prev;
 	mNextL = nextL;
 	mNextR = nextR;
-	mCurrentState = (State**)this;
+	mCurrentState = currentState;
 
 	mData.running = 1;
 }
@@ -65,6 +65,7 @@ void State::updateData()
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
 		}
 	}
 
@@ -75,7 +76,7 @@ void State::updateData()
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
-			render();
+			mData.doesDisplay = 1;
 		}
 	}
 
@@ -84,12 +85,15 @@ void State::updateData()
 		if (mData.bufferIndex == 0)
 			return;
 		mData.buffer[--mData.bufferIndex] = '\0';
-		render();
+		mData.doesDisplay = 1;
 	}
 
 	if (mData.keyboard[VK_RETURN])
 	{
 		processBuffer();
+		memset(mData.buffer, 0, sizeof(char) * 256);
+		mData.buffer[0] = '\0';
+		mData.bufferIndex = 0;
 	}
 }
 // Process data currently in the input buffer, in the base state it just clears the buffer
@@ -123,13 +127,14 @@ void State::render()
 {
 	system("CLS");
 	std::cout << mData.promptBuffer << mData.buffer;
+	mData.doesDisplay = 0;
 }
 
 
 
 void State::GoToNextState(State* nextState)
 {
-	mCurrentState = &nextState;
+	*mCurrentState = nextState;
 	nextState->ArriveFromPreviousState(&mData);
 }
 void State::ArriveFromPreviousState(StateData * data)

@@ -1,8 +1,8 @@
 #include "LobbyState.h"
 
-void LobbyState::init(State * prev, State * nextL, State * nextR)
+void LobbyState::init(State * prev, State * nextL, State * nextR, State** currentState)
 {
-	State::init(prev, nextL, nextR);
+	State::init(prev, nextL, nextR, currentState);
 
 	mData.running = 1;
 	mData.port = 0;
@@ -13,7 +13,7 @@ void LobbyState::init(State * prev, State * nextL, State * nextR)
 	mData.doesUpdateInput = 1;
 	mData.doesUpdateNetworking = 0;
 	mData.doesUpdateState = 1;
-	mData.doesDisplay = 0;
+	mData.doesDisplay = 1;
 }
 
 // Process data currently in the input buffer

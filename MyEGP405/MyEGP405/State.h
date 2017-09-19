@@ -20,7 +20,7 @@ class State abstract
 
 		virtual void update();
 		virtual void render();
-		virtual void init(State* prev, State* nextL, State* nextR);
+		virtual void init(State* prev, State* nextL, State* nextR, State** currentState);
 		inline int isRunning() { return mData.running; };
 
 		State* operator=(State*other);

@@ -6,15 +6,13 @@
 class ClientState : public State
 {
 public:
-	void update();
-	void render();
-
-	void init(State* prev, State* nextL, State* nextR) override;
+	void init(State* prev, State* nextL, State* nextR, State** currentState) override;
 
 protected:
-	void updateData();
 	void updateNetworking();
+	void updateData() override;
 	void processBuffer() override;
+	void render() override;
 
 	void ArriveFromPreviousState(StateData *data) override;
 
