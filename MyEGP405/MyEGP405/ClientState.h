@@ -9,10 +9,14 @@ public:
 	void update();
 	void render();
 
-private:
+	void init(State* prev, State* nextL, State* nextR) override;
+
+protected:
 	void updateData();
 	void updateNetworking();
-	void processBuffer();
+	void processBuffer() override;
+
+	void ArriveFromPreviousState(StateData *data) override;
 
 	RakNet::RakPeerInterface *peer;
 };

@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "RakNet\RakPeerInterface.h"
+#include <stdio.h>
 
 enum ServerStates
 {

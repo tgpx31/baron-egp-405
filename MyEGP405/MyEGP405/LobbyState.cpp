@@ -1,5 +1,4 @@
 #include "LobbyState.h"
-#include <stdio.h>
 
 void LobbyState::init(State * prev, State * nextL, State * nextR)
 {

@@ -15,6 +15,8 @@ State::State()
 	mData.doesUpdateNetworking = 0;
 	mData.doesUpdateState = 0;
 	mData.doesDisplay = 0;
+
+	strcpy(mData.connectionAddress, "");
 }
 
 void State::init(State * prev, State * nextL, State * nextR)
