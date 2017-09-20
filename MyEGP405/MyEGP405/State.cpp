@@ -111,9 +111,7 @@ void State::updateData()
 	if (mData.keyboard[VK_RETURN])
 	{
 		processBuffer();
-		memset(mData.buffer, 0, sizeof(char) * 256);
-		mData.buffer[0] = '\0';
-		mData.bufferIndex = 0;
+		clearBuffer();
 	}
 }
 // Process data currently in the input buffer, in the base state it just clears the buffer
@@ -161,4 +159,12 @@ void State::ArriveFromPreviousState(StateData * data)
 {
 	printf("YOU MADE IT");
 	mData = *data;
+}
+
+void State::clearBuffer()
+{
+	// Clear the buffer
+	memset(mData.buffer, 0, sizeof(char) * 256);
+	mData.buffer[0] = '\0';
+	mData.bufferIndex = 0;
 }

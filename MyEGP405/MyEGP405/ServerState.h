@@ -11,6 +11,9 @@ private:
 	void updateNetworking();
 	void processBuffer() override;
 	void ArriveFromPreviousState(StateData *data) override;
+
+	int maxClients;
+	int isServer;
 };
 
 #endif

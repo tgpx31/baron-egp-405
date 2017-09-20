@@ -54,6 +54,8 @@ class State abstract
 
 		void GoToNextState(State* nextState);
 		virtual void ArriveFromPreviousState(StateData *data);
+
+		void clearBuffer();
 };
 
 #endif

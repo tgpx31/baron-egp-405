@@ -45,9 +45,7 @@ void LobbyState::processBuffer()
 
 	}
 	// Clear the buffer
-	memset(mData.buffer, 0, sizeof(char) * 256);
-	mData.buffer[0] = '\0';
-	mData.bufferIndex = 0;
+	clearBuffer();
 }
 
 void LobbyState::ArriveFromPreviousState(StateData * data)

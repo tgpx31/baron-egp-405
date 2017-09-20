@@ -20,9 +20,7 @@ void ClientState::processBuffer()
 {
 	//If the connection address is still the default
 	if (strcmp(mData.connectionAddress, "default\n") && ipSet == 0)
-	//if (mData.connectionAddress == "default")
 	{
-		//If this is an endline character, pick default IP
 		if (mData.buffer[0] == '\0')
 			strcpy(mData.connectionAddress, "127.0.0.1");
 		else //Else copy the inputted IP to the connection Address
@@ -32,10 +30,7 @@ void ClientState::processBuffer()
 		strcpy(mData.promptBuffer, "Please enter server port number: \n");
 
 		// Clear the buffer
-		memset(mData.buffer, 0, sizeof(char) * 256);
-		mData.buffer[0] = '\0';
-		mData.bufferIndex = 0;
-
+		clearBuffer();
 		render();
 
 		ipSet = 1;
@@ -49,9 +44,7 @@ void ClientState::processBuffer()
 	}
 
 	// Clear the buffer
-	memset(mData.buffer, 0, sizeof(char) * 256);
-	mData.buffer[0] = '\0';
-	mData.bufferIndex = 0;
+	clearBuffer();
 }
 
 void ClientState::ArriveFromPreviousState(StateData *data)
