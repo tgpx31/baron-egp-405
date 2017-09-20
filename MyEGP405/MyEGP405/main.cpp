@@ -56,45 +56,6 @@ int main()
 	}
 
 	{
-		//printf("Welcome to the Lobby!\n(C)lient, (S)erver, (E)xit?\n");
-
-		//while (1)
-		//{
-		//	fgets(str, 512, stdin);
-
-		//	if (str[0] == 'E' || str[0] == 'e')
-		//	{
-		//		ApplicationState->mData.running = 0;
-		//	}
-		//	else if (str[0] == 'C' || str[0] == 'c')
-		//	{
-		//		// Client
-		//		RakNet::SocketDescriptor sd;
-		//		peer->Startup(1, &sd, 1);
-
-		//		printf("Client selected\n");
-		//		ApplicationState->mData.state = CLIENT_STATE;
-
-		//		// Ask for IP and Port
-		//		printf("Enter server IP or hit enter for 127.0.0.1\n");
-		//		fgets(ApplicationState->mData.connectionAddress, 512, stdin);
-
-		//		if (str[0] == '\n')
-		//			strcpy(ApplicationState->mData.connectionAddress, "127.0.0.1");
-
-		//		// Prompt for the port
-		//		printf("\nInput Port Number: ");
-		//		fgets(str, 512, stdin);
-
-		//		// Grab the port number from the input
-		//		sscanf(str, "%i", &ApplicationState->mData.port);
-		//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
-
-		//		// attempt connection
-		//		printf("Starting the client, connecting to %s.\n", ApplicationState->mData.connectionAddress);
-		//		peer->Connect(ApplicationState->mData.connectionAddress, ApplicationState->mData.port, 0, 0);
-		//	}
-		//	else if (str[0] == 'S' || str[0] == 's')
 		//	{
 		//		// Server
 		//		printf("Server selected\n");

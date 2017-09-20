@@ -10,9 +10,7 @@ public:
 
 protected:
 	void updateNetworking();
-	void updateData() override;
 	void processBuffer() override;
-	void render() override;
 
 	void ArriveFromPreviousState(StateData *data) override;
 
@@ -20,6 +18,7 @@ protected:
 
 	//Flags
 	int ipSet;
+	int requestConnection;
 };
 
 #endif

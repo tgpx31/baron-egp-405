@@ -4,52 +4,10 @@
 void ClientState::updateNetworking()
 {
 	//Attempt to connect if IP and the port number are set
-	if (ipSet == 1 && mData.port != 0)
+	if (ipSet == 1 && mData.port != 0 && !requestConnection)
 	{
 		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
-	}
-}
-
-void ClientState::updateData()
-{
-	int i;
-
-	// Number keys
-	for (i = 0x30; i < 0x3A; ++i)
-	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
-		{
-			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
-			mData.buffer[++mData.bufferIndex] = '\0';
-			render();
-		}
-	}
-
-	// Alphabet
-	for (i = 0x41; i < 0x5B; ++i)
-	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
-		{
-			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
-			mData.buffer[++mData.bufferIndex] = '\0';
-			render();
-		}
-	}
-
-	if (mData.keyboard[VK_BACK])
-	{
-		if (mData.bufferIndex == 0)
-			return;
-		mData.buffer[--mData.bufferIndex] = '\0';
-		render();
-	}
-
-	if (mData.keyboard[VK_RETURN])
-	{
-		processBuffer();
-		memset(mData.buffer, 0, sizeof(char) * 256);
-		mData.buffer[0] = '\0';
-		mData.bufferIndex = 0;
+		requestConnection = 1;
 	}
 }
 
@@ -92,12 +50,6 @@ void ClientState::processBuffer()
 	mData.bufferIndex = 0;
 }
 
-void ClientState::render()
-{
-	system("CLS");
-	printf("%s%s", mData.promptBuffer, mData.buffer);
-}
-
 void ClientState::ArriveFromPreviousState(StateData *data)
 {
 	//mData = *data;
@@ -118,4 +70,5 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	mData.doesDisplay = 0;
 
 	ipSet = 0;
+	requestConnection = 0;
 }

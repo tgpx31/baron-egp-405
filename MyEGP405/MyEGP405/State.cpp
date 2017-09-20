@@ -69,6 +69,26 @@ void State::updateData()
 		}
 	}
 
+	// Numpad
+	for (i = 0x60; i < 0x69; ++i)
+	{
+		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		{
+			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
+		}
+	}
+
+	// Decimal key/period
+	i = 0x6E;
+	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < 256)
+	{
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+		mData.buffer[++mData.bufferIndex] = '\0';
+		mData.doesDisplay = 1;
+	}
+
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
 	{

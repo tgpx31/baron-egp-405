@@ -1,15 +1,5 @@
 #include "ServerState.h"
 
-// Render information to the screen
-void ServerState::render()
-{
-}
-
-// Update data based on input and anything else
-void ServerState::updateData()
-{
-}
-
 // Receive and process incoming information from the network
 void ServerState::updateNetworking()
 {
@@ -18,4 +8,10 @@ void ServerState::updateNetworking()
 // Process data currently in the input buffer
 void ServerState::processBuffer()
 {
+}
+
+void ServerState::ArriveFromPreviousState(StateData * data)
+{
+	strcpy(mData.promptBuffer, "Please the port for your server: \n");
+	render();
 }

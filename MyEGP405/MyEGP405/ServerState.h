@@ -6,12 +6,11 @@
 class ServerState : public ClientState
 {
 public:
-	void render();
 
 private:
-	void updateData();
 	void updateNetworking();
 	void processBuffer();
+	void ArriveFromPreviousState(StateData *data) override;
 };
 
 #endif
