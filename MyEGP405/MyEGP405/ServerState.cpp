@@ -81,6 +81,8 @@ void ServerState::updateNetworking()
 		case ID_CONNECTION_LOST:
 			printf("A client lost the connection.\n");
 			--mDataBase.connectedClientCount;
+			// iterate through the map, find disconnected client and remove them
+
 			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
 
