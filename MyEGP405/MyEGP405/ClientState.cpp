@@ -105,10 +105,29 @@ void ClientState::processBuffer()
 		sscanf(mData.buffer, "%i", &mData.port);
 		printf("\nIP Address: %s \n", mData.connectionAddress);
 		printf("\nPort Number: %i \n", mData.port);
+
+		//Prompt for a user 
+		strcpy(mData.promptBuffer, "Please enter desired user name: \n");
+
+		clearBuffer();
+		render();
+	}
+	//Have the client set their user name
+	else if (mData.port != 0 && ipSet == 1)
+	{
+		if (mData.buffer[0] == '\0')
+			strcpy(username, "Guest_User");
+		else //Else copy the inputted user name into the username slot
+			strcpy(username, mData.buffer);
+		printf("\nUser Name: %s \n", username);
+
+		requestConnection = 0;
 	}
 
 	// Clear the buffer
 	clearBuffer();
+
+
 }
 
 void ClientState::ArriveFromPreviousState(StateData *data)
@@ -131,7 +150,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	mData.doesDisplay = 0;
 
 	ipSet = 0;
-	requestConnection = 0;
+	requestConnection = 1;
 	id = 0;
 
 	peer = RakNet::RakPeerInterface::GetInstance();

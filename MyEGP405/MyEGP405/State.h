@@ -33,7 +33,6 @@ class State abstract
 
 			char connectionAddress[512]; // IP of connection to connect to
 			unsigned int port; //Port the server will be connecting to
-			char username[31]; //Username of the user
 
 			unsigned char keyboard[256]; //Keyboard state array
 			char buffer[256]; //Buffer to store input
