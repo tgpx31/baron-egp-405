@@ -2,6 +2,7 @@
 #define MESSAGES_H
 
 #include "RakNet\MessageIdentifiers.h"
+#include "RakNet\RakNetTypes.h"
 
 enum GameMessages
 {

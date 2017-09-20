@@ -14,6 +14,8 @@ private:
 
 	int maxClients;
 	int isServer;
+
+	int connectedClients;
 };
 
 #endif

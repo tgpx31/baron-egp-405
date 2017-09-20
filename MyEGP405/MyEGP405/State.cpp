@@ -28,18 +28,6 @@ void State::init(State * prev, State * nextL, State * nextR, State **currentStat
 
 	mData.running = 1;
 }
-State * State::operator=(State * other)
-{
-	// Point to the other state
-	mData.running = other->mData.running;
-	mData.port = other->mData.port;
-	mData.bufferIndex = other->mData.bufferIndex;
-	strcpy(mData.buffer, other->mData.buffer);
-
-	// Run Arrival
-	other->ArriveFromPreviousState(&mData);
-	return other;
-}
 
 
 // Update current input state

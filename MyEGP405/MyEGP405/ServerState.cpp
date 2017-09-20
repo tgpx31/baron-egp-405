@@ -23,6 +23,43 @@ void ServerState::updateNetworking()
 		RakNet::SocketDescriptor sd(mData.port, 0);
 		peer->Startup(maxClients, &sd, 1);
 		peer->SetMaximumIncomingConnections(maxClients);
+		isServer = 1;
+		mData.doesUpdateInput = 0;
+	}
+	// message loop
+	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
+	{
+		switch (packet->data[0])
+		{
+			// Client connected messages
+		case ID_REMOTE_NEW_INCOMING_CONNECTION:
+			printf("Another client has connected.\n");
+			break;
+
+		case ID_NEW_INCOMING_CONNECTION:
+			printf("A connection is incoming.\n");
+			break;
+
+			// Other
+
+
+
+
+
+
+			// Client lost messages
+		case ID_CONNECTION_LOST:
+			printf("A client lost the connection.\n");
+			break;
+
+		case ID_DISCONNECTION_NOTIFICATION:
+			printf("A client has disconnected.\n");
+			break;
+
+		default:
+			printf("Message with identifier %i has arrived.\n", packet->data[0]);
+			break;
+		}
 	}
 }
 

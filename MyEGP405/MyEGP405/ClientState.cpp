@@ -7,11 +7,13 @@ void ClientState::updateNetworking()
 	if (ipSet == 1 && mData.port != 0 && !requestConnection)
 	{
 		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
+		printf("Requesting connection...\n");
 		requestConnection = 1;
 	}
 	else if (requestConnection)
 	{
 		// **** TODO
+		// Message Loop
 	}
 }
 
@@ -58,6 +60,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 {
 	State::init(prev, nextL, nextR, currentState);
 
+	strcpy(username, "Guest_User");
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
 
 	mData.doesUpdateInput = 1;

@@ -2,6 +2,8 @@
 #define CLIENT_STATE_H
 
 #include "State.h"
+#include "RakNet\BitStream.h"
+#include "Messages.h"
 
 class ClientState : public State
 {
@@ -16,6 +18,8 @@ protected:
 
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
+
+	char username[256];
 
 	//Flags
 	int ipSet;
