@@ -3,6 +3,11 @@
 // Receive and process incoming information from the network
 void ClientState::updateNetworking()
 {
+	//Attempt to connect if IP and the port number are set
+	if (ipSet == 1 && mData.port != 0)
+	{
+		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
+	}
 }
 
 void ClientState::updateData()
