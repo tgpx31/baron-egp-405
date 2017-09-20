@@ -8,6 +8,7 @@ void ServerState::init(State * prev, State * nextL, State * nextR, State ** curr
 	mData.doesUpdateState = 1;
 	mData.doesDisplay = 0;
 
+	mDataBase.connectedClientCount = 0;
 	maxClients = 0;
 	isServer = 0;
 
@@ -34,26 +35,59 @@ void ServerState::updateNetworking()
 			// Client connected messages
 		case ID_REMOTE_NEW_INCOMING_CONNECTION:
 			printf("Another client has connected.\n");
+			++mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
 
 		case ID_NEW_INCOMING_CONNECTION:
 			printf("A connection is incoming.\n");
+			++mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
+			break;
+
+		case ID_USERNAME:
+			UsernameMessage *pmsIn;
+			pmsIn = (UsernameMessage*)packet->data;
+			printf("Client Request: Join with username \'%s\'\n", pmsIn->username);
+
+			// assign an identifier to associate the client with
+			// ex,	TGPx31 joins, id 1
+			//		TGPx31 joins, id 2
+			// same username, distinguishably different clients
+			// check for open IDs, ascending
+			for (unsigned int i = 0; i < maxClients; ++i)
+			{
+				if (mDataBase.clientDictionary.find(i) == mDataBase.clientDictionary.end())	// if there isn't an entry with the ID
+				{
+					// assign the first open ID
+					mDataBase.clientDictionary.insert(std::pair <int, std::string>(i, pmsIn->username));
+					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+					return;
+				}
+			}
+			
 			break;
 
 			// Other
 
 
-
+			{
+				
+			}
 
 
 
 			// Client lost messages
 		case ID_CONNECTION_LOST:
 			printf("A client lost the connection.\n");
+			--mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
 
 		case ID_DISCONNECTION_NOTIFICATION:
 			printf("A client has disconnected.\n");
+			--mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
 
 		default:

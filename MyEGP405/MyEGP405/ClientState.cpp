@@ -14,6 +14,53 @@ void ClientState::updateNetworking()
 	{
 		// **** TODO
 		// Message Loop
+		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
+		{
+			switch (packet->data[0])
+			{
+				// Client connected messages
+			case ID_CONNECTION_REQUEST_ACCEPTED:
+			{
+				printf("Our connection request has been accepted.\n");
+
+				// Once connected, send message w/ user data to prompt welcome broadcast
+				UsernameMessage msOut;
+				strcpy(msOut.username, username);
+				msOut.messageID = ID_USERNAME;
+
+				peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+				break;
+			}
+				
+			
+
+				// Other
+				{
+
+				}
+
+
+
+				// Full Server
+			case ID_NO_FREE_INCOMING_CONNECTIONS:
+				printf("The server is full.\n");
+				break;
+
+				// Client lost messages
+			case ID_DISCONNECTION_NOTIFICATION:
+				printf("\tWe have been disconnected.\n");
+				break;
+
+			case ID_CONNECTION_LOST:
+				printf("Connection lost.\n");
+				break;
+
+
+			default:
+				printf("Message with identifier %i has arrived.\n", packet->data[0]);
+				break;
+			}
+		}
 	}
 }
 

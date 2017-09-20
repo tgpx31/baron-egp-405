@@ -2,6 +2,9 @@
 #define SERVER_STATE_H
 
 #include "ClientState.h"
+#include <map>
+//#include <iterator>
+#include <string>
 
 class ServerState : public ClientState
 {
@@ -15,7 +18,13 @@ private:
 	int maxClients;
 	int isServer;
 
-	int connectedClients;
+	//int connectedClientCount;
+
+	struct ClientDatabase
+	{
+		int connectedClientCount;
+		std::map<int, std::string> clientDictionary;
+	}mDataBase;
 };
 
 #endif
