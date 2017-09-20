@@ -19,10 +19,13 @@ void ClientState::updateNetworking()
 			switch (packet->data[0])
 			{
 				// Client connected messages
-			case ID_USERNAME:
+			case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
 				printf("Our connection request has been accepted.\nSending our username to the server...\n");
-
+				break;
+			}
+			case ID_USERNAME:
+			{
 				// Once connected, send message w/ user data to prompt welcome broadcast
 				UsernameMessage msOut;
 				strcpy(msOut.username, username);

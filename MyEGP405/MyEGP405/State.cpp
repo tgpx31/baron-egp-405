@@ -58,7 +58,7 @@ void State::updateData()
 	}
 
 	// Numpad
-	for (i = 0x60; i < 0x69; ++i)
+	for (i = 0x60; i < 0x6A; ++i)
 	{
 		if (mData.keyboard[i] && mData.bufferIndex < 256)
 		{
