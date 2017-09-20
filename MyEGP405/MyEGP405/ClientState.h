@@ -15,6 +15,7 @@ protected:
 	void ArriveFromPreviousState(StateData *data) override;
 
 	RakNet::RakPeerInterface *peer;
+	RakNet::Packet *packet;
 
 	//Flags
 	int ipSet;

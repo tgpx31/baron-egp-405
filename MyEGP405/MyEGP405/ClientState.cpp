@@ -9,6 +9,10 @@ void ClientState::updateNetworking()
 		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
 		requestConnection = 1;
 	}
+	else if (requestConnection)
+	{
+		// **** TODO
+	}
 }
 
 // Process data currently in the input buffer
@@ -19,7 +23,7 @@ void ClientState::processBuffer()
 	//if (mData.connectionAddress == "default")
 	{
 		//If this is an endline character, pick default IP
-		if (mData.buffer[0] == '\n')
+		if (mData.buffer[0] == '\0')
 			strcpy(mData.connectionAddress, "127.0.0.1");
 		else //Else copy the inputted IP to the connection Address
 			strcpy(mData.connectionAddress, mData.buffer);
@@ -52,9 +56,8 @@ void ClientState::processBuffer()
 
 void ClientState::ArriveFromPreviousState(StateData *data)
 {
-	//mData = *data;
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
-	render();
+	mData.doesDisplay = 1;
 }
 
 //Initializing the client state
@@ -65,10 +68,14 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
 
 	mData.doesUpdateInput = 1;
-	mData.doesUpdateNetworking = 0;
+	mData.doesUpdateNetworking = 1;
 	mData.doesUpdateState = 1;
 	mData.doesDisplay = 0;
 
 	ipSet = 0;
 	requestConnection = 0;
+
+	peer = RakNet::RakPeerInterface::GetInstance();
+	RakNet::SocketDescriptor sd;
+	peer->Startup(1, &sd, 1);
 }

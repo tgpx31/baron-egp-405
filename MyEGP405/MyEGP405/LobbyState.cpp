@@ -11,7 +11,7 @@ void LobbyState::init(State * prev, State * nextL, State * nextR, State** curren
 	strcpy(mData.promptBuffer, "Welcome to the Lobby.\n(C)lient, (S)erver, or (E)xit?\n");
 
 	mData.doesUpdateInput = 1;
-	mData.doesUpdateNetworking = 0;
+	mData.doesUpdateNetworking = 1;
 	mData.doesUpdateState = 1;
 	mData.doesDisplay = 1;
 }

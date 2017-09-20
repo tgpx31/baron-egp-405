@@ -6,10 +6,10 @@
 class ServerState : public ClientState
 {
 public:
-
+	void init(State* prev, State* nextL, State* nextR, State** currentState) override;
 private:
 	void updateNetworking();
-	void processBuffer();
+	void processBuffer() override;
 	void ArriveFromPreviousState(StateData *data) override;
 };
 
