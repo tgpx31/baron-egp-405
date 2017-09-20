@@ -22,7 +22,7 @@ private:
 	{
 		int connectedClientCount;
 		std::string clientList[256];
-		std::map<int, std::string> clientDictionary;
+		std::map<int, RakNet::SystemAddress> clientDictionary;
 	}mDataBase;
 };
 

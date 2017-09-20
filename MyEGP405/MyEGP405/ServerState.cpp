@@ -59,61 +59,40 @@ void ServerState::updateNetworking()
 			
 
 		case ID_NEW_CLIENT_JOIN:
+		{
 			UsernameMessage *pmsIn;
 			pmsIn = (UsernameMessage*)packet->data;
 			printf("Client Request: Join with username \'%s\'\n", pmsIn->username);
 
-			// assign an identifier to associate the client with
-			// ex,	TGPx31 joins, id 1
-			//		TGPx31 joins, id 2
-			// same username, distinguishably different clients
-			// check for open IDs, ascending
-
-			/*add the client to the list of clients with their ID
-			send them their ID*/
-
-			// iterate through the list of clients for the first empty client identifier
 			for (unsigned int i = 0; i < maxClients; ++i)
 			{
-				if (mDataBase.clientList[i] == "")
+				if (mDataBase.clientDictionary.count(i) <= 0)	// if there isn't an entry with the ID
 				{
-					// found an empty spot
+					// assign the first open ID
+					mDataBase.clientDictionary.insert(std::pair <int, RakNet::SystemAddress>(i, packet->systemAddress));
+					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+
 					// send them their id
-					mDataBase.clientList[i] == pmsIn->username;
 					ClientNumberMessage msOut = { ID_CLIENT_NUMBER, i };
 					peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 
 					// broadcast welcome
 					ChatMessage broadcast;
 					broadcast.messageID = ID_SEND_ALL;
-					std::string message = mDataBase.clientList[i] + " joined the server\n";
+					std::string message = (std::string)pmsIn->username + " joined the server\n";
 					strcpy(broadcast.message, message.c_str());
-					peer->Send((char*)&broadcast, sizeof(broadcast), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, true);
+
+					for (unsigned int j = 0; j < maxClients; ++j)
+						peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j], false);
 					return;
 				}
 			}
 
-
-
-
-			//for (unsigned int i = 0; i < maxClients; ++i)
-			//{
-			//	if (mDataBase.clientDictionary.find(i) == mDataBase.clientDictionary.end())	// if there isn't an entry with the ID
-			//	{
-			//		// assign the first open ID
-			//		mDataBase.clientDictionary.insert(std::pair <int, std::string>(i, pmsIn->username));
-			//		printf("Client %s assigned ID #%i\n", pmsIn->username, i);
-			//		return;
-			//	}
-			//}
-
 			++mDataBase.connectedClientCount;
 			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
-			
-			// broadcast welcome message to all connected clients
-
-
 			break;
+		}
+			
 
 			// Other
 
@@ -129,6 +108,7 @@ void ServerState::updateNetworking()
 			printf("A client lost the connection.\n");
 			--mDataBase.connectedClientCount;
 			// iterate through the map, find disconnected client and remove them
+			//mDataBase.clientDictionary
 
 			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;

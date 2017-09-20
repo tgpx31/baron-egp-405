@@ -37,7 +37,7 @@ void ClientState::updateNetworking()
 				pmsIn = (ClientNumberMessage*)packet->data;
 				id = pmsIn->clientNumber;
 				printf("We are assigned to ID#%i\n", id);
-
+				break;
 			}
 
 
@@ -46,10 +46,12 @@ void ClientState::updateNetworking()
 			
 			// Broadcast message recieve
 			case ID_SEND_ALL:
+			{
 				ChatMessage *pmsIn;
 				pmsIn = (ChatMessage*)packet->data;
-				printf("TO_ALL: %s", pmsIn->message);
+				printf("TO_ALL:\t%s\n", pmsIn->message);
 				break;
+			}
 			
 
 
