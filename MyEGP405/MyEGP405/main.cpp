@@ -36,12 +36,7 @@ int main()
 	server->init(lobby, nullptr, nullptr, &CurrentState);
 
 	CurrentState = lobby;
-
-
 	Timer timer;
-	char str[512];
-
-	const float framerate = 1.0f / 30.0f;
 
 	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
 	unsigned int maxClients;
@@ -53,58 +48,6 @@ int main()
 	while (CurrentState->isRunning())
 	{
 		CurrentState->update();
-	}
-
-	{
-		//	{
-		//		// Server
-		//		printf("Server selected\n");
-		//		//ApplicationState->mData.state = SERVER_STATE;
-
-		//		// Ask for port and max clients
-
-		//		// Prompt for the port
-		//		printf("\nInput Port Number: ");
-		//		fgets(str, 512, stdin);
-
-		//		// Grab the port number from the input
-		//		sscanf(str, "%i", &ApplicationState->mData.port);
-		//		printf("\nPort Number: %i \n", ApplicationState->mData.port);
-
-		//		// If server, initialize maxClients
-		//		printf("\nInput Max Clients: ");
-		//		fgets(str, 512, stdin);
-
-		//		// Grab the max clients from input
-		//		sscanf(str, "%i", &maxClients);
-		//		printf("\nMax Clients: %i \n", maxClients);
-
-		//		RakNet::SocketDescriptor sd(ApplicationState->mData.port, 0);
-		//		peer->Startup(maxClients, &sd, 1);
-
-		//		peer->SetMaximumIncomingConnections(maxClients);
-		//	}
-		//	else // Invalid inputs
-		//	{
-		//		printf("Following input is invalid: %s(C)lient, (S)erver, (E)xit?\n", str);
-		//	}
-
-		//	// If it changes out of lobby state, it'll go into the network loop
-		//	// Otherwise it will return to the Lobby State loop
-
-		//	// Networking Loop
-		//	while (ApplicationState->mData.running && ApplicationState->mData.state != LOBBY_STATE)
-		//	{
-		//		timer.start();
-
-		//		ApplicationState->update();
-		//		ApplicationState->render();
-
-		//		timer.sleepUntilElapsed(framerate * 1000);
-		//		timer.stop();
-		//	}
-
-		//}
 	}
 	system("pause");
 	return 0;

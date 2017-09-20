@@ -20,6 +20,7 @@ protected:
 	RakNet::Packet *packet;
 
 	char username[256];
+	unsigned int id;
 
 	//Flags
 	int ipSet;

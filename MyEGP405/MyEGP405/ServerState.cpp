@@ -34,18 +34,31 @@ void ServerState::updateNetworking()
 		{
 			// Client connected messages
 		case ID_REMOTE_NEW_INCOMING_CONNECTION:
+		{
 			printf("Another client has connected.\n");
-			++mDataBase.connectedClientCount;
-			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
+			/*++mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);*/
+			UsernameMessage msOut;
+			strcpy(msOut.username, "");
+			msOut.messageID = ID_USERNAME;
+			peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			break;
+		}
 
 		case ID_NEW_INCOMING_CONNECTION:
+		{
 			printf("A connection is incoming.\n");
-			++mDataBase.connectedClientCount;
-			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
+			/*++mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);*/
+			UsernameMessage msOut;
+			strcpy(msOut.username, "");
+			msOut.messageID = ID_USERNAME;
+			peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 			break;
+		}
+			
 
-		case ID_USERNAME:
+		case ID_NEW_CLIENT_JOIN:
 			UsernameMessage *pmsIn;
 			pmsIn = (UsernameMessage*)packet->data;
 			printf("Client Request: Join with username \'%s\'\n", pmsIn->username);
@@ -55,17 +68,51 @@ void ServerState::updateNetworking()
 			//		TGPx31 joins, id 2
 			// same username, distinguishably different clients
 			// check for open IDs, ascending
+
+			/*add the client to the list of clients with their ID
+			send them their ID*/
+
+			// iterate through the list of clients for the first empty client identifier
 			for (unsigned int i = 0; i < maxClients; ++i)
 			{
-				if (mDataBase.clientDictionary.find(i) == mDataBase.clientDictionary.end())	// if there isn't an entry with the ID
+				if (mDataBase.clientList[i] == "")
 				{
-					// assign the first open ID
-					mDataBase.clientDictionary.insert(std::pair <int, std::string>(i, pmsIn->username));
-					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+					// found an empty spot
+					// send them their id
+					mDataBase.clientList[i] == pmsIn->username;
+					ClientNumberMessage msOut = { ID_CLIENT_NUMBER, i };
+					peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+					// broadcast welcome
+					ChatMessage broadcast;
+					broadcast.messageID = ID_SEND_ALL;
+					std::string message = mDataBase.clientList[i] + " joined the server\n";
+					strcpy(broadcast.message, message.c_str());
+					peer->Send((char*)&broadcast, sizeof(broadcast), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, true);
 					return;
 				}
 			}
+
+
+
+
+			//for (unsigned int i = 0; i < maxClients; ++i)
+			//{
+			//	if (mDataBase.clientDictionary.find(i) == mDataBase.clientDictionary.end())	// if there isn't an entry with the ID
+			//	{
+			//		// assign the first open ID
+			//		mDataBase.clientDictionary.insert(std::pair <int, std::string>(i, pmsIn->username));
+			//		printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+			//		return;
+			//	}
+			//}
+
+			++mDataBase.connectedClientCount;
+			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			
+			// broadcast welcome message to all connected clients
+
+
 			break;
 
 			// Other

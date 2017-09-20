@@ -18,11 +18,10 @@ private:
 	int maxClients;
 	int isServer;
 
-	//int connectedClientCount;
-
 	struct ClientDatabase
 	{
 		int connectedClientCount;
+		std::string clientList[256];
 		std::map<int, std::string> clientDictionary;
 	}mDataBase;
 };

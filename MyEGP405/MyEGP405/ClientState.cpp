@@ -19,29 +19,42 @@ void ClientState::updateNetworking()
 			switch (packet->data[0])
 			{
 				// Client connected messages
-			case ID_CONNECTION_REQUEST_ACCEPTED:
+			case ID_USERNAME:
 			{
-				printf("Our connection request has been accepted.\n");
+				printf("Our connection request has been accepted.\nSending our username to the server...\n");
 
 				// Once connected, send message w/ user data to prompt welcome broadcast
 				UsernameMessage msOut;
 				strcpy(msOut.username, username);
-				msOut.messageID = ID_USERNAME;
+				msOut.messageID = ID_NEW_CLIENT_JOIN;
 
 				peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 				break;
 			}
-				
+			case ID_CLIENT_NUMBER:
+			{
+				ClientNumberMessage* pmsIn;
+				pmsIn = (ClientNumberMessage*)packet->data;
+				id = pmsIn->clientNumber;
+				printf("We are assigned to ID#%i\n", id);
+
+			}
+
+
+
+			// Other
+			
+			// Broadcast message recieve
+			case ID_SEND_ALL:
+				ChatMessage *pmsIn;
+				pmsIn = (ChatMessage*)packet->data;
+				printf("TO_ALL: %s", pmsIn->message);
+				break;
 			
 
-				// Other
-				{
-
-				}
 
 
-
-				// Full Server
+			// Full Server
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
 				printf("The server is full.\n");
 				break;
@@ -85,7 +98,7 @@ void ClientState::processBuffer()
 		ipSet = 1;
 	}
 	//Else if the port number is still the default value
-	else if(mData.port == 0 && ipSet == 1)
+	else if (mData.port == 0 && ipSet == 1)
 	{
 		sscanf(mData.buffer, "%i", &mData.port);
 		printf("\nIP Address: %s \n", mData.connectionAddress);
@@ -117,6 +130,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 
 	ipSet = 0;
 	requestConnection = 0;
+	id = 0;
 
 	peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::SocketDescriptor sd;
