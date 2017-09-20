@@ -116,7 +116,15 @@ void ServerState::updateNetworking()
 			printf("A client lost the connection.\n");
 			--mDataBase.connectedClientCount;
 			// iterate through the map, find disconnected client and remove them
-			//mDataBase.clientDictionary
+			for (int i = 0; i < maxClients; ++i)
+			{
+				//I think that'll work - Brian
+				if (mDataBase.clientDictionary.at(i) == packet->systemAddress)
+				{
+					mDataBase.clientDictionary.erase(i);
+					return;
+				}
+			}
 
 			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
