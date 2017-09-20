@@ -61,6 +61,7 @@ void ServerState::updateNetworking()
 		case ID_NEW_CLIENT_JOIN:
 		{
 			UsernameMessage *pmsIn;
+
 			pmsIn = (UsernameMessage*)packet->data;
 			printf("Client Request: Join with username \'%s\'\n", pmsIn->username);
 
@@ -83,7 +84,14 @@ void ServerState::updateNetworking()
 					strcpy(broadcast.message, message.c_str());
 
 					for (unsigned int j = 0; j < maxClients; ++j)
-						peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j], false);
+					{
+						//If this already exists, broadcast
+						if (mDataBase.clientDictionary.count(j) > 0)
+						{
+							peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j], false);
+
+						}
+					}
 					return;
 				}
 			}
