@@ -53,13 +53,20 @@ void ClientState::updateNetworking()
 				ServerChatMessage* pmsIn;
 				pmsIn = (ServerChatMessage*)packet->data;
 				
-				system("Color 1A");
+				if (strcmp(pmsIn->username, username))
+					system("Color 1A");
+
 				char tmpChar[555];
 
 				if (pmsIn->isWhisper)
+				{
+					system("Color 3B");
 					sprintf(tmpChar, "%s whispered: %s\n", pmsIn->username, pmsIn->message);
+				}
 				else
+				{
 					sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+				}
 				
 				printf("%s", tmpChar);
 
@@ -130,6 +137,10 @@ void ClientState::processBuffer()
 			GoToNextState(mPrev);
 			infoSet = 0;
 			mData.doesDisplay = 1;
+			clearBuffer();
+			mData.port = 0;
+			ipSet = 0;
+			displayStrings.erase(displayStrings.begin(), displayStrings.end());
 		}
 
 
