@@ -114,7 +114,39 @@ void ClientState::processBuffer()
 		message.messageID = ID_CLIENT_CHAT_MESSAGE;
 		message.uniqueID = id;	//Setting unique ID to the clients ID
 
-		strcpy(message.message, mData.buffer);
+		// Whisper to specific user
+		if (mData.buffer[0] == '/' && mData.buffer[1] == 'W')
+		{
+			std::string tmp;
+			int i;
+			for (i = 0; i < mData.bufferIndex && mData.buffer[i] != ' '; ++i)
+			{
+				tmp += mData.buffer[i];
+			}
+
+			strcpy(message.destination, tmp.c_str());
+			
+			if (i > mData.bufferIndex)
+			{
+				tmp = "";
+				
+				for (i; i < mData.bufferIndex; ++i)
+				{
+					tmp += mData.buffer[i];
+				}
+
+				strcpy(message.message, tmp.c_str());
+			}
+			else //Empty message, do not send
+			{
+				return;
+			}
+		}
+		else //regular public message
+		{
+			strcpy(message.destination, "");
+			strcpy(message.message, mData.buffer);
+		}
 
 		//As long as we are only recieving packets from the server this should work?
 		peer->Send((char*)&message, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);

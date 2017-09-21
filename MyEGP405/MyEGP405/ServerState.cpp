@@ -160,12 +160,26 @@ void ServerState::updateNetworking()
 			strcpy(broadcast.username, username.c_str());
 			strcpy(broadcast.message, message.c_str());
 			
-			for (unsigned int j = 0; j < maxClients; ++j)
+			// Public messaage
+			if (pmsIn->destination == "")
 			{
-				//If this already exists, broadcast
-				if (mDataBase.clientDictionary.count(j) > 0)
+				for (unsigned int j = 0; j < maxClients; ++j)
 				{
-					peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+					//If this already exists, broadcast
+					if (mDataBase.clientDictionary.count(j) > 0)
+					{
+						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+					}
+				}
+			}
+			else // Whisper message
+			{
+				for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
+				{
+					if (it->second.username == pmsIn->destination)
+					{
+						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
+					}
 				}
 			}
 			break;
