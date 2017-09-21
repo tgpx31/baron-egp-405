@@ -161,7 +161,7 @@ void ServerState::updateNetworking()
 			strcpy(broadcast.message, message.c_str());
 			
 			// Public messaage
-			if (pmsIn->destination == "")
+			if (pmsIn->destination[0] == '\0')
 			{
 				for (unsigned int j = 0; j < maxClients; ++j)
 				{
