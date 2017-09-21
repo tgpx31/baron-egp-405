@@ -53,8 +53,8 @@ void ClientState::updateNetworking()
 			// Broadcast message recieve
 			case ID_SEND_ALL:
 			{
-				ChatMessage *pmsIn;
-				pmsIn = (ChatMessage*)packet->data;
+				ClientChatMessage *pmsIn;
+				pmsIn = (ClientChatMessage*)packet->data;
 				printf("TO_ALL:\t%s\n", pmsIn->message);
 				break;
 			}
