@@ -248,6 +248,13 @@ void ClientState::updateData()
 		mData.doesDisplay = 1;
 	}
 
+	if (mData.keyboard[VK_OEM_2] && mData.bufferIndex < 256)
+	{
+		mData.buffer[mData.bufferIndex] = '/';
+		mData.buffer[++mData.bufferIndex] = '\0';
+		mData.doesDisplay = 1;
+	}
+
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
 	{
