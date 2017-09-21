@@ -70,7 +70,13 @@ void ServerState::updateNetworking()
 				if (mDataBase.clientDictionary.count(i) <= 0)	// if there isn't an entry with the ID
 				{
 					// assign the first open ID
-					mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, { pmsIn->username, packet->systemAddress }));
+					int id = i;
+					ClientInfo ci;
+					ci.address = packet->systemAddress;
+					strcpy(ci.username, pmsIn->username);
+					
+					mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, ci));
+
 					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
 
 					// send them their id

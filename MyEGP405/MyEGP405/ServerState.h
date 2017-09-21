@@ -20,7 +20,7 @@ private:
 
 	struct ClientInfo
 	{
-		std::string username;
+		char username[31];
 		RakNet::SystemAddress address;
 	};
 
