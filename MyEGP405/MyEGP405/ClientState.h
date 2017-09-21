@@ -25,7 +25,7 @@ protected:
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 
-	char username[256];
+	char username[STR_MAX];
 	unsigned int id;
 
 	//Flags

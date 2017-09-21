@@ -4,6 +4,8 @@
 #include "RakNet\RakPeerInterface.h"
 #include <stdio.h>
 
+#define STR_MAX 256
+
 enum ServerStates
 {
 	LOBBY_STATE,
@@ -34,9 +36,9 @@ class State abstract
 			char connectionAddress[512]; // IP of connection to connect to
 			unsigned int port; //Port the server will be connecting to
 
-			unsigned char keyboard[256]; //Keyboard state array
-			char buffer[256]; //Buffer to store input
-			char promptBuffer[256];
+			unsigned char keyboard[STR_MAX]; //Keyboard state array
+			char buffer[STR_MAX]; //Buffer to store input
+			char promptBuffer[STR_MAX];
 
 			unsigned int bufferIndex; //Index to end of buffer
 		} mData;

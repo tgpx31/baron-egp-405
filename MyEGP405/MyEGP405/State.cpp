@@ -35,7 +35,7 @@ void State::updateInput()
 {
 	//GetKeyboardState(mData.keyboard);
 
-	for (int i = 0; i < 256; ++i)
+	for (int i = 0; i < STR_MAX; ++i)
 	{
 		// This creates problems, like not being able to use shift/caplock propery, but we're going to go with it for now
 		mData.keyboard[i] = GetAsyncKeyState(i);
@@ -49,7 +49,7 @@ void State::updateData()
 	// Number keys
 	for (i = 0x30; i < 0x3A; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
@@ -60,7 +60,7 @@ void State::updateData()
 	// Numpad
 	for (i = 0x60; i < 0x6A; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
@@ -70,14 +70,14 @@ void State::updateData()
 
 	// Decimal key/period
 	i = 0x6E;
-	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < 256)
+	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < STR_MAX)
 	{
 		mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 	}
 
-	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < 256)
+	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < STR_MAX)
 	{
 		mData.buffer[mData.bufferIndex] = ' ';
 		mData.buffer[++mData.bufferIndex] = '\0';
@@ -87,7 +87,7 @@ void State::updateData()
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
@@ -161,7 +161,7 @@ void State::ArriveFromPreviousState(StateData * data)
 void State::clearBuffer()
 {
 	// Clear the buffer
-	memset(mData.buffer, 0, sizeof(char) * 256);
+	memset(mData.buffer, 0, sizeof(char) * STR_MAX);
 	mData.buffer[0] = '\0';
 	mData.bufferIndex = 0;
 }

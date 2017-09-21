@@ -26,6 +26,8 @@ void ServerState::updateNetworking()
 		peer->SetMaximumIncomingConnections(maxClients);
 		isServer = 1;
 		mData.doesUpdateInput = 0;
+
+		printf("\nYour IPV4 Address is: %s \n", peer->GetLocalIP(0));
 	}
 	// message loop
 	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
@@ -85,7 +87,7 @@ void ServerState::updateNetworking()
 				std::strftime(timeString, 80, "%Y-%m-%d-%H-%M-%S", timedata);
 				std::puts(timeString);
 
-				char str[256];
+				char str[STR_MAX];
 
 				sprintf(str, "Client %s assigned ID #%i at %s\n", pmsIn->username, 0, timeString);
 
@@ -141,7 +143,7 @@ void ServerState::updateNetworking()
 						std::strftime(timeString, 80, "%Y-%m-%d-%H-%M-%S", timedata);
 						std::puts(timeString);
 
-						char str[256];
+						char str[STR_MAX];
 
 						sprintf(str, "Client %s assigned ID #%i at %s\n", pmsIn->username, i, timeString);
 
@@ -297,6 +299,9 @@ void ServerState::processBuffer()
 
 		if (maxClients > 0)
 		{
+			system("cls");
+
+
 			printf("\nPort Number: %i \n", mData.port);
 			printf("\nMax Clients: %i \n", maxClients);
 		}

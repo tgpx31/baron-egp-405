@@ -252,7 +252,7 @@ void ClientState::updateData()
 	// Number keys
 	for (i = 0x30; i < 0x3A; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
@@ -263,7 +263,7 @@ void ClientState::updateData()
 	// Numpad
 	for (i = 0x60; i < 0x6A; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
@@ -273,7 +273,7 @@ void ClientState::updateData()
 
 	// Decimal key/period
 	i = 0x6E;
-	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < 256)
+	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < STR_MAX)
 	{
 		mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
@@ -281,14 +281,14 @@ void ClientState::updateData()
 	}
 
 	//Disable spaces for the username so that we can have PM's work correctly
-	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < 256 && infoSet)
+	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < STR_MAX && infoSet)
 	{
 		mData.buffer[mData.bufferIndex] = ' ';
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 	}
 
-	if (mData.keyboard[VK_OEM_2] && mData.bufferIndex < 256)
+	if (mData.keyboard[VK_OEM_2] && mData.bufferIndex < STR_MAX)
 	{
 		mData.buffer[mData.bufferIndex] = '/';
 		mData.buffer[++mData.bufferIndex] = '\0';
@@ -298,7 +298,7 @@ void ClientState::updateData()
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
 	{
-		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		if (mData.keyboard[i] && mData.bufferIndex < STR_MAX)
 		{
 			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
 			mData.buffer[++mData.bufferIndex] = '\0';
