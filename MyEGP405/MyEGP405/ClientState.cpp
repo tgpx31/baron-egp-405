@@ -53,13 +53,20 @@ void ClientState::updateNetworking()
 				ServerChatMessage* pmsIn;
 				pmsIn = (ServerChatMessage*)packet->data;
 				
-				system("Color 1A");
+				if (strcmp(pmsIn->username, username))
+					system("Color 1A");
+
 				char tmpChar[555];
 
 				if (pmsIn->isWhisper)
+				{
+					system("Color 3B");
 					sprintf(tmpChar, "%s whispered: %s\n", pmsIn->username, pmsIn->message);
+				}
 				else
+				{
 					sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+				}
 				
 				printf("%s", tmpChar);
 
@@ -114,6 +121,29 @@ void ClientState::processBuffer()
 	//Else get chat input
 	else if(infoSet == 1)
 	{
+		if (mData.buffer[0] == '\0')
+			return;
+		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'H')
+		{
+			printf("\n/H prints all commands\n");
+			printf("/E exits the server\n");
+			printf("/W [USERNAME] sends a whisper\n");
+			printf("Type normally to send a public message\n");
+			return;
+		}
+		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'E')
+		{
+			peer->CloseConnection(peer->GetSystemAddressFromIndex(0), true);
+			GoToNextState(mPrev);
+			infoSet = 0;
+			mData.doesDisplay = 1;
+			clearBuffer();
+			mData.port = 0;
+			ipSet = 0;
+			displayStrings.erase(displayStrings.begin(), displayStrings.end());
+		}
+
+
 		ClientChatMessage message;
 
 		//Setting the message id to the client chat message ID
