@@ -118,15 +118,15 @@ void ClientState::processBuffer()
 		if (mData.buffer[0] == '/' && mData.buffer[1] == 'W')
 		{
 			std::string tmp;
-			int i;
-			for (i = 0; i < mData.bufferIndex && mData.buffer[i] != ' '; ++i)
+			unsigned int i;
+			for (i = 3; i < mData.bufferIndex && mData.buffer[i] != ' '; ++i)
 			{
 				tmp += mData.buffer[i];
 			}
 
 			strcpy(message.destination, tmp.c_str());
 			
-			if (i > mData.bufferIndex)
+			if (++i < mData.bufferIndex)
 			{
 				tmp = "";
 				
@@ -141,6 +141,10 @@ void ClientState::processBuffer()
 			{
 				return;
 			}
+		}
+		else if (mData.buffer == '\0')
+		{
+			return;
 		}
 		else //regular public message
 		{

@@ -176,7 +176,7 @@ void ServerState::updateNetworking()
 			{
 				for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
 				{
-					if (it->second.username == pmsIn->destination)
+					if (strcmp(it->second.username, pmsIn->destination))
 					{
 						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
 					}
