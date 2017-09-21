@@ -27,6 +27,8 @@ void ServerState::init(State * prev, State * nextL, State * nextR, State ** curr
 	maxClients = 0;
 	isServer = 0;
 
+	strcpy(username, "SERVERHOSTADMIN");
+
 	peer = RakNet::RakPeerInterface::GetInstance();
 	strcpy(mData.promptBuffer, "Please enter port number: \n");
 }
@@ -40,9 +42,12 @@ void ServerState::updateNetworking()
 		peer->Startup(maxClients, &sd, 1);
 		peer->SetMaximumIncomingConnections(maxClients);
 		isServer = 1;
-		mData.doesUpdateInput = 0;
+		strcpy(username, "SERVERHOSTADMIN");
 
 		printf("\nYour IPV4 Address is: %s \n", peer->GetLocalIP(0));
+		strcpy(mData.promptBuffer, "Welcome to the Buckroom!\nLet's talk Toronto\n");
+
+		infoSet = 1;
 	}
 	// message loop
 	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
@@ -214,6 +219,42 @@ void ServerState::updateNetworking()
 			strcpy(broadcast.username, username.c_str());
 			strcpy(broadcast.message, message.c_str());
 			
+			// if sent from server
+			if (pmsIn->uniqueID == -1)
+			{
+				// it came from us as the server
+				if (pmsIn->destination[0] == '\0')
+				{
+					broadcast.isWhisper = 0;
+					printf("%s: %s \n", "SYSTEMHOSTADMIN", pmsIn->message);
+
+					for (unsigned int j = 0; j < maxClients; ++j)
+					{
+						//If this already exists, broadcast
+						if (mDataBase.clientDictionary.count(j) > 0)
+						{
+							peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+						}
+					}
+				}
+				else // Whisper message
+				{
+					broadcast.isWhisper = 1;
+					printf("%s Whispered to %s: %s \n", "SYSTEMHOSTADMIN", pmsIn->destination, pmsIn->message);
+					for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
+					{
+						if (strcmp(it->second.username, pmsIn->destination) == 0)
+						{
+							peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
+						}
+					}
+				}
+				break;
+
+				break;
+				
+			}
+
 			// Public messaage
 			if (pmsIn->destination[0] == '\0')
 			{
@@ -332,9 +373,87 @@ void ServerState::processBuffer()
 		// Clear the buffer
 		clearBuffer();
 	}
+	//ClientState::processBuffer();
+	else if (infoSet == 1)
+	{
+		if (mData.buffer[0] == '\0')
+			return;
+		//Display the help function when the user input /h
+		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'H')
+		{
+			printf("\n/H prints all commands\n");
+			printf("/E exits the server\n");
+			printf("/W [USERNAME] sends a whisper\n");
+			printf("Type normally to send a public message\n");
+			return;
+		}
+		//Exit back to lobby if the user inputs /e
+		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'E')
+		{
+			//Close the connection from the peer
+			peer->CloseConnection(peer->GetSystemAddressFromIndex(0), true);
+			GoToNextState(mPrev); //Go to the lobby state
 
-	// Clear the buffer
-	clearBuffer();
+								  //Reset flags and clear buffers
+			infoSet = 0;
+			mData.doesDisplay = 1;
+			clearBuffer();
+			mData.port = 0;
+			ipSet = 0;
+			displayStrings.erase(displayStrings.begin(), displayStrings.end());
+		}
+
+
+		ClientChatMessage message;
+
+		//Setting the message id to the client chat message ID
+		message.messageID = ID_CLIENT_CHAT_MESSAGE;
+		message.uniqueID = -1;	//Setting unique ID to the clients ID
+
+								// Whisper to specific user
+		if (mData.buffer[0] == '/' && mData.buffer[1] == 'W')
+		{
+			std::string tmp;
+			unsigned int i;
+			for (i = 3; i < mData.bufferIndex && mData.buffer[i] != ' '; ++i)
+			{
+				tmp += mData.buffer[i];
+			}
+
+			strcpy(message.destination, tmp.c_str());
+
+			if (++i < mData.bufferIndex)
+			{
+				tmp = "";
+
+				for (i; i < mData.bufferIndex; ++i)
+				{
+					tmp += mData.buffer[i];
+				}
+
+				strcpy(message.message, tmp.c_str());
+			}
+			else //Empty message, do not send
+			{
+				return;
+			}
+		}
+		else if (mData.buffer == '\0')
+		{
+			return;
+		}
+		else //regular public message
+		{
+			strcpy(message.destination, "");
+			strcpy(message.message, mData.buffer);
+		}
+
+		//As long as we are only recieving packets from the server this should work?
+		peer->Send((char*)&message, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::SystemAddress::SystemAddress("127.0.0.1", mData.port), false);
+
+		clearBuffer();
+		render();
+	}
 }
 
 void ServerState::ArriveFromPreviousState(StateData * data)
