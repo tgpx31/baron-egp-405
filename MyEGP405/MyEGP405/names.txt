@@ -1,2 +1,3 @@
-Client 852222 assigned ID #0 at 2017-09-21-03-41-09
-Client TTTTT assigned ID #1 at 2017-09-21-03-41-29
+Client HUI assigned ID #0 at 2017-09-21-04-16-32
+Client BRYAN assigned ID #1 at 2017-09-21-04-17-15
+Client BRIAN assigned ID #2 at 2017-09-21-04-17-19
