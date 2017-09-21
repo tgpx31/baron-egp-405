@@ -49,6 +49,9 @@ void State::init(State * prev, State * nextL, State * nextR, State **currentStat
 void State::updateInput()
 {
 	//GetKeyboardState(mData.keyboard);
+	// new tech, only get input if active window
+	if (GetConsoleWindow() != GetForegroundWindow())
+		return;
 
 	for (int i = 0; i < STR_MAX; ++i)
 	{
