@@ -8,6 +8,9 @@ void ClientState::updateNetworking()
 	{
 		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
 		printf("Requesting connection...\n");
+
+		strcpy(mData.promptBuffer, "Welcome to the Buckroom!\nLet's talk Toronto\n");
+
 		requestConnection = 1;
 	}
 	else if (requestConnection)
