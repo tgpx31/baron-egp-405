@@ -20,6 +20,8 @@ protected:
 
 	void getClientInfo();
 
+	void updateData() override;
+
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 

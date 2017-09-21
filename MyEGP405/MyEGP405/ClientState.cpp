@@ -191,17 +191,89 @@ void ClientState::getClientInfo()
 	//Have the client set their user name
 	else if (mData.port != 0 && ipSet == 1)
 	{
+		//If they inputted nothing use a default user name
 		if (mData.buffer[0] == '\0')
 			strcpy(username, "Guest_User");
 		else //Else copy the inputted user name into the username slot
 			strcpy(username, mData.buffer);
 		printf("\nUser Name: %s \n", username);
 
-		requestConnection = 0;
+		requestConnection = 0;		
 	}
 
 	// Clear the buffer
 	clearBuffer();
+}
+
+void ClientState::updateData()
+{
+	int i;
+
+	// Number keys
+	for (i = 0x30; i < 0x3A; ++i)
+	{
+		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		{
+			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
+		}
+	}
+
+	// Numpad
+	for (i = 0x60; i < 0x6A; ++i)
+	{
+		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		{
+			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
+		}
+	}
+
+	// Decimal key/period
+	i = 0x6E;
+	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < 256)
+	{
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+		mData.buffer[++mData.bufferIndex] = '\0';
+		mData.doesDisplay = 1;
+	}
+
+	//Disable spaces for the username so that we can have PM's work correctly
+	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < 256 && infoSet)
+	{
+		mData.buffer[mData.bufferIndex] = ' ';
+		mData.buffer[++mData.bufferIndex] = '\0';
+		mData.doesDisplay = 1;
+	}
+
+	// Alphabet
+	for (i = 0x41; i < 0x5B; ++i)
+	{
+		if (mData.keyboard[i] && mData.bufferIndex < 256)
+		{
+			mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
+		}
+	}
+
+	if (mData.keyboard[VK_BACK])
+	{
+		if (mData.bufferIndex == 0)
+			return;
+		mData.buffer[--mData.bufferIndex] = '\0';
+		mData.doesDisplay = 1;
+	}
+
+
+
+	if (mData.keyboard[VK_RETURN])
+	{
+		processBuffer();
+		clearBuffer();
+	}
 }
 
 void ClientState::ArriveFromPreviousState(StateData *data)
