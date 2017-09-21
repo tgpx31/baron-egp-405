@@ -101,7 +101,7 @@ void ClientState::processBuffer()
 		strcpy(message.message, mData.buffer);
 
 		//As long as we are only recieving packets from the server this should work?
-		peer->Send((char*)&message, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+		peer->Send((char*)&message, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 
 		clearBuffer();
 		render();
