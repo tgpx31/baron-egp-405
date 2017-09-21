@@ -23,7 +23,7 @@ void ClientState::updateNetworking()
 	//Attempt to connect if IP and the port number are set
 	if (ipSet == 1 && mData.port != 0 && !requestConnection)
 	{
-		peer->Connect(mData.connectionAddress, mData.port, 0, 0);
+		peer->Connect(mData.connectionAddress, mData.port, 0, 0); //Peer connection at the connection address and the port
 		printf("Requesting connection...\n");
 
 		strcpy(mData.promptBuffer, "Welcome to the Buckroom!\nLet's talk Toronto\n");
@@ -31,9 +31,8 @@ void ClientState::updateNetworking()
 		requestConnection = 1;
 		infoSet = 1;
 	}
-	else if (requestConnection)
+	else if (requestConnection) // Else if the connection has been requested
 	{
-		// **** TODO
 		// Message Loop
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 		{
@@ -57,30 +56,34 @@ void ClientState::updateNetworking()
 			}
 			case ID_CLIENT_NUMBER:
 			{
+				//Send message w/ the clients ID# 
 				ClientNumberMessage* pmsIn;
 				pmsIn = (ClientNumberMessage*)packet->data;
 				id = pmsIn->clientNumber;
 				printf("We are assigned to ID#%i\n", id);
 				break;
 			}
-			case ID_SERVER_CHAT_MESSAGE:
+			case ID_SERVER_CHAT_MESSAGE:	//Case for the client sending a chat message
 			{
+				//Create the server chat message
 				ServerChatMessage* pmsIn;
 				pmsIn = (ServerChatMessage*)packet->data;
 				
+				//If the user is seeing their own message, do not change color of the window for notification
 				if (strcmp(pmsIn->username, username))
 					system("Color 1A");
 
 				char tmpChar[555];
 
+				//If the message is a whisper
 				if (pmsIn->isWhisper)
 				{
-					system("Color 3B");
-					sprintf(tmpChar, "%s whispered: %s\n", pmsIn->username, pmsIn->message);
+					system("Color 3B"); //Change the color
+					sprintf(tmpChar, "%s whispered: %s\n", pmsIn->username, pmsIn->message); //Display who wispered to you followed by the message
 				}
-				else
+				else //Else its a normal message
 				{
-					sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+					sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message); //Display the user and message they sent
 				}
 				
 				printf("%s", tmpChar);
@@ -138,6 +141,7 @@ void ClientState::processBuffer()
 	{
 		if (mData.buffer[0] == '\0')
 			return;
+		//Display the help function when the user input /h
 		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'H')
 		{
 			printf("\n/H prints all commands\n");
@@ -146,10 +150,14 @@ void ClientState::processBuffer()
 			printf("Type normally to send a public message\n");
 			return;
 		}
+		//Exit back to lobby if the user inputs /e
 		else if (mData.buffer[0] == '/' && mData.buffer[1] == 'E')
 		{
+			//Close the connection from the peer
 			peer->CloseConnection(peer->GetSystemAddressFromIndex(0), true);
-			GoToNextState(mPrev);
+			GoToNextState(mPrev); //Go to the lobby state
+
+			//Reset flags and clear buffers
 			infoSet = 0;
 			mData.doesDisplay = 1;
 			clearBuffer();
@@ -338,6 +346,7 @@ void ClientState::updateData()
 	}
 }
 
+//Arriving from the previous state
 void ClientState::ArriveFromPreviousState(StateData *data)
 {
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
@@ -352,6 +361,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	strcpy(username, "GUESTUSER");
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
 
+	//Setting flags
 	mData.doesUpdateInput = 1;
 	mData.doesUpdateNetworking = 1;
 	mData.doesUpdateState = 1;
@@ -369,6 +379,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 
 void ClientState::render()
 {
+	//Set background color
 	system("Color 0F");
 	system("CLS");
 	std::cout << mData.promptBuffer;
