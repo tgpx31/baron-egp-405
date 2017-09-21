@@ -50,5 +50,6 @@ void LobbyState::processBuffer()
 
 void LobbyState::ArriveFromPreviousState(StateData * data)
 {
-	render();
+	mData.doesDisplay = 1;
+	//render();
 }
