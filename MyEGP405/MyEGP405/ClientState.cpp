@@ -1,4 +1,6 @@
 #include "ClientState.h"
+#include <iostream>
+#include <string>
 
 // Receive and process incoming information from the network
 void ClientState::updateNetworking()
@@ -50,7 +52,15 @@ void ClientState::updateNetworking()
 			{
 				ServerChatMessage* pmsIn;
 				pmsIn = (ServerChatMessage*)packet->data;
-				printf("%s: %s\n", pmsIn->username, pmsIn->message);
+				
+				char tmpChar[555];
+				sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+				printf("%s", tmpChar);
+
+				std::string newString(tmpChar);
+
+				displayStrings.push_back(newString);
+
 				break;
 			}
 			// Other
@@ -189,4 +199,19 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::SocketDescriptor sd;
 	peer->Startup(1, &sd, 1);
+}
+
+void ClientState::render()
+{
+	system("CLS");
+	std::cout << mData.promptBuffer;
+	
+	for (int i = 0; i < displayStrings.size(); ++i)
+	{
+		std::cout << displayStrings[i];
+	}
+
+	std::cout << mData.buffer;
+
+	mData.doesDisplay = 0;
 }
