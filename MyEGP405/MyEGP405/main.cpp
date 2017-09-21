@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 #include "State.h"
-#include "Timer.h"
 #include "LobbyState.h"
 #include "ClientState.h"
 #include "ServerState.h"
@@ -36,10 +35,6 @@ int main()
 	server->init(lobby, nullptr, nullptr, &CurrentState);
 
 	CurrentState = lobby;
-	Timer timer;
-
-	RakNet::RakPeerInterface *peer = RakNet::RakPeerInterface::GetInstance();
-	unsigned int maxClients;
 
 	// Lobby State
 	// Start server
