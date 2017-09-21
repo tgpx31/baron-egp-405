@@ -14,6 +14,8 @@ void ServerState::init(State * prev, State * nextL, State * nextR, State ** curr
 
 	peer = RakNet::RakPeerInterface::GetInstance();
 	strcpy(mData.promptBuffer, "Please enter port number: \n");
+
+	mTimer.start();
 }
 
 // Receive and process incoming information from the network
@@ -75,7 +77,7 @@ void ServerState::updateNetworking()
 
 				mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(0, ci));
 
-				printf("Client %s assigned ID #%i\n", pmsIn->username, 0);
+				printf("Client %s assigned ID #%i at %d\n", pmsIn->username, 0, mTimer.getElapsedTime());
 
 				// send them their id
 				ClientNumberMessage msOut = { ID_CLIENT_NUMBER, 0 };
