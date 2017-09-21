@@ -203,7 +203,7 @@ void ClientState::getClientInfo()
 	{
 		//If they inputted nothing use a default user name
 		if (mData.buffer[0] == '\0')
-			strcpy(username, "Guest_User");
+			strcpy(username, "GUESTUSER");
 		else //Else copy the inputted user name into the username slot
 			strcpy(username, mData.buffer);
 		printf("\nUser Name: %s \n", username);
@@ -304,7 +304,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 {
 	State::init(prev, nextL, nextR, currentState);
 
-	strcpy(username, "Guest_User");
+	strcpy(username, "GUESTUSER");
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
 
 	mData.doesUpdateInput = 1;
