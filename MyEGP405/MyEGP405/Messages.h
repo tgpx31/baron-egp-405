@@ -14,7 +14,8 @@ enum GameMessages
 	ID_CLIENT_NUMBER,		// server associates username with client number
 
 	// Messaging exchange
-	ID_CHAT_MESSAGE,		// send request by anyone
+	ID_CLIENT_CHAT_MESSAGE,		// chat message sent from client to server
+	ID_SERVER_CHAT_MESSAGE,		// chat message sent from server to clients
 
 	// Misc.
 	ID_SEND_ALL,			// sent by client, all current usernames!
@@ -33,12 +34,19 @@ struct ClientNumberMessage
 	unsigned int clientNumber;
 };
 
-struct ChatMessage
+struct ClientChatMessage
 {
 	char messageID;
 	int uniqueID;
 	char destination[31];
 	char message[512];
+};
+
+struct ServerChatMessage
+{
+	char messageID;
+	char message[512];
+	char username[31];
 };
 #pragma pack (pop)
 

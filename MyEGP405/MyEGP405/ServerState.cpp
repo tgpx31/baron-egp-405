@@ -78,7 +78,7 @@ void ServerState::updateNetworking()
 					peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 
 					// broadcast welcome
-					ChatMessage broadcast;
+					ClientChatMessage broadcast;
 					broadcast.messageID = ID_SEND_ALL;
 					std::string message = (std::string)pmsIn->username + " joined the server\n";
 					strcpy(broadcast.message, message.c_str());
@@ -88,7 +88,7 @@ void ServerState::updateNetworking()
 						//If this already exists, broadcast
 						if (mDataBase.clientDictionary.count(j) > 0)
 						{
-							peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+							peer->Send((char*)&broadcast, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
 
 						}
 					}
@@ -102,20 +102,33 @@ void ServerState::updateNetworking()
 		}
 			
 
-		case ID_CHAT_MESSAGE:
+		case ID_CLIENT_CHAT_MESSAGE:
 		{
-			ChatMessage* pmsIn;
-			pmsIn = (ChatMessage*)packet->data;
+			ClientChatMessage* pmsIn;
+			pmsIn = (ClientChatMessage*)packet->data;
+
+			std::string username = mDataBase.clientDictionary[pmsIn->uniqueID].username;
+			std::string message = pmsIn->message;
 
 			printf("%s: %s", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
 
-			/*
+			
 			// broadcast welcome
-			ChatMessage broadcast;
-			broadcast.messageID = ID_SEND_ALL;
-			std::string message = (std::string)pmsIn->username + " joined the server\n";
+			ServerChatMessage broadcast;
+			broadcast.messageID = ID_SERVER_CHAT_MESSAGE;
+			strcpy(broadcast.username, username.c_str());
 			strcpy(broadcast.message, message.c_str());
-			*/
+			
+			for (unsigned int j = 0; j < maxClients; ++j)
+			{
+				//If this already exists, broadcast
+				if (mDataBase.clientDictionary.count(j) > 0)
+				{
+					peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+				}
+			}
+			break;
+
 			break;
 		}
 
