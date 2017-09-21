@@ -85,7 +85,17 @@ void ServerState::updateNetworking()
 				std::strftime(timeString, 80, "%Y-%m-%d-%H-%M-%S", timedata);
 				std::puts(timeString);
 
-				printf("Client %s assigned ID #%i at %s\n", pmsIn->username, 0, timeString);
+				char str[256];
+
+				sprintf(str, "Client %s assigned ID #%i at %s\n", pmsIn->username, 0, timeString);
+
+				std::ofstream out("names.txt", std::ofstream::out);
+
+				out << str;
+
+				out.close();
+
+				printf(str);
 
 				// send them their id
 				ClientNumberMessage msOut = { ID_CLIENT_NUMBER, 0 };
@@ -121,7 +131,27 @@ void ServerState::updateNetworking()
 
 						mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, ci));
 
-						printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+						time_t t = time(0);
+						tm* timedata;
+						timedata = std::localtime(&t);
+
+
+						// reference on how to format time stamp: https://stackoverflow.com/questions/5438482/getting-the-current-time-as-a-yyyy-mm-dd-hh-mm-ss-string
+						char timeString[64];
+						std::strftime(timeString, 80, "%Y-%m-%d-%H-%M-%S", timedata);
+						std::puts(timeString);
+
+						char str[256];
+
+						sprintf(str, "Client %s assigned ID #%i at %s\n", pmsIn->username, i, timeString);
+
+						std::ofstream out("names.txt", std::ios_base::app);
+
+						out << str;
+
+						out.close();
+
+						printf(str);
 
 						// send them their id
 						ClientNumberMessage msOut = { ID_CLIENT_NUMBER, i };

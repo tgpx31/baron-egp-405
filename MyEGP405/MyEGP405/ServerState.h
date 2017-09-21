@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <ctime>
+#include <fstream>
 
 class ServerState : public ClientState
 {
