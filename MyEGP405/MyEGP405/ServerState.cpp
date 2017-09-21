@@ -150,10 +150,7 @@ void ServerState::updateNetworking()
 
 			std::string username = mDataBase.clientDictionary[pmsIn->uniqueID].username;
 			std::string message = pmsIn->message;
-
-			printf("%s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
-
-			
+	
 			// broadcast welcome
 			ServerChatMessage broadcast;
 			broadcast.messageID = ID_SERVER_CHAT_MESSAGE;
@@ -163,6 +160,9 @@ void ServerState::updateNetworking()
 			// Public messaage
 			if (pmsIn->destination[0] == '\0')
 			{
+				broadcast.isWhisper = 0;
+				printf("%s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
+
 				for (unsigned int j = 0; j < maxClients; ++j)
 				{
 					//If this already exists, broadcast
@@ -174,9 +174,11 @@ void ServerState::updateNetworking()
 			}
 			else // Whisper message
 			{
+				broadcast.isWhisper = 1;
+				printf("%s Whispered to %s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->destination, pmsIn->message);
 				for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
 				{
-					if (strcmp(it->second.username, pmsIn->destination))
+					if (strcmp(it->second.username, pmsIn->destination) == 0)
 					{
 						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
 					}

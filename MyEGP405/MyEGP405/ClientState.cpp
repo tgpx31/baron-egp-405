@@ -55,7 +55,12 @@ void ClientState::updateNetworking()
 				
 				system("Color 1A");
 				char tmpChar[555];
-				sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+
+				if (pmsIn->isWhisper)
+					sprintf(tmpChar, "%s whispered: %s\n", pmsIn->username, pmsIn->message);
+				else
+					sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
+				
 				printf("%s", tmpChar);
 
 				std::string newString(tmpChar);

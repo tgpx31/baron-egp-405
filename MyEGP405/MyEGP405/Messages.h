@@ -45,6 +45,7 @@ struct ClientChatMessage
 struct ServerChatMessage
 {
 	char messageID;
+	int isWhisper;
 	char message[512];
 	char username[31];
 };
