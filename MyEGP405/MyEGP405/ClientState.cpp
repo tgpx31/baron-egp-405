@@ -53,6 +53,7 @@ void ClientState::updateNetworking()
 				ServerChatMessage* pmsIn;
 				pmsIn = (ServerChatMessage*)packet->data;
 				
+				system("Color 1A");
 				char tmpChar[555];
 				sprintf(tmpChar, "%s: %s\n", pmsIn->username, pmsIn->message);
 				printf("%s", tmpChar);
@@ -318,6 +319,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 
 void ClientState::render()
 {
+	system("Color 0F");
 	system("CLS");
 	std::cout << mData.promptBuffer;
 	
