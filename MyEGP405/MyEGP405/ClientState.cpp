@@ -90,9 +90,22 @@ void ClientState::processBuffer()
 		getClientInfo();
 	}
 	//Else get chat input
-	else
+	else if(infoSet == 1)
 	{
+		ClientChatMessage* message;
+		message = (ClientChatMessage*)packet->data;
 
+		//Setting the message id to the client chat message ID
+		message->messageID = ID_CLIENT_CHAT_MESSAGE;
+		message->uniqueID = id;	//Setting unique ID to the clients ID
+
+		strcpy(message->message, mData.buffer);
+
+		//As long as we are only recieving packets from the server this should work?
+		peer->Send((char*)&message, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+		clearBuffer();
+		render();
 	}
 }
 
