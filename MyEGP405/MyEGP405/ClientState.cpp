@@ -12,6 +12,7 @@ void ClientState::updateNetworking()
 		strcpy(mData.promptBuffer, "Welcome to the Buckroom!\nLet's talk Toronto\n");
 
 		requestConnection = 1;
+		infoSet = 1;
 	}
 	else if (requestConnection)
 	{
@@ -46,8 +47,6 @@ void ClientState::updateNetworking()
 				break;
 			}
 
-
-
 			// Other
 			
 			// Broadcast message recieve
@@ -59,9 +58,6 @@ void ClientState::updateNetworking()
 				break;
 			}
 			
-
-
-
 			// Full Server
 			case ID_NO_FREE_INCOMING_CONNECTIONS:
 				printf("The server is full.\n");
@@ -87,6 +83,20 @@ void ClientState::updateNetworking()
 
 // Process data currently in the input buffer
 void ClientState::processBuffer()
+{
+	//If the client info hasn't yet been set, get it
+	if (infoSet == 0)
+	{
+		getClientInfo();
+	}
+	//Else get chat input
+	else
+	{
+
+	}
+}
+
+void ClientState::getClientInfo()
 {
 	//If the connection address is still the default
 	if (strcmp(mData.connectionAddress, "default\n") && ipSet == 0)
@@ -132,8 +142,6 @@ void ClientState::processBuffer()
 
 	// Clear the buffer
 	clearBuffer();
-
-
 }
 
 void ClientState::ArriveFromPreviousState(StateData *data)
@@ -158,6 +166,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 	ipSet = 0;
 	requestConnection = 1;
 	id = 0;
+	infoSet = 0;
 
 	peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::SocketDescriptor sd;

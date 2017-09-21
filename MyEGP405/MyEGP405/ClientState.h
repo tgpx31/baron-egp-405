@@ -16,6 +16,8 @@ protected:
 
 	void ArriveFromPreviousState(StateData *data) override;
 
+	void getClientInfo();
+
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 
@@ -25,6 +27,7 @@ protected:
 	//Flags
 	int ipSet;
 	int requestConnection;
+	int infoSet;
 };
 
 #endif
