@@ -161,7 +161,7 @@ void State::render()
 }
 
 
-
+// traverse between states
 void State::GoToNextState(State* nextState)
 {
 	*mCurrentState = nextState;
