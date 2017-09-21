@@ -65,40 +65,75 @@ void ServerState::updateNetworking()
 			pmsIn = (UsernameMessage*)packet->data;
 			printf("Client Request: Join with username \'%s\'\n", pmsIn->username);
 
-			for (unsigned int i = 0; i < maxClients; ++i)
+			if (mDataBase.connectedClientCount == 0)
 			{
-				if (mDataBase.clientDictionary.count(i) <= 0)	// if there isn't an entry with the ID
+				// assign the first open ID
+				int id = 0;
+				ClientInfo ci;
+				ci.address = packet->systemAddress;
+				strcpy(ci.username, pmsIn->username);
+
+				mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(0, ci));
+
+				printf("Client %s assigned ID #%i\n", pmsIn->username, 0);
+
+				// send them their id
+				ClientNumberMessage msOut = { ID_CLIENT_NUMBER, 0 };
+				peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+				// broadcast welcome
+				ClientChatMessage broadcast;
+				broadcast.messageID = ID_SEND_ALL;
+				std::string message = (std::string)pmsIn->username + " joined the server\n";
+				strcpy(broadcast.message, message.c_str());
+
+				for (unsigned int j = 0; j < maxClients; ++j)
 				{
-					// assign the first open ID
-					int id = i;
-					ClientInfo ci;
-					ci.address = packet->systemAddress;
-					strcpy(ci.username, pmsIn->username);
-					
-					mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, ci));
-
-					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
-
-					// send them their id
-					ClientNumberMessage msOut = { ID_CLIENT_NUMBER, i };
-					peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
-
-					// broadcast welcome
-					ClientChatMessage broadcast;
-					broadcast.messageID = ID_SEND_ALL;
-					std::string message = (std::string)pmsIn->username + " joined the server\n";
-					strcpy(broadcast.message, message.c_str());
-
-					for (unsigned int j = 0; j < maxClients; ++j)
+					//If this already exists, broadcast
+					if (mDataBase.clientDictionary.count(j) > 0)
 					{
-						//If this already exists, broadcast
-						if (mDataBase.clientDictionary.count(j) > 0)
-						{
-							peer->Send((char*)&broadcast, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+						peer->Send((char*)&broadcast, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
 
-						}
 					}
-					break;
+				}
+			}
+			else
+			{
+				for (unsigned int i = 0; i < maxClients; ++i)
+				{
+					if (mDataBase.clientDictionary.count(i) <= 0)	// if there isn't an entry with the ID
+					{
+						// assign the first open ID
+						int id = i;
+						ClientInfo ci;
+						ci.address = packet->systemAddress;
+						strcpy(ci.username, pmsIn->username);
+
+						mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, ci));
+
+						printf("Client %s assigned ID #%i\n", pmsIn->username, i);
+
+						// send them their id
+						ClientNumberMessage msOut = { ID_CLIENT_NUMBER, i };
+						peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+						// broadcast welcome
+						ClientChatMessage broadcast;
+						broadcast.messageID = ID_SEND_ALL;
+						std::string message = (std::string)pmsIn->username + " joined the server\n";
+						strcpy(broadcast.message, message.c_str());
+
+						for (unsigned int j = 0; j < maxClients; ++j)
+						{
+							//If this already exists, broadcast
+							if (mDataBase.clientDictionary.count(j) > 0)
+							{
+								peer->Send((char*)&broadcast, sizeof(ClientChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+
+							}
+						}
+						break;
+					}
 				}
 			}
 
@@ -116,7 +151,7 @@ void ServerState::updateNetworking()
 			std::string username = mDataBase.clientDictionary[pmsIn->uniqueID].username;
 			std::string message = pmsIn->message;
 
-			printf("%s: %s", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
+			printf("%s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
 
 			
 			// broadcast welcome
@@ -144,6 +179,8 @@ void ServerState::updateNetworking()
 		case ID_CONNECTION_LOST:
 			printf("A client lost the connection.\n");
 			--mDataBase.connectedClientCount;
+			if (mDataBase.connectedClientCount == 0)
+				return;
 			// iterate through the map, find disconnected client and remove them
 			for (int i = 0; i < maxClients; ++i)
 			{
