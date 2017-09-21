@@ -36,6 +36,7 @@ struct ClientNumberMessage
 struct ChatMessage
 {
 	char messageID;
+	int uniqueID;
 	char destination[31];
 	char message[512];
 };

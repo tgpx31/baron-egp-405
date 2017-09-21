@@ -70,7 +70,7 @@ void ServerState::updateNetworking()
 				if (mDataBase.clientDictionary.count(i) <= 0)	// if there isn't an entry with the ID
 				{
 					// assign the first open ID
-					mDataBase.clientDictionary.insert(std::pair <int, RakNet::SystemAddress>(i, packet->systemAddress));
+					mDataBase.clientDictionary.insert(std::pair <int, ClientInfo>(i, { pmsIn->username, packet->systemAddress }));
 					printf("Client %s assigned ID #%i\n", pmsIn->username, i);
 
 					// send them their id
@@ -88,11 +88,11 @@ void ServerState::updateNetworking()
 						//If this already exists, broadcast
 						if (mDataBase.clientDictionary.count(j) > 0)
 						{
-							peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j], false);
+							peer->Send((char*)&broadcast, sizeof(ChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
 
 						}
 					}
-					return;
+					break;
 				}
 			}
 
@@ -102,12 +102,22 @@ void ServerState::updateNetworking()
 		}
 			
 
-			// Other
+		case ID_CHAT_MESSAGE:
+		{
+			ChatMessage* pmsIn;
+			pmsIn = (ChatMessage*)packet->data;
 
+			printf("%s: %s", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
 
-			{
-				
-			}
+			/*
+			// broadcast welcome
+			ChatMessage broadcast;
+			broadcast.messageID = ID_SEND_ALL;
+			std::string message = (std::string)pmsIn->username + " joined the server\n";
+			strcpy(broadcast.message, message.c_str());
+			*/
+			break;
+		}
 
 
 
@@ -119,7 +129,7 @@ void ServerState::updateNetworking()
 			for (int i = 0; i < maxClients; ++i)
 			{
 				//I think that'll work - Brian
-				if (mDataBase.clientDictionary.at(i) == packet->systemAddress)
+				if (mDataBase.clientDictionary.at(i).address == packet->systemAddress)
 				{
 					mDataBase.clientDictionary.erase(i);
 					return;

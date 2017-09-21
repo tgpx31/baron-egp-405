@@ -18,11 +18,16 @@ private:
 	int maxClients;
 	int isServer;
 
+	struct ClientInfo
+	{
+		std::string username;
+		RakNet::SystemAddress address;
+	};
+
 	struct ClientDatabase
 	{
 		int connectedClientCount;
-		std::string clientList[256];
-		std::map<int, RakNet::SystemAddress> clientDictionary;
+		std::map<int, ClientInfo> clientDictionary;
 	}mDataBase;
 };
 
