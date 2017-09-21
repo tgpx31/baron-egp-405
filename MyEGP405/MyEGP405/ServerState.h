@@ -29,8 +29,6 @@ private:
 		int connectedClientCount;
 		std::map<int, ClientInfo> clientDictionary;
 	}mDataBase;
-
-	time_t timer;
 };
 
 #endif
