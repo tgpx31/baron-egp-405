@@ -27,7 +27,7 @@ void ServerState::init(State * prev, State * nextL, State * nextR, State ** curr
 	maxClients = 0;
 	isServer = 0;
 
-	strcpy(username, "SERVERHOSTADMIN");
+	strcpy(myUsername, "SERVERHOSTADMIN");
 
 	peer = RakNet::RakPeerInterface::GetInstance();
 	strcpy(mData.promptBuffer, "Please enter port number: \n");
@@ -42,7 +42,7 @@ void ServerState::updateNetworking()
 		peer->Startup(maxClients, &sd, 1);
 		peer->SetMaximumIncomingConnections(maxClients);
 		isServer = 1;
-		strcpy(username, "SERVERHOSTADMIN");
+		strcpy(myUsername, "SERVERHOSTADMIN");
 
 		printf("\nYour IPV4 Address is: %s \n", peer->GetLocalIP(0));
 		strcpy(mData.promptBuffer, "Welcome to the Buckroom!\nLet's talk Toronto\n");
@@ -222,11 +222,14 @@ void ServerState::updateNetworking()
 			// if sent from server
 			if (pmsIn->uniqueID == -1)
 			{
+				strcpy(broadcast.username, myUsername);
 				// it came from us as the server
 				if (pmsIn->destination[0] == '\0')
 				{
 					broadcast.isWhisper = 0;
-					printf("%s: %s \n", "SYSTEMHOSTADMIN", pmsIn->message);
+					
+
+					printf("%s: %s \n", myUsername, pmsIn->message);
 
 					for (unsigned int j = 0; j < maxClients; ++j)
 					{
@@ -240,7 +243,7 @@ void ServerState::updateNetworking()
 				else // Whisper message
 				{
 					broadcast.isWhisper = 1;
-					printf("%s Whispered to %s: %s \n", "SYSTEMHOSTADMIN", pmsIn->destination, pmsIn->message);
+					printf("%s Whispered to %s: %s \n", myUsername, pmsIn->destination, pmsIn->message);
 					for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
 					{
 						if (strcmp(it->second.username, pmsIn->destination) == 0)
@@ -254,37 +257,41 @@ void ServerState::updateNetworking()
 				break;
 				
 			}
-
-			// Public messaage
-			if (pmsIn->destination[0] == '\0')
+			else
 			{
-				broadcast.isWhisper = 0;
-				printf("%s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
-
-				for (unsigned int j = 0; j < maxClients; ++j)
+				// Public messaage
+				if (pmsIn->destination[0] == '\0')
 				{
-					//If this already exists, broadcast
-					if (mDataBase.clientDictionary.count(j) > 0)
+					broadcast.isWhisper = 0;
+					printf("%s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->message);
+
+					for (unsigned int j = 0; j < maxClients; ++j)
 					{
-						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+						//If this already exists, broadcast
+						if (mDataBase.clientDictionary.count(j) > 0)
+						{
+							peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, mDataBase.clientDictionary[j].address, false);
+						}
 					}
 				}
-			}
-			else // Whisper message
-			{
-				broadcast.isWhisper = 1;
-				printf("%s Whispered to %s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->destination, pmsIn->message);
-				for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
+				else // Whisper message
 				{
-					if (strcmp(it->second.username, pmsIn->destination) == 0)
+					broadcast.isWhisper = 1;
+					printf("%s Whispered to %s: %s \n", mDataBase.clientDictionary[pmsIn->uniqueID].username, pmsIn->destination, pmsIn->message);
+					for (std::map<int, ClientInfo>::iterator it = mDataBase.clientDictionary.begin(); it != mDataBase.clientDictionary.end(); ++it)
 					{
-						peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
+						if (strcmp(it->second.username, pmsIn->destination) == 0)
+						{
+							peer->Send((char*)&broadcast, sizeof(ServerChatMessage), HIGH_PRIORITY, RELIABLE_ORDERED, 0, it->second.address, false);
+						}
 					}
 				}
-			}
-			break;
+				break;
 
-			break;
+				break;
+			}
+
+			
 		}
 
 		//----------------------------------------------------------------------------------------------------------------------------------------------------------	

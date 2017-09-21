@@ -48,7 +48,7 @@ void ClientState::updateNetworking()
 			{
 				// Once connected, send message w/ user data to prompt welcome broadcast
 				UsernameMessage msOut;
-				strcpy(msOut.username, username);
+				strcpy(msOut.username, myUsername);
 				msOut.messageID = ID_NEW_CLIENT_JOIN;
 
 				peer->Send((char*)&msOut, sizeof(msOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
@@ -70,7 +70,7 @@ void ClientState::updateNetworking()
 				pmsIn = (ServerChatMessage*)packet->data;
 				
 				//If the user is seeing their own message, do not change color of the window for notification
-				if (strcmp(pmsIn->username, username))
+				if (strcmp(pmsIn->username, myUsername))
 					system("Color 1A");
 
 				char tmpChar[555];
@@ -256,10 +256,10 @@ void ClientState::getClientInfo()
 	{
 		//If they inputted nothing use a default user name
 		if (mData.buffer[0] == '\0')
-			strcpy(username, "GUESTUSER");
+			strcpy(myUsername, "GUESTUSER");
 		else //Else copy the inputted user name into the username slot
-			strcpy(username, mData.buffer);
-		printf("\nUser Name: %s \n", username);
+			strcpy(myUsername, mData.buffer);
+		printf("\nUser Name: %s \n", myUsername);
 
 		requestConnection = 0;		
 	}
@@ -358,7 +358,7 @@ void ClientState::init(State* prev, State* nextL, State* nextR, State** currentS
 {
 	State::init(prev, nextL, nextR, currentState);
 
-	strcpy(username, "GUESTUSER");
+	strcpy(myUsername, "GUESTUSER");
 	strcpy(mData.promptBuffer, "Please enter server IP: \n");
 
 	//Setting flags

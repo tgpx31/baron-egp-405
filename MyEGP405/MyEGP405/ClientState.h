@@ -43,7 +43,7 @@ protected:
 	RakNet::Packet *packet;
 
 	// User specific identifiers
-	char username[STR_MAX];
+	char myUsername[STR_MAX];
 	unsigned int id;
 
 	//Flags
