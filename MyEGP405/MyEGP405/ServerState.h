@@ -3,8 +3,8 @@
 
 #include "ClientState.h"
 #include <map>
-//#include <iterator>
 #include <string>
+#include <ctime>
 
 class ServerState : public ClientState
 {
@@ -30,7 +30,7 @@ private:
 		std::map<int, ClientInfo> clientDictionary;
 	}mDataBase;
 
-	Timer mTimer;
+	time_t timer;
 };
 
 #endif
