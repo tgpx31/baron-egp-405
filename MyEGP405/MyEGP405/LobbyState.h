@@ -18,6 +18,7 @@
 
 #include "State.h"
 
+// Inherited from state with overrides
 class LobbyState : public State
 {
 public:

@@ -25,6 +25,7 @@
 class ServerState : public ClientState
 {
 public:
+	// inherited
 	void init(State* prev, State* nextL, State* nextR, State** currentState) override;
 private:
 	void updateNetworking();

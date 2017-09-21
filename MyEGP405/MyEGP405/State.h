@@ -21,15 +21,6 @@
 
 #define STR_MAX 256
 
-enum ServerStates
-{
-	LOBBY_STATE,
-	CLIENT_STATE,
-	SERVER_STATE
-};
-
-
-
 class State abstract
 {
 	public: 
@@ -47,7 +38,6 @@ class State abstract
 			int running; //Whether or not the application is running
 			int doesUpdateInput, doesUpdateNetworking, doesUpdateState, doesDisplay;
 
-
 			char connectionAddress[512]; // IP of connection to connect to
 			unsigned int port; //Port the server will be connecting to
 
@@ -58,17 +48,21 @@ class State abstract
 			unsigned int bufferIndex; //Index to end of buffer
 		} mData;
 
+		// Pointers to jump states
 		State *mPrev, *mNextL, *mNextR;
 		State **mCurrentState;
 
+		// Update loop component functions
 		void updateInput();
 		virtual void updateData();
 		virtual void updateNetworking() = 0;
 		virtual void processBuffer() = 0;
 
+		// State jumpers
 		void GoToNextState(State* nextState);
 		virtual void ArriveFromPreviousState(StateData *data);
 
+		// convenience function
 		void clearBuffer();
 };
 
