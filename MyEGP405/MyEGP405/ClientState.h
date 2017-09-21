@@ -24,22 +24,25 @@
 class ClientState : public State
 {
 public:
+	// inherited
 	void init(State* prev, State* nextL, State* nextR, State** currentState) override;
 	void render();
 
 protected:
+	// inherited
 	void updateNetworking();
 	void processBuffer() override;
-
 	void ArriveFromPreviousState(StateData *data) override;
-
-	void getClientInfo();
-
 	void updateData() override;
 
+	// ease of use function
+	void getClientInfo();
+
+	// RakNet connection vars
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 
+	// User specific identifiers
 	char username[STR_MAX];
 	unsigned int id;
 
@@ -48,6 +51,7 @@ protected:
 	int requestConnection;
 	int infoSet;
 
+	// Used for the message history
 	std::vector<std::string> displayStrings;
 };
 

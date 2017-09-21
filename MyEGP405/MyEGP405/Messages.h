@@ -19,6 +19,9 @@
 #include "RakNet\MessageIdentifiers.h"
 #include "RakNet\RakNetTypes.h"
 
+// Message structs and identifiers
+// all pretty self explanatory
+
 enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,

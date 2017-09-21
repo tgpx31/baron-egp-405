@@ -198,7 +198,7 @@ void ServerState::updateNetworking()
 			printf("Clients Connected: %i of max (%i)\n", mDataBase.connectedClientCount, maxClients);
 			break;
 		}
-			
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------	
 
 		case ID_CLIENT_CHAT_MESSAGE:
 		{
@@ -246,6 +246,7 @@ void ServerState::updateNetworking()
 			break;
 		}
 
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------	
 
 
 			// Client lost messages
@@ -296,6 +297,7 @@ void ServerState::updateNetworking()
 // Process data currently in the input buffer
 void ServerState::processBuffer()
 {
+	// assign necessary rules/parameters
 	if (mData.port == 0)
 	{
 		sscanf(mData.buffer, "%i", &mData.port);
