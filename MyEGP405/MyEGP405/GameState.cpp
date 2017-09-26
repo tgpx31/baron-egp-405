@@ -16,7 +16,7 @@ void GameState::init(State * prev, State ** currentState)
 
 void GameState::initializeBoard()
 {
-	strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  ");
+	strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
 
 	// I do it like this in case in the creation of this project I reorganize the buffer.
 	// Otherwise values would be hard set
@@ -94,23 +94,52 @@ void GameState::processBuffer()
 		// **** TODO:
 		// make sure the next selected space 
 	case 'W':
-		mGameStateData.selectedSpace -= 3;
+		if (mGameStateData.selectedSpace >= 3)
+		{
+			mGameStateData.selectedSpace -= 3;
+			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+		}
 		break;
 
 	case 'A':
-		mGameStateData.selectedSpace -= 1;
+		if (mGameStateData.selectedSpace >= 1 &&
+			mGameStateData.selectedSpace != 3 &&
+			mGameStateData.selectedSpace != 6)
+		{
+			mGameStateData.selectedSpace -= 1;
+			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+		}
 		break;
 
 	case 'S':
-		mGameStateData.selectedSpace += 3;
+		if (mGameStateData.selectedSpace <= 5)
+		{
+			mGameStateData.selectedSpace += 3;
+			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+		}
 		break;
 
 	case 'D':
-		mGameStateData.selectedSpace += 1;
+		if (mGameStateData.selectedSpace <= 7 &&
+			mGameStateData.selectedSpace != 2 &&
+			mGameStateData.selectedSpace != 5)
+		{
+			mGameStateData.selectedSpace += 1;
+			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+		}
 		break;
 
 		// Enter: Check if valid space
 	case '\0':
+		if (validateMove())
+		{
+			// if valid move, update the board
+
+		}
+		else
+		{
+			printf("\n\tERROR: That space is taken!\n");
+		}
 		break;
 
 	default:
@@ -142,4 +171,15 @@ void GameState::ArriveFromPreviousState(StateData *data)
 {
 	// Render the prompt to screen
 	mData.doesDisplay = 1;
+}
+
+int GameState::validateMove()
+{
+	// if the character at the selected space offset is not an underscore, return false
+	if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) != '_')
+		return 0;
+	else
+		return 1;
+
+	return 0;
 }

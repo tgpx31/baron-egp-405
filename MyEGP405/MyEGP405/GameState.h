@@ -55,6 +55,7 @@ protected:
 
 	// GameState specific
 	void initializeBoard();
+	int validateMove();
 };
 
 #endif
