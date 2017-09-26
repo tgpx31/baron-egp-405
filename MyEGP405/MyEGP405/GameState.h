@@ -32,14 +32,29 @@ protected:
 	{
 		State *mPrev;
 
-		int isLocal;
-
 		char board[STR_MAX];
 		int boardSpaceOffsets[BOARD_SLOTS];
+
+		// The game needs to know
+		// Whose turn, X or O?
+		// What space is currently selected?
+		// Did they win with that move?
+		int playerPriority;	// 0 is o, 1 is x
+		int selectedSpace;
+		char currentPlayerChar;
+
+		int winner;			// Default this to -1. 0 = o win, 1 = x win
+
 	} mGameStateData;
 
-	void initializeBoard();
+	void updateData() override;
+	void processBuffer() override;
+
+
 	void ArriveFromPreviousState(StateData *data) override;
+
+	// GameState specific
+	void initializeBoard();
 };
 
 #endif

@@ -81,14 +81,6 @@ void State::updateData()
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 	}
-
-	/*if (mData.keyboard[VK_SPACE] && mData.bufferIndex < STR_MAX)
-	{
-		mData.buffer[mData.bufferIndex] = ' ';
-		mData.buffer[++mData.bufferIndex] = '\0';
-		mData.doesDisplay = 1;
-	}*/
-
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
 	{
