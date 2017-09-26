@@ -1,8 +1,7 @@
 // Brian Baron		0974390
-// Colin Brady		0979605
 // Justin Mulkin	0952465
 //
-// EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
+// EGP 405-02	Lab 2	2017/09/25	(YYYY/MM/DD)
 //
 //
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -15,18 +14,17 @@
 //
 #include "LobbyState.h"
 
-void LobbyState::init(State * prev, State * nextL, State * nextR, State** currentState)
+void LobbyState::init(State * nextL, State * nextM, State * nextR, State** currentState)
 {
-	State::init(prev, nextL, nextR, currentState);
+	State::init(currentState);
 
-	mData.running = 1;
-	mData.port = 0;
-	mData.bufferIndex = 0;
-	mData.buffer[0] = '\0';
-	strcpy(mData.promptBuffer, "Welcome to the Lobby.\n(C)lient, (S)erver, or (E)xit?\n");
+	next1 = nextL;
+	next2 = nextM;
+	next3 = nextR;
+
+	strcpy(mData.promptBuffer, "Welcome to Tic-Tac-Toe.\n\t(L)ocal game\n\t(H)ost an online game\n\t(C)onnect to an online game\n\t(E)xit?\n");
 
 	mData.doesUpdateInput = 1;
-	mData.doesUpdateNetworking = 1;
 	mData.doesUpdateState = 1;
 	mData.doesDisplay = 1;
 }
@@ -39,7 +37,7 @@ void LobbyState::processBuffer()
 	case 'C':
 		printf("\nClient selected\n");
 		// Initialize the client
-		GoToNextState(mNextL);
+		//GoToNextState(next3);
 		break;
 
 	case 'E':
@@ -47,12 +45,17 @@ void LobbyState::processBuffer()
 		mData.running = 0;
 		break;
 
-	case 'S':
-		printf("\nServer selected\n");
+	case 'H':
+		printf("\nHost selected\n");
 		// initialize the server
-		GoToNextState(mNextR);
+		//GoToNextState(next2);
 		break;
 
+	case 'L':
+		printf("\nLocal Game selected");
+		// load a local game
+		//GoToNextState(next1);
+		break;
 
 	default:
 		printf("\n\tERROR: Invalid Input\n");
@@ -61,9 +64,4 @@ void LobbyState::processBuffer()
 	}
 	// Clear the buffer
 	clearBuffer();
-}
-
-void LobbyState::ArriveFromPreviousState(StateData * data)
-{
-	mData.doesDisplay = 1;
 }

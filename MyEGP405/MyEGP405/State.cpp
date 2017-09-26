@@ -1,8 +1,7 @@
 // Brian Baron		0974390
-// Colin Brady		0979605
 // Justin Mulkin	0952465
 //
-// EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
+// EGP 405-02	Lab 2	2017/09/25	(YYYY/MM/DD)
 //
 //
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -20,28 +19,20 @@
 
 State::State()
 {
-	mData.running = 0;
-	mData.port = 0;
-	mData.bufferIndex = 0;
-	mData.buffer[0] = '\0';
-	strcpy(mData.promptBuffer, "");
-
 	mData.doesUpdateInput = 0;
 	mData.doesUpdateNetworking = 0;
 	mData.doesUpdateState = 0;
 	mData.doesDisplay = 0;
 
-	strcpy(mData.connectionAddress, "default");
-}
-
-void State::init(State * prev, State * nextL, State * nextR, State **currentState)
-{
-	mPrev = prev;
-	mNextL = nextL;
-	mNextR = nextR;
-	mCurrentState = currentState;
+	mData.bufferIndex = 0;
+	mData.buffer[0] = '\0';
+	strcpy(mData.promptBuffer, "");
 
 	mData.running = 1;
+}
+void State::init(State** currentState)
+{
+	mCurrentState = currentState;
 }
 
 
@@ -74,7 +65,6 @@ void State::updateData()
 			mData.doesDisplay = 1;
 		}
 	}
-
 	// Numpad
 	for (i = 0x60; i < 0x6A; ++i)
 	{
@@ -87,20 +77,19 @@ void State::updateData()
 	}
 
 	// Decimal key/period
-	i = 0x6E;
 	if (mData.keyboard[0x6E] || mData.keyboard[0xBE] && mData.bufferIndex < STR_MAX)
 	{
-		mData.buffer[mData.bufferIndex] = MapVirtualKey(i, MAPVK_VK_TO_CHAR);
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(0x6E, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 	}
 
-	if (mData.keyboard[VK_SPACE] && mData.bufferIndex < STR_MAX)
+	/*if (mData.keyboard[VK_SPACE] && mData.bufferIndex < STR_MAX)
 	{
 		mData.buffer[mData.bufferIndex] = ' ';
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
-	}
+	}*/
 
 	// Alphabet
 	for (i = 0x41; i < 0x5B; ++i)
@@ -120,9 +109,6 @@ void State::updateData()
 		mData.buffer[--mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 	}
-
-
-
 	if (mData.keyboard[VK_RETURN])
 	{
 		processBuffer();
@@ -162,7 +148,6 @@ void State::render()
 	std::cout << mData.promptBuffer << mData.buffer;
 	mData.doesDisplay = 0;
 }
-
 
 // traverse between states
 void State::GoToNextState(State* nextState)

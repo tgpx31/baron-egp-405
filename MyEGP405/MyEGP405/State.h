@@ -1,8 +1,7 @@
 // Brian Baron		0974390
-// Colin Brady		0979605
 // Justin Mulkin	0952465
 //
-// EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
+// EGP 405-02	Lab 2	2017/09/25	(YYYY/MM/DD)
 //
 //
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -25,38 +24,37 @@ class State abstract
 {
 	public: 
 		State();
+		virtual void init(State** currentState);
 
 		virtual void update();
 		virtual void render();
-		virtual void init(State* prev, State* nextL, State* nextR, State** currentState);
 		inline int isRunning() { return mData.running; };
 
 	protected:
 		// All data that every state will have in common
 		struct StateData
 		{
-			int running; //Whether or not the application is running
-			int doesUpdateInput, doesUpdateNetworking, doesUpdateState, doesDisplay;
-
-			char connectionAddress[512]; // IP of connection to connect to
-			unsigned int port; //Port the server will be connecting to
+			int running,
+				doesUpdateInput, 
+				doesUpdateNetworking, 
+				doesUpdateState, 
+				// flip this flag whenever you want to display your buffer and prompt
+				doesDisplay;
 
 			unsigned char keyboard[STR_MAX]; //Keyboard state array
-			char buffer[STR_MAX]; //Buffer to store input
-			char promptBuffer[STR_MAX];
-
 			unsigned int bufferIndex; //Index to end of buffer
+			char buffer[STR_MAX],
+				promptBuffer[STR_MAX];
+
 		} mData;
 
-		// Pointers to jump states
-		State *mPrev, *mNextL, *mNextR;
 		State **mCurrentState;
 
 		// Update loop component functions
 		void updateInput();
 		virtual void updateData();
-		virtual void updateNetworking() = 0;
-		virtual void processBuffer() = 0;
+		virtual void updateNetworking() {};
+		virtual void processBuffer();
 
 		// State jumpers
 		void GoToNextState(State* nextState);

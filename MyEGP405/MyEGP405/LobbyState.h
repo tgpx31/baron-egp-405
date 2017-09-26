@@ -1,8 +1,7 @@
 // Brian Baron		0974390
-// Colin Brady		0979605
 // Justin Mulkin	0952465
 //
-// EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
+// EGP 405-02	Lab 2	2017/09/25	(YYYY/MM/DD)
 //
 //
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -22,11 +21,11 @@
 class LobbyState : public State
 {
 public:
-	virtual void init(State* prev, State* nextL, State* nextR, State** currentState) override;
+	// Local, Host, Client
+	void init(State* nextL, State* nextM, State* nextR, State** currentState);
 private:
-	virtual void ArriveFromPreviousState(StateData *data) override;
+	State *next1, *next2, *next3;
 	virtual void processBuffer() override;
-	virtual void updateNetworking() {};
 };
 
 #endif

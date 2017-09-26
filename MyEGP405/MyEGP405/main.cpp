@@ -1,8 +1,7 @@
 // Brian Baron		0974390
-// Colin Brady		0979605
 // Justin Mulkin	0952465
 //
-// EGP 405-02	Project 1	2017/09/17 (YYYY/MM/DD)
+// EGP 405-02	Lab 2	2017/09/25	(YYYY/MM/DD)
 //
 //
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -14,25 +13,18 @@
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
 
-#include <stdio.h>
-#include "State.h"
 #include "LobbyState.h"
-#include "ClientState.h"
-#include "ServerState.h"
-
 
 int main()
 {
 	
-	LobbyState lobby[1];
-	ClientState client[1];
-	ServerState server[1];
-	
+	//ClientState client[1];
+	//ServerState server[1];
+	//
 	State *CurrentState;	// Starts in the Lobby State by default
+	LobbyState lobby[1];
 
-	lobby->init(nullptr, client, server, &CurrentState);
-	client->init(lobby, nullptr, nullptr, &CurrentState);
-	server->init(lobby, nullptr, nullptr, &CurrentState);
+	lobby->init(nullptr, nullptr, nullptr, &CurrentState);
 
 	CurrentState = lobby;
 
