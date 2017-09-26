@@ -33,6 +33,7 @@ protected:
 		State *mPrev;
 
 		char board[STR_MAX];
+		char tmpBoard[STR_MAX];
 		int boardSpaceOffsets[BOARD_SLOTS];
 
 		// The game needs to know

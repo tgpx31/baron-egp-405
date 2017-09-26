@@ -3,6 +3,12 @@
 void GameState::init(State * prev, State ** currentState)
 {
 	State::init(currentState);
+
+	mData.doesUpdateInput = 1;
+	mData.doesUpdateState = 1;
+	mData.doesUpdateNetworking = 0;
+	mData.doesDisplay = 0;
+
 	mGameStateData.mPrev = prev;
 
 	strcpy(mData.promptBuffer, "Tic-Tac-Toe*\n************\n");
@@ -17,7 +23,7 @@ void GameState::init(State * prev, State ** currentState)
 void GameState::initializeBoard()
 {
 	strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
-
+	strcpy(mGameStateData.tmpBoard, mGameStateData.board);
 	// I do it like this in case in the creation of this project I reorganize the buffer.
 	// Otherwise values would be hard set
 	unsigned int i = 0;
@@ -42,36 +48,36 @@ void GameState::initializeBoard()
 void GameState::updateData()
 {
 	// WASD
-	if (mData.keyboard['W'] && mData.bufferIndex < STR_MAX)
+	if (mData.keyboard[0x57] && mData.bufferIndex < STR_MAX)
 	{
-		mData.buffer[mData.bufferIndex] = MapVirtualKey('W', MAPVK_VK_TO_CHAR);
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(0x57, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 
 		processBuffer();
 		clearBuffer();
 	}
-	else if (mData.keyboard['A'] && mData.bufferIndex < STR_MAX)
+	else if (mData.keyboard[0x41] && mData.bufferIndex < STR_MAX)
 	{
-		mData.buffer[mData.bufferIndex] = MapVirtualKey('A', MAPVK_VK_TO_CHAR);
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(0x41, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 
 		processBuffer();
 		clearBuffer();
 	}
-	else if (mData.keyboard['S'] && mData.bufferIndex < STR_MAX)
+	else if (mData.keyboard[0x53] && mData.bufferIndex < STR_MAX)
 	{
-		mData.buffer[mData.bufferIndex] = MapVirtualKey('S', MAPVK_VK_TO_CHAR);
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(0x53, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 
 		processBuffer();
 		clearBuffer();
 	}
-	else if (mData.keyboard['D'] && mData.bufferIndex < STR_MAX)
+	else if (mData.keyboard[0x44] && mData.bufferIndex < STR_MAX)
 	{
-		mData.buffer[mData.bufferIndex] = MapVirtualKey('D', MAPVK_VK_TO_CHAR);
+		mData.buffer[mData.bufferIndex] = MapVirtualKey(0x44, MAPVK_VK_TO_CHAR);
 		mData.buffer[++mData.bufferIndex] = '\0';
 		mData.doesDisplay = 1;
 
@@ -96,7 +102,13 @@ void GameState::processBuffer()
 	case 'W':
 		if (mGameStateData.selectedSpace >= 3)
 		{
+			// reset the tmpBoard to the current board
+			strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 			mGameStateData.selectedSpace -= 3;
+
+			// Change the char to the 'select char'
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
 			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
@@ -106,7 +118,13 @@ void GameState::processBuffer()
 			mGameStateData.selectedSpace != 3 &&
 			mGameStateData.selectedSpace != 6)
 		{
+			// reset the tmpBoard to the current board
+			strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 			mGameStateData.selectedSpace -= 1;
+
+			// Change the char to the 'select char'
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
 			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
@@ -114,7 +132,13 @@ void GameState::processBuffer()
 	case 'S':
 		if (mGameStateData.selectedSpace <= 5)
 		{
+			// reset the tmpBoard to the current board
+			strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 			mGameStateData.selectedSpace += 3;
+
+			// Change the char to the 'select char'
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
 			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
@@ -124,7 +148,13 @@ void GameState::processBuffer()
 			mGameStateData.selectedSpace != 2 &&
 			mGameStateData.selectedSpace != 5)
 		{
+			// reset the tmpBoard to the current board
+			strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 			mGameStateData.selectedSpace += 1;
+
+			// Change the char to the 'select char'
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
 			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
@@ -134,6 +164,15 @@ void GameState::processBuffer()
 		if (validateMove())
 		{
 			// if valid move, update the board
+			// set the selected space to your char
+			mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
+			// set the current board
+			strcpy(mGameStateData.board, mGameStateData.tmpBoard);
+			// check if player won
+
+
+			// if not, switch player priority
 
 		}
 		else
@@ -160,8 +199,18 @@ void GameState::render()
 {
 	system("CLS");
 	printf(mData.promptBuffer);
+	
 	// Display the board
-	printf(mGameStateData.board);
+	// if the boards are different, display the tmpBoard
+	// otherwise display the regular board
+	if (strcmp(mGameStateData.board, mGameStateData.tmpBoard) != 0)
+	{
+		printf(mGameStateData.tmpBoard);
+	}
+	else
+	{
+		printf(mGameStateData.board);
+	}
 
 	printf(mData.buffer);
 	mData.doesDisplay = 0;
@@ -177,9 +226,9 @@ int GameState::validateMove()
 {
 	// if the character at the selected space offset is not an underscore, return false
 	if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) != '_')
-		return 0;
+		return 0;	// false
 	else
-		return 1;
+		return 1;	// true
 
-	return 0;
+	return 0;	// false
 }
