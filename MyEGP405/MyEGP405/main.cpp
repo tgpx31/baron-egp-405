@@ -14,6 +14,7 @@
 //
 
 #include "LobbyState.h"
+#include "GameState.h"
 
 int main()
 {
@@ -23,15 +24,13 @@ int main()
 	//
 	State *CurrentState;	// Starts in the Lobby State by default
 	LobbyState lobby[1];
+	GameState localGame[1];
 
-	lobby->init(nullptr, nullptr, nullptr, &CurrentState);
-
+	lobby->init(localGame, nullptr, nullptr, &CurrentState);
+	localGame->init(lobby, &CurrentState);
+	
 	CurrentState = lobby;
 
-	// Lobby State
-	// Start server
-	// Or client?
-	// ... or exit
 	while (CurrentState->isRunning())
 	{
 		CurrentState->update();

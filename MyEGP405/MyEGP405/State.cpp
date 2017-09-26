@@ -13,9 +13,7 @@
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
 #include "State.h"
-#include <Windows.h>
-#include <iostream>
-#include <iomanip>
+
 
 State::State()
 {
@@ -145,7 +143,8 @@ void State::update()
 void State::render()
 {
 	system("CLS");
-	std::cout << mData.promptBuffer << mData.buffer;
+	printf(mData.promptBuffer);
+	printf(mData.buffer);
 	mData.doesDisplay = 0;
 }
 

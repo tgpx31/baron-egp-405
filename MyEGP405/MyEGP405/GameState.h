@@ -12,24 +12,34 @@
 //
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
-#ifndef LOBBY_STATE_H
-#define LOBBY_STATE_H
+#ifndef GAME_STATE_H
+#define GAME_STATE_H
 
 #include "State.h"
 
-// Inherited from state with overrides
-class LobbyState : public State
+#define BOARD_SLOTS 9
+
+class GameState : public State
 {
 public:
-	// Local, Host, Client
-	void init(State* nextL, State* nextM, State* nextR, State** currentState);
-private:
-	// Data for the lobby state
-	struct LobbyData
+	void init(State* prev, State** currentState);
+
+	void render() override;
+
+protected:
+	// Data relevant to the game state
+	struct GameData
 	{
-		State *next1, *next2, *next3;
-	} mLobbyData;
-	virtual void processBuffer() override;
+		State *mPrev;
+
+		int isLocal;
+
+		char board[STR_MAX];
+		int boardSpaceOffsets[BOARD_SLOTS];
+	} mGameStateData;
+
+	void initializeBoard();
+	void ArriveFromPreviousState(StateData *data) override;
 };
 
 #endif

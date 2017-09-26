@@ -15,8 +15,12 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "RakNet\RakPeerInterface.h"
 #include <stdio.h>
+//#include <Windows.h>
+//#include <iomanip>
+
+#include "RakNet\RakPeerInterface.h"
+
 
 #define STR_MAX 256
 

@@ -18,9 +18,9 @@ void LobbyState::init(State * nextL, State * nextM, State * nextR, State** curre
 {
 	State::init(currentState);
 
-	next1 = nextL;
-	next2 = nextM;
-	next3 = nextR;
+	mLobbyData.next1 = nextL;
+	mLobbyData.next2 = nextM;
+	mLobbyData.next3 = nextR;
 
 	strcpy(mData.promptBuffer, "Welcome to Tic-Tac-Toe.\n\t(L)ocal game\n\t(H)ost an online game\n\t(C)onnect to an online game\n\t(E)xit?\n");
 
@@ -37,7 +37,7 @@ void LobbyState::processBuffer()
 	case 'C':
 		printf("\nClient selected\n");
 		// Initialize the client
-		//GoToNextState(next3);
+		//GoToNextState(mLobbyData.next3);
 		break;
 
 	case 'E':
@@ -48,13 +48,13 @@ void LobbyState::processBuffer()
 	case 'H':
 		printf("\nHost selected\n");
 		// initialize the server
-		//GoToNextState(next2);
+		//GoToNextState(mLobbyData.next2);
 		break;
 
 	case 'L':
 		printf("\nLocal Game selected");
 		// load a local game
-		//GoToNextState(next1);
+		GoToNextState(mLobbyData.next1);
 		break;
 
 	default:
