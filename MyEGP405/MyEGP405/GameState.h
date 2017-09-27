@@ -59,6 +59,7 @@ protected:
 	void initializeBoard();
 	int validateMove();
 	int checkWin();
+	int checkDraw();
 };
 
 #endif

@@ -191,6 +191,24 @@ void GameState::processBuffer()
 				mGameStateData.initialPlayerPriority = 1 - mGameStateData.initialPlayerPriority;
 				mGameStateData.playerPriority = mGameStateData.initialPlayerPriority;
 			}
+			// check if draw
+			else if (checkDraw())
+			{
+				printf("It's a draw!\n");
+				// set the tmpBoard to an empty string and wait for user to select option
+				// new round or
+				// return to menu state
+
+
+				// for now, reset the board
+				strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
+				strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+				mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+
+				// flip the starting player flag
+				mGameStateData.initialPlayerPriority = 1 - mGameStateData.initialPlayerPriority;
+				mGameStateData.playerPriority = mGameStateData.initialPlayerPriority;
+			}
 			// if not, switch player priority
 			else
 			{
@@ -341,4 +359,17 @@ int GameState::checkWin()
 	}
 
 	return 0;
+}
+
+int GameState::checkDraw()
+{
+	// Check if all spaces are filled
+	for (unsigned int i = 0; i < 9; ++i)
+	{
+		// if there are still empty spaces, there is no draw
+		if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[i]) == '_')
+			return 0;	// no draw
+	}
+
+	return 1;	// draw
 }
