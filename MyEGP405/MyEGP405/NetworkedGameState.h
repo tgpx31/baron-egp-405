@@ -29,6 +29,7 @@ private:
 	int connectionSet, networkingSetup;
 
 	RakNet::RakPeerInterface *peer;
+	RakNet::Packet *packet;
 	char connectionAddress[STR_MAX];
 	int port;
 
