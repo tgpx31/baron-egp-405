@@ -46,6 +46,7 @@ protected:
 		char currentPlayerChar;
 
 		int winner;			// Default this to -1. 0 = o win, 1 = x win
+		int endGame;
 
 	} mGameStateData;
 

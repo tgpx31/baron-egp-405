@@ -148,8 +148,8 @@ void State::GoToNextState(State* nextState)
 }
 void State::ArriveFromPreviousState(StateData * data)
 {
-	printf("YOU MADE IT");
-	mData = *data;
+	// Render the prompt to screen
+	mData.doesDisplay = 1;
 }
 
 void State::clearBuffer()
