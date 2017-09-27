@@ -35,9 +35,9 @@ void LobbyState::processBuffer()
 	switch (mData.buffer[0])
 	{
 	case 'C':
-		printf("\nClient selected\n");
+		printf("\Connect selected\n");
 		// Initialize the client
-		//GoToNextState(mLobbyData.next3);
+		GoToNextState(mLobbyData.next3);
 		break;
 
 	case 'E':
@@ -48,7 +48,8 @@ void LobbyState::processBuffer()
 	case 'H':
 		printf("\nHost selected\n");
 		// initialize the server
-		//GoToNextState(mLobbyData.next2);
+		mData.mIsHost = 1;
+		GoToNextState(mLobbyData.next2);
 		break;
 
 	case 'L':

@@ -14,20 +14,18 @@
 //
 
 #include "LobbyState.h"
-#include "GameState.h"
+#include "NetworkedGameState.h"
 
 int main()
 {
-	
-	//ClientState client[1];
-	//ServerState server[1];
-	//
 	State *CurrentState;	// Starts in the Lobby State by default
 	LobbyState lobby[1];
 	GameState localGame[1];
+	NetworkedGameState networkedGame[1];	// Can get away with using only one instance of this
 
-	lobby->init(localGame, nullptr, nullptr, &CurrentState);
+	lobby->init(localGame, networkedGame, networkedGame, &CurrentState);
 	localGame->init(lobby, &CurrentState);
+	networkedGame->init(lobby, &CurrentState);
 	
 	CurrentState = lobby;
 

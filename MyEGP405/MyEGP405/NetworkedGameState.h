@@ -12,53 +12,33 @@
 //
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
-#ifndef GAME_STATE_H
-#define GAME_STATE_H
+#ifndef NETWORKED_GAME_STATE_H
+#define NETWORKED_GAME_STATE_H
 
-#include "State.h"
+#include "GameState.h"
 
-#define BOARD_SLOTS 9
+#define DEFAULT_PORT_NUMBER 666
+#define MAX_PEER_CONNECTIONS 1
 
-class GameState : public State
+class NetworkedGameState : public GameState
 {
 public:
 	void init(State* prev, State** currentState);
 
-protected:
-	// Data relevant to the game state
-	struct GameData
-	{
-		State *mPrev;
+private:
+	int connectionSet, networkingSetup;
 
-		char board[STR_MAX];
-		char tmpBoard[STR_MAX];
-		int boardSpaceOffsets[BOARD_SLOTS];
+	RakNet::RakPeerInterface *peer;
+	char connectionAddress[STR_MAX];
+	int port;
 
-		// The game needs to know
-		// Whose turn, X or O?
-		// What space is currently selected?
-		// Did they win with that move?
-		int initialPlayerPriority;
-		int playerPriority;	// 0 is o, 1 is x
-		int selectedSpace;
-		char currentPlayerChar;
-
-		int winner;			// Default this to -1. 0 = o win, 1 = x win
-		int endGame;
-
-	} mGameStateData;
-
-	void updateData() override;
 	void processBuffer() override;
+	void updateData() override;
+	void updateNetworking() override;
 
 	void render() override;
-	void ArriveFromPreviousState(StateData *data) override;
 
-	// GameState specific
-	void initializeBoard();
-	int validateMove();
-	int checkWin();
-	int checkDraw();
+	void ArriveFromPreviousState(StateData *data) override;
 };
 
 #endif

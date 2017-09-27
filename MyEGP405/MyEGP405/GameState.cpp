@@ -309,11 +309,6 @@ void GameState::processBuffer()
 	clearBuffer();
 }
 
-
-
-
-
-
 void GameState::render()
 {
 	// Board

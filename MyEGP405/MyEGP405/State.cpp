@@ -21,6 +21,7 @@ State::State()
 	mData.doesUpdateNetworking = 0;
 	mData.doesUpdateState = 0;
 	mData.doesDisplay = 0;
+	mData.mIsHost = 0;
 
 	mData.bufferIndex = 0;
 	mData.buffer[0] = '\0';

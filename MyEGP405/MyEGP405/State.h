@@ -16,9 +16,6 @@
 #define STATE_H
 
 #include <stdio.h>
-//#include <Windows.h>
-//#include <iomanip>
-
 #include "RakNet\RakPeerInterface.h"
 
 
@@ -39,6 +36,7 @@ class State abstract
 		struct StateData
 		{
 			int running,
+				mIsHost,
 				doesUpdateInput, 
 				doesUpdateNetworking, 
 				doesUpdateState, 
