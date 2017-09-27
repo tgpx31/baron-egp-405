@@ -40,6 +40,7 @@ protected:
 		// Whose turn, X or O?
 		// What space is currently selected?
 		// Did they win with that move?
+		int initialPlayerPriority;
 		int playerPriority;	// 0 is o, 1 is x
 		int selectedSpace;
 		char currentPlayerChar;

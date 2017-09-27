@@ -11,11 +11,12 @@ void GameState::init(State * prev, State ** currentState)
 
 	mGameStateData.mPrev = prev;
 
-	strcpy(mData.promptBuffer, "Tic-Tac-Toe*\n************\n");
+	strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
 	initializeBoard();
 
+	mGameStateData.initialPlayerPriority = 1;	// start with X
 	mGameStateData.playerPriority = 1;	// start with X
-	mGameStateData.selectedSpace = 0;
+	mGameStateData.selectedSpace = 4;
 	mGameStateData.currentPlayerChar = 'X';
 	mGameStateData.winner = -1;
 }
@@ -24,6 +25,7 @@ void GameState::initializeBoard()
 {
 	strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
 	strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 	// I do it like this in case in the creation of this project I reorganize the buffer.
 	// Otherwise values would be hard set
 	unsigned int i = 0;
@@ -32,7 +34,7 @@ void GameState::initializeBoard()
 		// if the char is an underscore, it represents an empty space
 		// if there is room in the empty spaces array, store the offset of that space.
 		if (i >= BOARD_SLOTS)
-			return;
+			break;
 
 		if (c == '_')
 		{
@@ -42,6 +44,7 @@ void GameState::initializeBoard()
 			++i;
 		}
 	}
+	mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
 }
 
 
@@ -174,22 +177,31 @@ void GameState::processBuffer()
 			{
 				mGameStateData.winner = mGameStateData.playerPriority;
 				printf("Player %c is the winner!\n", mGameStateData.currentPlayerChar);
-				
-				
-				// reset the board and swap
+				// set the tmpBoard to an empty string and wait for user to select option
+				// new round or
+				// return to menu state
 
+
+				// for now, reset the board
+				strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
+				strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+				mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+
+				// flip the starting player flag
+				mGameStateData.initialPlayerPriority = 1 - mGameStateData.initialPlayerPriority;
+				mGameStateData.playerPriority = mGameStateData.initialPlayerPriority;
 			}
 			// if not, switch player priority
 			else
 			{
-
+				mGameStateData.playerPriority = 1 - mGameStateData.playerPriority;
+				mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
 			}
 
-			// reset selected
-			mGameStateData.selectedSpace = 0;
-
-
+			// reset selected space
+			mGameStateData.selectedSpace = 4;
 			mData.doesDisplay = 1;
+			mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
 		}
 		else
 		{
@@ -228,7 +240,8 @@ void GameState::render()
 		printf(mGameStateData.board);
 	}
 
-	printf(mData.buffer);
+	printf("\nPlayer %c's turn\n", mGameStateData.currentPlayerChar);
+	//printf(mData.buffer);
 	mData.doesDisplay = 0;
 }
 
