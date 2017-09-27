@@ -92,6 +92,18 @@ void GameState::updateData()
 			processBuffer();
 			clearBuffer();
 		}
+
+		// ESC
+		else if (mData.keyboard[0x1B] && mData.bufferIndex < STR_MAX)
+		{
+			mData.buffer[mData.bufferIndex] = MapVirtualKey(0x1B, MAPVK_VK_TO_CHAR);
+			mData.buffer[++mData.bufferIndex] = '\0';
+			mData.doesDisplay = 1;
+
+			processBuffer();
+			clearBuffer();
+		}
+
 	}
 	else if (mGameStateData.endGame)
 	{
@@ -188,6 +200,20 @@ void GameState::processBuffer()
 				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
 				//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 			}
+			break;
+		}
+
+		// ESC
+		case '\x1b':
+		{
+			printf("ESC pressed\n");
+			// Active player forfeits
+			mGameStateData.endGame = 1;
+			mGameStateData.winner = 1 - mGameStateData.playerPriority;
+
+			strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+
+			mData.doesDisplay = 1;
 			break;
 		}
 
@@ -312,7 +338,7 @@ void GameState::render()
 		system("CLS");
 
 		if (mGameStateData.winner != -1)
-			printf("Player %c is the winner!\n", mGameStateData.currentPlayerChar);
+			printf("Player %c is the winner!\n", mGameStateData.winner ? 'X' : 'O');
 		else if (mGameStateData.winner == -1)
 			printf("It's a draw!\n");
 
