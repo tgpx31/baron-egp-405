@@ -109,7 +109,7 @@ void GameState::processBuffer()
 
 			// Change the char to the 'select char'
 			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
-			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+			//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
 
@@ -125,7 +125,7 @@ void GameState::processBuffer()
 
 			// Change the char to the 'select char'
 			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
-			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+			//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
 
@@ -139,7 +139,7 @@ void GameState::processBuffer()
 
 			// Change the char to the 'select char'
 			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
-			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+			//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
 
@@ -155,7 +155,7 @@ void GameState::processBuffer()
 
 			// Change the char to the 'select char'
 			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
-			printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+			//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
 		}
 		break;
 
@@ -170,10 +170,26 @@ void GameState::processBuffer()
 			// set the current board
 			strcpy(mGameStateData.board, mGameStateData.tmpBoard);
 			// check if player won
+			if (checkWin())
+			{
+				mGameStateData.winner = mGameStateData.playerPriority;
+				printf("Player %c is the winner!\n", mGameStateData.currentPlayerChar);
+				
+				
+				// reset the board and swap
 
-
+			}
 			// if not, switch player priority
+			else
+			{
 
+			}
+
+			// reset selected
+			mGameStateData.selectedSpace = 0;
+
+
+			mData.doesDisplay = 1;
 		}
 		else
 		{
@@ -231,4 +247,85 @@ int GameState::validateMove()
 		return 1;	// true
 
 	return 0;	// false
+}
+
+int GameState::checkWin()
+{
+	// If we got here, then our move was validated and we placed our char
+	
+	// check horizontal
+	{
+		// if selected space is in the left column
+		if (mGameStateData.selectedSpace == 0 || mGameStateData.selectedSpace % 3 == 0)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 2]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+		// middle
+		else if (mGameStateData.selectedSpace % 3 == 1)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+		// right
+		else if (mGameStateData.selectedSpace % 3 == 2)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 2]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+	}
+	// check vertical
+	{
+		// top row
+		if (mGameStateData.selectedSpace >= 0 && mGameStateData.selectedSpace <= 2)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 6]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+		// middle
+		else if (mGameStateData.selectedSpace >= 3 && mGameStateData.selectedSpace <= 5)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+		// bottom
+		else if (mGameStateData.selectedSpace >= 6 && mGameStateData.selectedSpace <= 8)
+		{
+			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 6]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar)
+			{
+				return 1;
+			}
+		}
+	}
+	// check diagonals
+	{
+		if ((*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[0]) == mGameStateData.currentPlayerChar &&
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[8]) == mGameStateData.currentPlayerChar) 
+			||
+			(*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[2]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[6]) == mGameStateData.currentPlayerChar))
+		{
+			return 1;
+		}
+	}
+
+	return 0;
 }
