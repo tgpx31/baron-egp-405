@@ -414,8 +414,12 @@ void NetworkedGameState::updateNetworking()
 			// reset selected space
 			mGameStateData.selectedSpace = 4;
 
+			strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
 			// Display
 			mData.doesDisplay = 1;
+
+			break;
 		}
 
 		default:
