@@ -8,25 +8,50 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 	mData.doesDisplay = 1;
 
 	if (!mData.mIsHost)
+	{
+		//Prompt for if it is not the host
 		strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Connecting\nEnter your friend's IP address, or hit ENTER to use '127.0.0.1'\n");
+
+		//Setup the socket descriptor
+		RakNet::SocketDescriptor sd(port, 0);
+		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
+	}
+	else if (mData.mIsHost)
+	{
+		//If you are the host:
+		RakNet::SocketDescriptor sd(port, 0);
+
+		//Startup the peer
+		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
+		peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
+
+		connectionSet = 1;
+
+		networkingSetup = 1;
+	}
+
+	//Set it to update the networking
+	mData.doesUpdateNetworking = 1;
+
 }
 
 void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nullptr)
 {
-	// initialize the game state
+	//Init the gamestate data
 	GameState::init(prev, currentState);
 
-	strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
-
-	// initialize the networking params
-	mData.doesUpdateNetworking = 1;
+	//Initialize the peer
 	peer = RakNet::RakPeerInterface::GetInstance();
 
+	//Initializing the connection address to the null terminator
 	memset(connectionAddress, '\0', sizeof(connectionAddress));
-	port = DEFAULT_PORT_NUMBER;
 
+	//Setting flags
 	connectionSet = 0;
 	networkingSetup = 0;
+
+	//Default prompt for the host
+	strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
 }
 
 void NetworkedGameState::updateData()
@@ -47,106 +72,60 @@ void NetworkedGameState::processBuffer()
 			strcpy(connectionAddress, mData.buffer);
 
 		clearBuffer();
+
+		connectionSet = 1;
 	}
 }
 
 void NetworkedGameState::updateNetworking()
 {
-	if (!connectionSet)
+	//If you aren't a host and the connection is false
+	if (connectionSet && !mData.mIsHost && !networkingSetup)
 	{
-		if (mData.mIsHost)
-		{
-			// Set up your connection (host)
-			RakNet::SocketDescriptor sd(port, 0);
-			peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
-			peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
-			render();
+		//Connect to the desired address and port
+		peer->Connect(connectionAddress, port, 0, 0);
 
-			connectionSet = 1;
-			mData.doesDisplay = 1;
-		}
-		else if (!mData.mIsHost && connectionAddress[0] != '\0')
-		{
-			// Client peer connection setup
-			peer->Connect(connectionAddress, port, 0, 0);
-			printf("\nRequesting connection to %s...\n", connectionAddress);
+		printf("Requesting connection...\n");
 
-			connectionSet = 1;
-			mData.doesDisplay = 1;
-		}
+		networkingSetup = 1;
 	}
-	else if (connectionSet)
+
+	// message loop
+	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 	{
-		// Start the networking loop
-		// check if all the networking setup is done
-		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
+		switch (packet->data[0])
 		{
-			if (!networkingSetup)
-			{
-				switch (packet->data[0])
-				{
-					case ID_NEW_INCOMING_CONNECTION: case ID_REMOTE_NEW_INCOMING_CONNECTION:
-				{
-					printf("A connection is incoming.\n");
-
-					if (mData.mIsHost)
-						networkingSetup = 1;
-					break;
-				}
-
-				case ID_CONNECTION_REQUEST_ACCEPTED:
-				{
-					printf("You've connected.\n");
-
-					if (!mData.mIsHost)
-						networkingSetup = 1;
-					break;
-				}
-
-				case ID_NO_FREE_INCOMING_CONNECTIONS:
-				{
-					printf("Theres no room to join!\n");
-					GoToNextState(mGameStateData.mPrev);
-					break;
-				}
-					
-
-				default:
-					printf("Message with identifier %i has arrived.\n", packet->data[0]);
-					break;
-				}
-			}
-			else if (networkingSetup)
-			{
-
-			}
-
-
-
-
-			//if (!networkingSetup)
-			//{
-			//	if (mData.mIsHost)
-			//	{
-			//		// Wait for your friend to connect
-
-			//		/*if (peer->NumberOfConnections() <= 0)
-			//			return;
-			//		else
-			//		{
-			//			printf("Your friend is here!\n");
-			//			networkingSetup = 1;
-			//		}*/
-			//	}
-			//	else if (!mData.mIsHost)
-			//	{
-			//		// Do we need anything here?
-			//		// we're not set up until our connection is accepted
-			//	}
-			//}
+			// Client connected messages
+		case ID_REMOTE_NEW_INCOMING_CONNECTION:
+		{
+			printf("Another client has connected.\n");
+			break;
 		}
-		// end messaging loop
 
+		case ID_NEW_INCOMING_CONNECTION:
+		{
+			printf("A connection is incoming.\n");
+			break;
+		}
+		// Client lost messages
+		case ID_CONNECTION_LOST:
+		{
+			printf("A client lost the connection.\n");
+			break;
+		}
+
+		case ID_DISCONNECTION_NOTIFICATION:
+		{
+			printf("A client has disconnected.\n");
+			break;
+		}
+
+		default:
+		{
+			printf("Message with identifier %i has arrived.\n", packet->data[0]);
+			break;
+		}
+		}
 	}
 }
 
