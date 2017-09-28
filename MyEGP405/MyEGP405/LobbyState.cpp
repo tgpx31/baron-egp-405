@@ -37,6 +37,7 @@ void LobbyState::processBuffer()
 	case 'C':
 		printf("\Connect selected\n");
 		// Initialize the client
+		mData.mIsHost = 0;
 		GoToNextState(mLobbyData.next3);
 		break;
 
