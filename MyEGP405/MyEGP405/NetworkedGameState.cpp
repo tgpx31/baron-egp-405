@@ -68,7 +68,7 @@ void NetworkedGameState::updateData()
 	else if (connectionSet)
 	{
 		//If the player priority is equal to the character flag, let the player have a turn
-		if (isX == mGameStateData.playerPriority)
+		if (isX == mGameStateData.playerPriority || mGameStateData.endGame)
 		{
 			GameState::updateData();
 		}
@@ -192,10 +192,10 @@ void NetworkedGameState::processBuffer()
 					// if valid move, update the board
 					// set the selected space to your char
 					mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
-					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
+					*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
 
 					// set the current board
-					strcpy(mGameStateData.board, mGameStateData.tmpBoard);
+					//strcpy(mGameStateData.board, mGameStateData.tmpBoard);
 
 					// check if player won
 					if (checkWin())
@@ -222,7 +222,6 @@ void NetworkedGameState::processBuffer()
 
 					// reset selected space
 					mGameStateData.selectedSpace = 4;
-					mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
 
 					// Display
 					mData.doesDisplay = 1;
@@ -248,7 +247,7 @@ void NetworkedGameState::processBuffer()
 				strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
 				strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
 				strcpy(mGameStateData.tmpBoard, mGameStateData.board);
-				mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+				//mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
 
 				// flip the starting player flag
 				mGameStateData.initialPlayerPriority = 1 - mGameStateData.initialPlayerPriority;
@@ -384,10 +383,10 @@ void NetworkedGameState::updateNetworking()
 			// if valid move, update the board
 			// set the selected space to your char
 			mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
-			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
+			*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
 
 			// set the current board
-			strcpy(mGameStateData.board, mGameStateData.tmpBoard);
+			//strcpy(mGameStateData.board, mGameStateData.tmpBoard);
 
 			// check if player won
 			if (checkWin())
@@ -414,7 +413,6 @@ void NetworkedGameState::updateNetworking()
 
 			// reset selected space
 			mGameStateData.selectedSpace = 4;
-			mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
 
 			// Display
 			mData.doesDisplay = 1;
