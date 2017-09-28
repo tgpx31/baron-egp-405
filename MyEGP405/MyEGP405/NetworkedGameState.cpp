@@ -13,7 +13,7 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Connecting\nEnter your friend's IP address, or hit ENTER to use '127.0.0.1'\n");
 
 		//Setup the socket descriptor
-		RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
+		RakNet::SocketDescriptor sd;// (DEFAULT_PORT_NUMBER, 0);
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 	}
 	else if (mData.mIsHost)
