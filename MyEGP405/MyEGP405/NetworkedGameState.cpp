@@ -83,7 +83,6 @@ void NetworkedGameState::updateNetworking()
 	{
 		//Connect to the desired address and port
 		peer->Connect(connectionAddress, DEFAULT_PORT_NUMBER, 0, 0);
-
 		printf("Requesting connection...\n");
 
 		networkingSetup = 1;
@@ -97,7 +96,16 @@ void NetworkedGameState::updateNetworking()
 	{
 		switch (packet->data[0])
 		{
-			// Client connected messages
+
+		// New connections
+		case ID_CONNECTION_REQUEST_ACCEPTED:
+		{
+			printf("Our connection has been accepted.\n");
+			// SETUP GAME BOARD
+			// SYNC WHOSE TURN IT IS
+			break;
+		}
+
 		case ID_REMOTE_NEW_INCOMING_CONNECTION:
 		{
 			printf("Another client has connected.\n");
@@ -107,12 +115,35 @@ void NetworkedGameState::updateNetworking()
 		case ID_NEW_INCOMING_CONNECTION:
 		{
 			printf("A connection is incoming.\n");
+			// SETUP GAME BOARD
+			// SYNC WHOSE TURN IT IS
 			break;
 		}
-		// Client lost messages
+
+		// Connection Lost
 		case ID_CONNECTION_LOST:
 		{
 			printf("A client lost the connection.\n");
+			// become host, awaiting friend to join
+			//mData.mIsHost = 1;
+			//// close the connection
+			//peer->Shutdown(0);
+
+			////Setting flags
+			//connectionSet = 0;
+			//networkingSetup = 0;
+
+			////Default prompt for the host
+			//strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
+
+			//RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
+
+			////Startup the peer
+			//peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
+			//peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
+
+			//connectionSet = 1;
+			//networkingSetup = 1;
 			break;
 		}
 
