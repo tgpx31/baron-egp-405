@@ -375,8 +375,8 @@ int GameState::checkWin()
 		// if selected space is in the left column
 		if (mGameStateData.selectedSpace == 0 || mGameStateData.selectedSpace % 3 == 0)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 2]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 2]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -384,8 +384,8 @@ int GameState::checkWin()
 		// middle
 		else if (mGameStateData.selectedSpace % 3 == 1)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 1]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -393,8 +393,8 @@ int GameState::checkWin()
 		// right
 		else if (mGameStateData.selectedSpace % 3 == 2)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 2]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 2]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 1]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -405,8 +405,8 @@ int GameState::checkWin()
 		// top row
 		if (mGameStateData.selectedSpace >= 0 && mGameStateData.selectedSpace <= 2)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 6]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 6]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -414,8 +414,8 @@ int GameState::checkWin()
 		// middle
 		else if (mGameStateData.selectedSpace >= 3 && mGameStateData.selectedSpace <= 5)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace + 3]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -423,8 +423,8 @@ int GameState::checkWin()
 		// bottom
 		else if (mGameStateData.selectedSpace >= 6 && mGameStateData.selectedSpace <= 8)
 		{
-			if (*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 6]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar)
+			if (*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 6]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace - 3]) == mGameStateData.currentPlayerChar)
 			{
 				return 1;
 			}
@@ -432,13 +432,13 @@ int GameState::checkWin()
 	}
 	// check diagonals
 	{
-		if ((*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[0]) == mGameStateData.currentPlayerChar &&
-			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
-			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[8]) == mGameStateData.currentPlayerChar)
+		if ((*(mGameStateData.board + mGameStateData.boardSpaceOffsets[0]) == mGameStateData.currentPlayerChar &&
+			*(mGameStateData.board + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
+			*(mGameStateData.board + mGameStateData.boardSpaceOffsets[8]) == mGameStateData.currentPlayerChar)
 			||
-			(*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[2]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
-				*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[6]) == mGameStateData.currentPlayerChar))
+			(*(mGameStateData.board + mGameStateData.boardSpaceOffsets[2]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[4]) == mGameStateData.currentPlayerChar &&
+				*(mGameStateData.board + mGameStateData.boardSpaceOffsets[6]) == mGameStateData.currentPlayerChar))
 		{
 			return 1;
 		}

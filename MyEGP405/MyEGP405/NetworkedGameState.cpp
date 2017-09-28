@@ -3,8 +3,12 @@
 
 void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 {
-	// Are you a host or not?
-	mData.mIsHost = data->mIsHost;
+	if (data != nullptr)
+	{
+		// Are you a host or not?
+		mData.mIsHost = data->mIsHost;
+	}
+
 	mData.doesDisplay = 1;
 
 	if (!mData.mIsHost)
@@ -263,6 +267,20 @@ void NetworkedGameState::processBuffer()
 
 			case 'M':
 			{
+				//Send a peer has left message
+				GameMoveMessage msgOut;
+				msgOut.id = ID_PEER_LEFT;
+				msgOut.placementIndex = 0;
+
+				//Send based on address saved when connecting			
+				peer->Send((char*)&msgOut, sizeof(msgOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, address, false);
+
+				//Close the connections
+				peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
+
+				//Init the state
+				init(nullptr, nullptr);
+
 				GoToNextState(mGameStateData.mPrev);
 				break;
 			}
@@ -420,6 +438,19 @@ void NetworkedGameState::updateNetworking()
 			mData.doesDisplay = 1;
 
 			break;
+		}
+		//Case for if one of the peers has left
+		case ID_PEER_LEFT:
+		{
+			//Close the connections
+			peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
+
+			//Set this as the host for a new game
+			mData.mIsHost = true;
+
+			//Initializing as a new host
+			init(nullptr, nullptr);
+			ArriveFromPreviousState(nullptr);
 		}
 
 		default:

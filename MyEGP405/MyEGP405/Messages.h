@@ -27,7 +27,7 @@ enum GameMessages
 
 	// New messages
 	ID_VALID_MOVE,
-	ID_
+	ID_PEER_LEFT,
 };
 
 /*
