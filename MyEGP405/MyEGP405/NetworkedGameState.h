@@ -26,7 +26,7 @@ public:
 	void init(State* prev, State** currentState);
 
 private:
-	int connectionSet, networkingSetup;
+	int connectionSet, networkingSetup, isPlaying, isX;
 
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;

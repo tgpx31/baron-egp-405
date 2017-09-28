@@ -15,6 +15,9 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		//Setup the socket descriptor
 		RakNet::SocketDescriptor sd;// (DEFAULT_PORT_NUMBER, 0);
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
+
+		//Setting the isX flag to one to indicate which letter the client is
+		isX = 0;
 	}
 	else if (mData.mIsHost)
 	{
@@ -27,6 +30,9 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 
 		connectionSet = 1;
 		networkingSetup = 1;
+
+		//Setting the isX flag to one to indicate which letter the host is
+		isX = 1;
 	}
 
 	//Set it to update the networking
@@ -48,6 +54,7 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 	//Setting flags
 	connectionSet = 0;
 	networkingSetup = 0;
+	isPlaying = 0;
 
 	//Default prompt for the host
 	strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
@@ -55,10 +62,17 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 
 void NetworkedGameState::updateData()
 {
+	//Update the state and gamestate data
 	if (!connectionSet)
 		State::updateData();
 	else if (connectionSet)
-		GameState::updateData();
+	{
+		//If the player priority is equal to the character flag, let the player have a turn
+		if (isX == mGameStateData.playerPriority)
+		{
+			GameState::updateData();
+		}
+	}
 }
 
 void NetworkedGameState::processBuffer()
@@ -101,7 +115,12 @@ void NetworkedGameState::updateNetworking()
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 		{
 			printf("Our connection has been accepted.\n");
+			isPlaying = 1;
 			// SETUP GAME BOARD
+			strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
+			
+			render();
+
 			// SYNC WHOSE TURN IT IS
 			break;
 		}
@@ -115,7 +134,12 @@ void NetworkedGameState::updateNetworking()
 		case ID_NEW_INCOMING_CONNECTION:
 		{
 			printf("A connection is incoming.\n");
+			isPlaying = 1;
 			// SETUP GAME BOARD
+			strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
+
+			render();
+
 			// SYNC WHOSE TURN IT IS
 			break;
 		}
@@ -164,8 +188,8 @@ void NetworkedGameState::updateNetworking()
 
 void NetworkedGameState::render()
 {
-	if (!connectionSet && !networkingSetup)
+	if (!isPlaying)
 		State::render();
-	else if (connectionSet && networkingSetup)
+	else if (isPlaying)
 		GameState::render();
 }
