@@ -275,8 +275,8 @@ void NetworkedGameState::processBuffer()
 				//Close the connections
 				//peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
 				//Init the state
-				init(nullptr, nullptr);
 				peer->Shutdown(1, RELIABLE_ORDERED, HIGH_PRIORITY);
+				init(nullptr, nullptr);
 				
 				GoToNextState(mGameStateData.mPrev);
 				return;
