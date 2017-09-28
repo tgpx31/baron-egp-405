@@ -198,9 +198,6 @@ void NetworkedGameState::processBuffer()
 					mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
 					*(mGameStateData.board + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
 
-					// set the current board
-					//strcpy(mGameStateData.board, mGameStateData.tmpBoard);
-
 					// check if player won
 					if (checkWin())
 					{
@@ -276,12 +273,13 @@ void NetworkedGameState::processBuffer()
 				peer->Send((char*)&msgOut, sizeof(msgOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, address, false);
 
 				//Close the connections
-				peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
-
+				//peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
 				//Init the state
 				init(nullptr, nullptr);
-
+				peer->Shutdown(1, RELIABLE_ORDERED, HIGH_PRIORITY);
+				
 				GoToNextState(mGameStateData.mPrev);
+				return;
 				break;
 			}
 
@@ -355,33 +353,6 @@ void NetworkedGameState::updateNetworking()
 			break;
 		}
 
-		// Connection Lost
-		case ID_CONNECTION_LOST:
-		{
-			printf("A client lost the connection.\n");
-			// become host, awaiting friend to join
-			//mData.mIsHost = 1;
-			//// close the connection
-			//peer->Shutdown(0);
-
-			////Setting flags
-			//connectionSet = 0;
-			//networkingSetup = 0;
-
-			////Default prompt for the host
-			//strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
-
-			//RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
-
-			////Startup the peer
-			//peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
-			//peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
-
-			//connectionSet = 1;
-			//networkingSetup = 1;
-			break;
-		}
-
 		case ID_DISCONNECTION_NOTIFICATION:
 		{
 			printf("A client has disconnected.\n");
@@ -443,14 +414,15 @@ void NetworkedGameState::updateNetworking()
 		case ID_PEER_LEFT:
 		{
 			//Close the connections
-			peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
+			//peer->CloseConnection(address, false, RELIABLE_ORDERED, HIGH_PRIORITY);
 
-			//Set this as the host for a new game
-			mData.mIsHost = true;
-
-			//Initializing as a new host
+			peer->Shutdown(1, RELIABLE_ORDERED, HIGH_PRIORITY);
 			init(nullptr, nullptr);
+			
+			mData.mIsHost = true;
 			ArriveFromPreviousState(nullptr);
+			return;
+			break;
 		}
 
 		default:
