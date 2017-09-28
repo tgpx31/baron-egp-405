@@ -178,14 +178,6 @@ void NetworkedGameState::processBuffer()
 				strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
 
 				mData.doesDisplay = 1;
-
-				// send this to the other player
-				GameMoveMessage msgOut;
-				msgOut.id = ID_PEER_SURRENDER;
-				msgOut.placementIndex = 0;
-
-				peer->Send((char*)&msgOut, sizeof(msgOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, address, false);
-
 				break;
 			}
 
@@ -430,21 +422,6 @@ void NetworkedGameState::updateNetworking()
 			mData.mIsHost = true;
 			ArriveFromPreviousState(nullptr);
 			return;
-			break;
-		}
-
-		case ID_PEER_SURRENDER:
-		{
-			// receive the message
-
-			// other player surrendered, send you to the win
-			mGameStateData.endGame = 1;
-			mGameStateData.winner = 1 - mGameStateData.playerPriority;
-
-			strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
-
-			mData.doesDisplay = 1;
-
 			break;
 		}
 
