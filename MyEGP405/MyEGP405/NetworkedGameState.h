@@ -32,6 +32,8 @@ private:
 	RakNet::Packet *packet;
 	char connectionAddress[STR_MAX];
 
+	RakNet::SystemAddress address;
+
 	void processBuffer() override;
 	void updateData() override;
 	void updateNetworking() override;

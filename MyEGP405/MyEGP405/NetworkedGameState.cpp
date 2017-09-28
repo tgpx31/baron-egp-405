@@ -88,6 +88,194 @@ void NetworkedGameState::processBuffer()
 
 		connectionSet = 1;
 	}
+	//Else if the connection has been set and you are in game
+	else if (isPlaying)
+	{
+		if (!mGameStateData.endGame)
+		{
+			switch (mData.buffer[0])
+			{
+				// WASD: move the 'selected space'
+				// **** TODO:
+				// make sure the next selected space 
+			case 'W':
+			{
+				if (mGameStateData.selectedSpace >= 3)
+				{
+					// reset the tmpBoard to the current board
+					strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
+					mGameStateData.selectedSpace -= 3;
+
+					// Change the char to the 'select char'
+					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
+					//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+				}
+				break;
+			}
+			case 'A':
+			{
+				if (mGameStateData.selectedSpace >= 1 &&
+					mGameStateData.selectedSpace != 3 &&
+					mGameStateData.selectedSpace != 6)
+				{
+					// reset the tmpBoard to the current board
+					strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
+					mGameStateData.selectedSpace -= 1;
+
+					// Change the char to the 'select char'
+					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
+					//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+				}
+				break;
+			}
+			case 'S':
+			{
+				if (mGameStateData.selectedSpace <= 5)
+				{
+					// reset the tmpBoard to the current board
+					strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
+					mGameStateData.selectedSpace += 3;
+
+					// Change the char to the 'select char'
+					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
+					//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+				}
+				break;
+			}
+			case 'D':
+			{
+				if (mGameStateData.selectedSpace <= 7 &&
+					mGameStateData.selectedSpace != 2 &&
+					mGameStateData.selectedSpace != 5)
+				{
+					// reset the tmpBoard to the current board
+					strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+
+					mGameStateData.selectedSpace += 1;
+
+					// Change the char to the 'select char'
+					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = '@';
+					//printf("\nSelected space %i\n", mGameStateData.selectedSpace);
+				}
+				break;
+			}
+
+			// ESC
+			case '\x1b':
+			{
+				printf("ESC pressed\n");
+				// Active player forfeits
+				mGameStateData.endGame = 1;
+				mGameStateData.winner = 1 - mGameStateData.playerPriority;
+
+				strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+
+				mData.doesDisplay = 1;
+				break;
+			}
+
+			// Enter: Check if valid space
+			case '\0':
+				if (validateMove())
+				{
+					//If the move is valid, send the move message
+					GameMoveMessage msgOut;
+					msgOut.id = ID_VALID_MOVE;
+					msgOut.placementIndex = mGameStateData.selectedSpace;
+
+					//Send based on address saved when connecting			
+					peer->Send((char*)&msgOut, sizeof(msgOut), HIGH_PRIORITY, RELIABLE_ORDERED, 0, address, false);
+
+					// if valid move, update the board
+					// set the selected space to your char
+					mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+					*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
+
+					// set the current board
+					strcpy(mGameStateData.board, mGameStateData.tmpBoard);
+
+					// check if player won
+					if (checkWin())
+					{
+						mGameStateData.endGame = 1;
+						mGameStateData.winner = mGameStateData.playerPriority;
+
+						strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+					}
+					// check if draw
+					else if (checkDraw())
+					{
+						mGameStateData.endGame = 1;
+						mGameStateData.winner = -1;
+
+						strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+					}
+					// if not, switch player priority
+					else
+					{
+						mGameStateData.playerPriority = 1 - mGameStateData.playerPriority;
+						mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+					}
+
+					// reset selected space
+					mGameStateData.selectedSpace = 4;
+					mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+
+					// Display
+					mData.doesDisplay = 1;
+				}
+				else
+				{
+					printf("\n\tERROR: That space is taken!\n");
+				}
+				break;
+
+			default:
+				printf("\n\tERROR: Invalid Input\n");
+				break;
+
+			}
+		}
+		else if (mGameStateData.endGame)
+		{
+			switch (mData.buffer[0])
+			{
+			case 'R':
+			{
+				strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
+				strcpy(mGameStateData.board, "  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n-----------------\n  _  |  _  |  _  \n");
+				strcpy(mGameStateData.tmpBoard, mGameStateData.board);
+				mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+
+				// flip the starting player flag
+				mGameStateData.initialPlayerPriority = 1 - mGameStateData.initialPlayerPriority;
+				mGameStateData.playerPriority = mGameStateData.initialPlayerPriority;
+				mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+
+				mGameStateData.winner = -1;
+				mGameStateData.endGame = 0;
+
+				mData.doesDisplay = 1;
+				break;
+			}
+
+			case 'M':
+			{
+				GoToNextState(mGameStateData.mPrev);
+				break;
+			}
+
+			default:
+				printf("\n\tERROR: Invalid Input\n");
+				break;
+			}
+		}
+		// Clear the buffer
+		clearBuffer();
+	}
 }
 
 void NetworkedGameState::updateNetworking()
@@ -116,6 +304,9 @@ void NetworkedGameState::updateNetworking()
 		{
 			printf("Our connection has been accepted.\n");
 			isPlaying = 1;
+
+			//Get a permanent reference to your peer
+			address = packet->systemAddress;
 			// SETUP GAME BOARD
 			strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
 			
@@ -135,6 +326,9 @@ void NetworkedGameState::updateNetworking()
 		{
 			printf("A connection is incoming.\n");
 			isPlaying = 1;
+
+			//Get a permanent reference to your peer
+			address = packet->systemAddress;
 			// SETUP GAME BOARD
 			strcpy(mData.promptBuffer, "* Tic-Tac-Toe * Use WASD to move your selection, press ENTER to confirm *\n*************************************************************************\n");
 
@@ -175,6 +369,55 @@ void NetworkedGameState::updateNetworking()
 		{
 			printf("A client has disconnected.\n");
 			break;
+		}
+
+		//Case for receiving a move message
+		case ID_VALID_MOVE:
+		{
+			//Create a gamemovemessage to recieve data from
+			GameMoveMessage* msgIn;
+			msgIn = (GameMoveMessage*)packet->data;
+
+			//Get the placement index from the packet
+			mGameStateData.selectedSpace = msgIn->placementIndex;
+
+			// if valid move, update the board
+			// set the selected space to your char
+			mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+			*(mGameStateData.tmpBoard + mGameStateData.boardSpaceOffsets[mGameStateData.selectedSpace]) = mGameStateData.currentPlayerChar;
+
+			// set the current board
+			strcpy(mGameStateData.board, mGameStateData.tmpBoard);
+
+			// check if player won
+			if (checkWin())
+			{
+				mGameStateData.endGame = 1;
+				mGameStateData.winner = mGameStateData.playerPriority;
+
+				strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+			}
+			// check if draw
+			else if (checkDraw())
+			{
+				mGameStateData.endGame = 1;
+				mGameStateData.winner = -1;
+
+				strcpy(mData.promptBuffer, "(R)ematch or (M)enu?\n");
+			}
+			// if not, switch player priority
+			else
+			{
+				mGameStateData.playerPriority = 1 - mGameStateData.playerPriority;
+				mGameStateData.currentPlayerChar = mGameStateData.playerPriority ? 'X' : 'O';
+			}
+
+			// reset selected space
+			mGameStateData.selectedSpace = 4;
+			mGameStateData.tmpBoard[mGameStateData.boardSpaceOffsets[4]] = '@';
+
+			// Display
+			mData.doesDisplay = 1;
 		}
 
 		default:
