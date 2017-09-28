@@ -31,7 +31,6 @@ private:
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 	char connectionAddress[STR_MAX];
-	int port;
 
 	void processBuffer() override;
 	void updateData() override;

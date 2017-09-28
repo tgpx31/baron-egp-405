@@ -13,20 +13,19 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		strcpy(mData.promptBuffer, "Tic-Tac-Toe Online: Connecting\nEnter your friend's IP address, or hit ENTER to use '127.0.0.1'\n");
 
 		//Setup the socket descriptor
-		RakNet::SocketDescriptor sd(port, 0);
+		RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 	}
 	else if (mData.mIsHost)
 	{
 		//If you are the host:
-		RakNet::SocketDescriptor sd(port, 0);
+		RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
 
 		//Startup the peer
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 		peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
 
 		connectionSet = 1;
-
 		networkingSetup = 1;
 	}
 
@@ -83,12 +82,15 @@ void NetworkedGameState::updateNetworking()
 	if (connectionSet && !mData.mIsHost && !networkingSetup)
 	{
 		//Connect to the desired address and port
-		peer->Connect(connectionAddress, port, 0, 0);
+		peer->Connect(connectionAddress, DEFAULT_PORT_NUMBER, 0, 0);
 
 		printf("Requesting connection...\n");
 
 		networkingSetup = 1;
 	}
+
+	if (!networkingSetup)
+		return;
 
 	// message loop
 	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
