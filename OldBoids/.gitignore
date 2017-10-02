@@ -1,0 +1,7 @@
+*.obj
+*.log
+*.db
+*.sdf
+**/Debug/
+**/.vs/
+*.opendb
