@@ -39,54 +39,58 @@ PerformanceTracker* gpPerformanceTracker = NULL;
 
 int main(int argc, char **argv)
 {
-	gpPerformanceTracker = new PerformanceTracker();
+	#pragma region OldBoidsMain
+	//gpPerformanceTracker = new PerformanceTracker();
+	//gpPerformanceTracker->startTracking("init");
 
-	gpPerformanceTracker->startTracking("init");
+	////create the global game object
+	//gpGame = new Game;
+	////init the game
+	//bool goodGame = gpGame->init();
+	//if(!goodGame) 
+	//{
+	//	fprintf(stderr, "failed to initialize Game object!\n");
+	//	return -1;
+	//}
 
-	//create the global game object
-	gpGame = new Game;
-	//init the game
-	bool goodGame = gpGame->init();
-	if(!goodGame) 
-	{
-		fprintf(stderr, "failed to initialize Game object!\n");
-		return -1;
-	}
+	//gpPerformanceTracker->stopTracking("init");
+	//cout << "initialization took:" << gpPerformanceTracker->getElapsedTime("init") << "ms\n";
 
-	gpPerformanceTracker->stopTracking("init");
-	cout << "initialization took:" << gpPerformanceTracker->getElapsedTime("init") << "ms\n";
+	//bool shouldExit = false;
 
-	bool shouldExit = false;
+	////game loop
+	//while( !shouldExit )
+	//{
+	//	gpPerformanceTracker->clearTracker("loop");
+	//	gpPerformanceTracker->startTracking("loop");
 
-	//game loop
-	while( !shouldExit )
-	{
-		gpPerformanceTracker->clearTracker("loop");
-		gpPerformanceTracker->startTracking("loop");
+	//	gpGame->beginLoop();
 
-		gpGame->beginLoop();
+	//	gpPerformanceTracker->clearTracker("draw");
+	//	gpPerformanceTracker->startTracking("draw");
 
-		gpPerformanceTracker->clearTracker("draw");
-		gpPerformanceTracker->startTracking("draw");
+	//	gpGame->processLoop();
 
-		gpGame->processLoop();
+	//	gpPerformanceTracker->stopTracking("draw");
 
-		gpPerformanceTracker->stopTracking("draw");
+	//	shouldExit = gpGame->endLoop();
 
-		shouldExit = gpGame->endLoop();
+	//	gpPerformanceTracker->stopTracking("loop");
+	//	cout << "loop took:" << gpPerformanceTracker->getElapsedTime("loop") << "ms";
+	//	cout << "draw took:" << gpPerformanceTracker->getElapsedTime("draw") << "ms\n";
 
-		gpPerformanceTracker->stopTracking("loop");
-		cout << "loop took:" << gpPerformanceTracker->getElapsedTime("loop") << "ms";
-		cout << "draw took:" << gpPerformanceTracker->getElapsedTime("draw") << "ms\n";
+	//}
 
-	}
+	//gpGame->cleanup();
+	//delete gpGame;
+	//gpGame = NULL;
 
-	gpGame->cleanup();
-	delete gpGame;
-	gpGame = NULL;
+	//delete gpPerformanceTracker;
+	//gMemoryTracker.reportAllocations( cout );
+#pragma endregion
 
-	delete gpPerformanceTracker;
-	gMemoryTracker.reportAllocations( cout );
+
+	
 	system("pause");
 
 	return 0;

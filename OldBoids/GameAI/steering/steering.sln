@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 13.00
-# Visual Studio 2013
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "steering", "water.vcxproj", "{07ED8114-0659-4424-9468-50DBBEA5882A}"
 EndProject
 Global
@@ -11,10 +13,13 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{07ED8114-0659-4424-9468-50DBBEA5882A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{07ED8114-0659-4424-9468-50DBBEA5882A}.Debug|Win32.Build.0 = Debug|Win32
-		{07ED8114-0659-4424-9468-50DBBEA5882A}.Release|Win32.ActiveCfg = Release|Win32
-		{07ED8114-0659-4424-9468-50DBBEA5882A}.Release|Win32.Build.0 = Release|Win32
+		{07ED8114-0659-4424-9468-50DBBEA5882A}.Release|Win32.ActiveCfg = Debug|Win32
+		{07ED8114-0659-4424-9468-50DBBEA5882A}.Release|Win32.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4EDD6E20-D328-4A80-A008-9F1F73EDCBCD}
 	EndGlobalSection
 EndGlobal

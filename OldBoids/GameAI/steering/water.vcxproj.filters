@@ -115,6 +115,18 @@
     <ClCompile Include="CircleCollider2D.cpp">
       <Filter>Source Files\Collisions</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\LobbyState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\NetworkedGameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Networking\State.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsBuffer.h">
@@ -233,6 +245,21 @@
     </ClInclude>
     <ClInclude Include="CircleCollider2D.h">
       <Filter>Header Files\Collisions</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\LobbyState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\Messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\NetworkedGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Networking\State.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

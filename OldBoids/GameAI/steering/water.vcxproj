@@ -36,6 +36,11 @@
     <ClInclude Include="KinematicSeekSteering.h" />
     <ClInclude Include="KinematicUnit.h" />
     <ClInclude Include="KinematicWanderSteering.h" />
+    <ClInclude Include="Networking\GameState.h" />
+    <ClInclude Include="Networking\LobbyState.h" />
+    <ClInclude Include="Networking\Messages.h" />
+    <ClInclude Include="Networking\NetworkedGameState.h" />
+    <ClInclude Include="Networking\State.h" />
     <ClInclude Include="PlayerMoveToMessage.h" />
     <ClInclude Include="SeparationSteering.h" />
     <ClInclude Include="SpawnBoidMessage.h" />
@@ -77,6 +82,10 @@
     <ClCompile Include="KinematicUnit.cpp" />
     <ClCompile Include="KinematicWanderSteering.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Networking\GameState.cpp" />
+    <ClCompile Include="Networking\LobbyState.cpp" />
+    <ClCompile Include="Networking\NetworkedGameState.cpp" />
+    <ClCompile Include="Networking\State.cpp" />
     <ClCompile Include="PlayerMoveToMessage.cpp" />
     <ClCompile Include="SeparationSteering.cpp" />
     <ClCompile Include="SpawnBoidMessage.cpp" />
@@ -134,7 +143,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -142,11 +151,11 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>..\..\DeanLib;..\..\External Libs\Allegro5\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DEV_SDK_DIR)include\;..\..\DeanLib;..\..\External Libs\Allegro5\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);allegro-5.0.10-monolith-md-debug.lib;DeanLib.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\External libs\Allegro5\lib;..\..\DeanLib\debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);allegro-5.0.10-monolith-md-debug.lib;DeanLib.lib;RakNet.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DEV_SDK_DIR)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;%(AdditionalLibraryDirectories);..\..\External libs\Allegro5\lib;..\..\DeanLib\debug</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
