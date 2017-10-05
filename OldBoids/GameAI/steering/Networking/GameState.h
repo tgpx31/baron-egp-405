@@ -16,8 +16,7 @@
 #define GAME_STATE_H
 
 #include "State.h"
-
-#define BOARD_SLOTS 9
+#include "../Game.h"
 
 class GameState : public State
 {
@@ -28,37 +27,22 @@ protected:
 	// Data relevant to the game state
 	struct GameData
 	{
-		State *mPrev;
-
-		char board[STR_MAX];
-		char tmpBoard[STR_MAX];
-		int boardSpaceOffsets[BOARD_SLOTS];
-
-		// The game needs to know
-		// Whose turn, X or O?
-		// What space is currently selected?
-		// Did they win with that move?
-		int initialPlayerPriority;
-		int playerPriority;	// 0 is o, 1 is x
-		int selectedSpace;
-		char currentPlayerChar;
-
-		int winner;			// Default this to -1. 0 = o win, 1 = x win
-		int endGame;
+		// We need all the Game data here
+		Game myGame;
 
 	} mGameStateData;
+
+	bool initializedBoids, exit;
+
+	int StartBoids();
+
+	State *mPrev;
 
 	void updateData() override;
 	void processBuffer() override;
 
 	void render() override;
 	void ArriveFromPreviousState(StateData *data) override;
-
-	// GameState specific
-	void initializeBoard();
-	int validateMove();
-	int checkWin();
-	int checkDraw();
 };
 
 #endif

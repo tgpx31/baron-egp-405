@@ -9,33 +9,8 @@
  */
 #define ALLEGRO_USE_CONSOLE
 
-#include <stdio.h>
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_audio.h>
-#include <allegro5/allegro_acodec.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_primitives.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-
-#include <sstream>
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include <crtdbg.h>
-
-#include "Game.h"
-#include "GraphicsSystem.h"
-#include "GraphicsBuffer.h"
-#include "Sprite.h"
-#include "KinematicUnit.h"
-#include "Timer.h"
-#include "PerformanceTracker.h"
-#include "MemoryTracker.h"
-
-using namespace std;
-
-PerformanceTracker* gpPerformanceTracker = NULL;
+#include "Networking\LobbyState.h"
+#include "Networking\NetworkedGameState.h"
 
 int main(int argc, char **argv)
 {
@@ -44,7 +19,7 @@ int main(int argc, char **argv)
 	//gpPerformanceTracker->startTracking("init");
 
 	////create the global game object
-	//gpGame = new Game;
+	gpGame = new Game;
 	////init the game
 	//bool goodGame = gpGame->init();
 	//if(!goodGame) 
@@ -89,9 +64,22 @@ int main(int argc, char **argv)
 	//gMemoryTracker.reportAllocations( cout );
 #pragma endregion
 
+	// We should still have a lobby state structure like in our previous project/lab
+	State *CurrentState;	// Starts in the Lobby State by default
+	LobbyState lobby[1];
+	GameState localGame[1];
+	//NetworkedGameState networkedGame[1];	// Can get away with using only one instance of this
 
-	
+	lobby->init(localGame, nullptr, nullptr, &CurrentState);
+	//localGame->init(lobby, &CurrentState);
+	//networkedGame->init(lobby, &CurrentState);
+
+	CurrentState = lobby;
+
+	while (CurrentState->isRunning())
+	{
+		CurrentState->update();
+	}
 	system("pause");
-
 	return 0;
 }
