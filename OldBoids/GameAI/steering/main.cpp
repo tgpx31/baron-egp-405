@@ -12,57 +12,15 @@
 #include "Networking\LobbyState.h"
 #include "Networking\NetworkedGameState.h"
 
+#include "../DeanLib/MemoryTracker.h"
+#include "../DeanLib/PerformanceTracker.h"
+
+PerformanceTracker* gpPerformanceTracker = NULL;
+
 int main(int argc, char **argv)
 {
-	#pragma region OldBoidsMain
-	//gpPerformanceTracker = new PerformanceTracker();
-	//gpPerformanceTracker->startTracking("init");
-
-	////create the global game object
+	gpPerformanceTracker = new PerformanceTracker();
 	gpGame = new Game;
-	////init the game
-	//bool goodGame = gpGame->init();
-	//if(!goodGame) 
-	//{
-	//	fprintf(stderr, "failed to initialize Game object!\n");
-	//	return -1;
-	//}
-
-	//gpPerformanceTracker->stopTracking("init");
-	//cout << "initialization took:" << gpPerformanceTracker->getElapsedTime("init") << "ms\n";
-
-	//bool shouldExit = false;
-
-	////game loop
-	//while( !shouldExit )
-	//{
-	//	gpPerformanceTracker->clearTracker("loop");
-	//	gpPerformanceTracker->startTracking("loop");
-
-	//	gpGame->beginLoop();
-
-	//	gpPerformanceTracker->clearTracker("draw");
-	//	gpPerformanceTracker->startTracking("draw");
-
-	//	gpGame->processLoop();
-
-	//	gpPerformanceTracker->stopTracking("draw");
-
-	//	shouldExit = gpGame->endLoop();
-
-	//	gpPerformanceTracker->stopTracking("loop");
-	//	cout << "loop took:" << gpPerformanceTracker->getElapsedTime("loop") << "ms";
-	//	cout << "draw took:" << gpPerformanceTracker->getElapsedTime("draw") << "ms\n";
-
-	//}
-
-	//gpGame->cleanup();
-	//delete gpGame;
-	//gpGame = NULL;
-
-	//delete gpPerformanceTracker;
-	//gMemoryTracker.reportAllocations( cout );
-#pragma endregion
 
 	// We should still have a lobby state structure like in our previous project/lab
 	State *CurrentState;	// Starts in the Lobby State by default
@@ -81,5 +39,12 @@ int main(int argc, char **argv)
 		CurrentState->update();
 	}
 	system("pause");
+
+	gpGame->cleanup();
+	delete gpGame;
+	gpGame = NULL;
+
+	delete gpPerformanceTracker;
+	gMemoryTracker.reportAllocations( std::cout );
 	return 0;
 }
