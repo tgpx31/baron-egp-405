@@ -55,7 +55,7 @@ Game::Game()
 
 Game::~Game()
 {
-	cleanup();
+	//cleanup();
 }
 
 bool Game::init()

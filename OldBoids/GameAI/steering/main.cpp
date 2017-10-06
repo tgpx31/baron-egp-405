@@ -20,7 +20,7 @@ PerformanceTracker* gpPerformanceTracker = NULL;
 int main(int argc, char **argv)
 {
 	gpPerformanceTracker = new PerformanceTracker();
-	gpGame = new Game;
+	gpGame = new Game();
 
 	// We should still have a lobby state structure like in our previous project/lab
 	State *CurrentState;	// Starts in the Lobby State by default
