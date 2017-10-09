@@ -26,11 +26,11 @@ int main(int argc, char **argv)
 	State *CurrentState;	// Starts in the Lobby State by default
 	LobbyState lobby[1];
 	GameState localGame[1];
-	//NetworkedGameState networkedGame[1];	// Can get away with using only one instance of this
+	NetworkedGameState networkedGame[1];	// Can get away with using only one instance of this
 
-	lobby->init(localGame, nullptr, nullptr, &CurrentState);
-	//localGame->init(lobby, &CurrentState);
-	//networkedGame->init(lobby, &CurrentState);
+	lobby->init(localGame, networkedGame, nullptr, &CurrentState);
+	localGame->init(lobby, &CurrentState);
+	networkedGame->init(lobby, &CurrentState);
 
 	CurrentState = lobby;
 

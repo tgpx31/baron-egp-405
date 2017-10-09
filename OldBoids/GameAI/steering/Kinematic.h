@@ -42,6 +42,8 @@ public:
 	float getOrientation() const { return mOrientation; };
 	void setOrientation( float orientation ) { mOrientation = orientation; };
 	void setRotationalVelocity( float rotVel ) { mRotationVel = rotVel; };
+	Vector2D getPosition() const { return mPosition; };
+	void setPosition(float x, float y) { mPosition.setX(x); mPosition.setY(y); };
 
 protected:
 	Vector2D mPosition;//where am I?

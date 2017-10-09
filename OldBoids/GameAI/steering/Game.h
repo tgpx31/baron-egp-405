@@ -80,6 +80,11 @@ public:
 	inline void setAlignmentWeight(int weight) { mAlignmentWeight = weight; };
 	inline void setVelocityMatchingWeight(int weight) { mVelocityMatchingWeight = weight; };
 
+	inline int getDataMode() { return mDataMode; };
+	inline bool getIsHost() { return mIsHost; };
+	inline void setDataMode(int dataMode) { mDataMode = dataMode; };
+	inline void setIsHost(bool isHost) { mIsHost = isHost; };
+
 private:
 	GraphicsSystem* mpGraphicsSystem;
 	GraphicsBufferManager* mpGraphicsBufferManager;
@@ -110,6 +115,9 @@ private:
 	int mSeparationWeight;
 	int mAlignmentWeight;
 	int mVelocityMatchingWeight;
+
+	int mDataMode; // 1 = data push, 2 = data sharing, 3 = data coupled
+	bool mIsHost;
 };
 
 float genRandomBinomial();//range -1:1 from "Artificial Intelligence for Games", Millington and Funge

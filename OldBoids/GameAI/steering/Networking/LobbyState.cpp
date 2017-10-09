@@ -21,8 +21,9 @@ void LobbyState::init(State * nextL, State * nextM, State * nextR, State** curre
 	mLobbyData.next1 = nextL;
 	mLobbyData.next2 = nextM;
 	mLobbyData.next3 = nextR;
+	mLobbyData.promptHost = 0;
 
-	strcpy(mData.promptBuffer, "Welcome to Tic-Tac-Toe.\n\t(L)ocal game\n\t(H)ost an online game\n\t(C)onnect to an online game\n\t(E)xit?\n");
+	strcpy(mData.promptBuffer, "The boids are back in town. \n\t(L)ocal boids\n\tNetworked Data (P)ush\n\tNetworked Data (S)haring\n\tNetworked Data (C)oupled\n\t(E)xit?\n");
 
 	mData.doesUpdateInput = 1;
 	mData.doesUpdateState = 1;
@@ -32,37 +33,63 @@ void LobbyState::init(State * nextL, State * nextM, State * nextR, State** curre
 // Process data currently in the input buffer
 void LobbyState::processBuffer()
 {
-	switch (mData.buffer[0])
+	if (!mLobbyData.promptHost)
 	{
-	case 'C':
-		printf("\Connect selected\n");
-		// Initialize the client
-		mData.mIsHost = 0;
-		GoToNextState(mLobbyData.next3);
-		break;
+		switch (mData.buffer[0])
+		{
+		case 'L':
+			printf("\nLocal boids selected");
+			// load a local game
+			GoToNextState(mLobbyData.next1);
+			break;
 
-	case 'E':
-		printf("\nGoodbye\n");
-		mData.running = 0;
-		break;
+		case 'P':
+			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
+			mLobbyData.promptHost = 1;
+			mData.dataMethod = 1;
+			mData.doesDisplay = 1;
+			break;
+		case 'S':
+			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
+			mLobbyData.promptHost = 1;
+			mData.dataMethod = 2;
+			mData.doesDisplay = 1;
+			break;
+		case 'C':
+			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
+			mLobbyData.promptHost = 1;
+			mData.dataMethod = 3;
+			mData.doesDisplay = 1;
+			break;
 
-	case 'H':
-		printf("\nHost selected\n");
-		// initialize the server
-		mData.mIsHost = 1;
-		GoToNextState(mLobbyData.next2);
-		break;
+		case 'E':
+			printf("\nGoodbye\n");
+			mData.running = 0;
+			break;
 
-	case 'L':
-		printf("\nLocal Game selected");
-		// load a local game
-		GoToNextState(mLobbyData.next1);
-		break;
+		default:
+			printf("\n\tERROR: Invalid Input\n");
+			break;
+		}
+	}
+	else
+	{
+		switch (mData.buffer[0])
+		{
+		case 'C':
+			printf("\Connect selected\n");
+			// Initialize the client
+			mData.mIsHost = 0;
+			GoToNextState(mLobbyData.next2);
+			break;
 
-	default:
-		printf("\n\tERROR: Invalid Input\n");
-		break;
-
+		case 'H':
+			printf("\nHost selected\n");
+			// initialize the server
+			mData.mIsHost = 1;
+			GoToNextState(mLobbyData.next2);
+			break;
+		}
 	}
 	// Clear the buffer
 	clearBuffer();

@@ -28,7 +28,9 @@ private:
 	struct LobbyData
 	{
 		State *next1, *next2, *next3;
+		int promptHost;
 	} mLobbyData;
+
 	virtual void processBuffer() override;
 };
 

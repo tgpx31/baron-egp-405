@@ -103,6 +103,15 @@ void UnitManager::removeRandomEnemy()
 	}
 }
 
+void UnitManager::removeEndUnit()
+{
+	if (mMap.size() == 0)
+		return;
+
+	std::map<UnitKey, KinematicUnit*>::iterator iter = mMap.end();
+	mMap.erase(--iter);
+}
+
 void UnitManager::updateMaxVelocity()
 {
 	std::map<UnitKey, KinematicUnit*>::iterator iter;

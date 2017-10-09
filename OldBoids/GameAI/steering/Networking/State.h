@@ -41,7 +41,8 @@ class State abstract
 				doesUpdateNetworking, 
 				doesUpdateState, 
 				// flip this flag whenever you want to display your buffer and prompt
-				doesDisplay;
+				doesDisplay,
+				dataMethod; // 1 = data push, 2 = data sharing, 3 = data coupled
 
 			unsigned char keyboard[STR_MAX]; //Keyboard state array
 			unsigned int bufferIndex; //Index to end of buffer

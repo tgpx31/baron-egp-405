@@ -50,6 +50,8 @@ Game::Game()
 	, mSeparationWeight(2)
 	, mAlignmentWeight(5)
 	, mVelocityMatchingWeight(2)
+	, mDataMode(0)
+	, mIsHost(false)
 {
 }
 
@@ -249,25 +251,26 @@ void Game::beginLoop()
 	
 void Game::processLoop()
 {
-	mpInputManager->update();
-	
-	//update units
-	mpUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
+	// If client on data push, do not do any updates
+	if (!(mDataMode == 1 && !mIsHost))
+	{
+		mpInputManager->update(); 
+
+		//update units
+		mpUnitManager->update(LOOP_TARGET_TIME / 1000.0f); 
+	}
 	
 	//draw background
-	Sprite* pBackgroundSprite = mpSpriteManager->getSprite( BACKGROUND_SPRITE_ID );
-	pBackgroundSprite->draw( *(mpGraphicsSystem->getBackBuffer()), 0, 0 );
+	Sprite* pBackgroundSprite = mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
+	pBackgroundSprite->draw(*(mpGraphicsSystem->getBackBuffer()), 0, 0);
 
 	//draw units
-	mpUnitManager->draw(GRAPHICS_SYSTEM->getBackBuffer(), true);
-	mpWallManager->draw(true);
-	mpInputManager->draw();
-	
+	mpUnitManager->draw(GRAPHICS_SYSTEM->getBackBuffer(), mDebug);
+	mpWallManager->draw(mDebug);
+	//mpInputManager->draw();
 
-	if (mDebug) 
-	{
-		mpUI->draw();
-	}
+	if (mDebug)
+		mpUI->draw(); 
 
 	mpMessageManager->processMessagesForThisframe();
 	mpGraphicsSystem->swap();

@@ -33,6 +33,7 @@ public:
 	void removeUnit(KinematicUnit* pUnit);
 	void removeUnit(const UnitKey& key);
 	void removeRandomEnemy();
+	void removeEndUnit();
 
 	//Update new values for all units currently in the manager
 	void updateMaxVelocity();

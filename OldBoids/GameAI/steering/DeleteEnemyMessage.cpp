@@ -11,5 +11,5 @@ DeleteEnemyMessage::~DeleteEnemyMessage()
 
 void DeleteEnemyMessage::process()
 {
-	gpGame->getUnitManager()->removeRandomEnemy();
+	gpGame->getUnitManager()->removeEndUnit();
 }

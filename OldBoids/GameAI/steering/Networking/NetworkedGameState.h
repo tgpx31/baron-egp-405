@@ -41,6 +41,9 @@ private:
 	void render() override;
 
 	void ArriveFromPreviousState(StateData *data) override;
+	int SerializeBoids(char* buffer);
+	void DeserializeBoids(char* buffer);
+	int StartBoids();
 };
 
 #endif
