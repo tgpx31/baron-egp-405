@@ -107,7 +107,7 @@ void NetworkedGameState::updateData()
 			buffer[0] = ID_BOID_DATA_AND_GLOBALS;
 			++bytesWritten;
 			bytesWritten += SerializeBoids(buffer + bytesWritten, true);
-			if (bytesWritten != 5) //If it's not just ID plus number of boids
+			if (bytesWritten != 33 || !mData.mIsHost) //If it's not just ID plus number of boids plus globals, and allows the client to send back data even if no new boids were added
 			{
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 				willSendState = false;
@@ -204,6 +204,8 @@ int NetworkedGameState::SerializeBoids(char* buffer, bool andGlobals)
 		buffer += sizeof(int);
 		memcpy(buffer, &matching, sizeof(matching));
 		buffer += sizeof(int);
+
+		bytesWritten += sizeof(velocity) + sizeof(accel) + sizeof(angularVel) + sizeof(cohesion) + sizeof(separation) + sizeof(alignment) + sizeof(matching);
 	}
 
 	for (iter = boids.begin(); iter != boids.end(); ++iter)
@@ -277,8 +279,8 @@ void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
 		buffer += sizeof(int);
 
 		gpGame->setMaxVelocity(velocity);
-		gpGame->setMaxAcceleration(velocity);
-		gpGame->setMaxAngularVelocity(velocity);
+		gpGame->setMaxAcceleration(accel);
+		gpGame->setMaxAngularVelocity(angularVel);
 
 		gpGame->setCohesionWeight(cohesion);
 		gpGame->setSeparationWeight(separation);
