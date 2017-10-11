@@ -181,6 +181,9 @@ bool Game::init()
 
 	//setup UnitManager
 	mpUnitManager = new UnitManager(pEnemyArrow);
+
+	// Unit manager for Data Sharing
+	mpUnitManager2 = new UnitManager(pEnemyArrow);
 	
 	/*
 	Vector2D pos(500.0f, 500.0f);

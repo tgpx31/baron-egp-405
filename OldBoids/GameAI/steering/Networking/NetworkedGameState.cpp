@@ -87,6 +87,12 @@ void NetworkedGameState::updateData()
 			if (bytesWritten != 1)
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 		}
+
+		//If the data method is data share and you are the host
+		else if (mData.dataMethod == 2 && mData.mIsHost)
+		{
+
+		}
 	}
 }
 
