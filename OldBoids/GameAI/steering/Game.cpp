@@ -38,6 +38,7 @@ Game::Game()
 	, mpSample(NULL)
 	, mBackgroundBufferID(INVALID_ID)
 	, mpUnitManager(NULL)
+	, mpUnitManager2(NULL)
 	, mpInputManager(NULL)
 	, mpWallManager(NULL)
 	, mpUI(NULL)
@@ -206,6 +207,8 @@ void Game::cleanup()
 {
 	delete mpUnitManager;
 	mpUnitManager = NULL;
+	delete mpUnitManager2;
+	mpUnitManager2 = NULL;
 
 	delete mpInputManager;
 	mpInputManager = NULL;
@@ -262,6 +265,17 @@ void Game::processLoop()
 		//update units
 		mpUnitManager->update(LOOP_TARGET_TIME / 1000.0f); 
 	}
+	else if (mDataMode == 2)	// if data sharing
+	{
+		// each peer should simulate their own 
+		// sends change in state to the other
+		// use mpUnitManager for your own flock, update mpUnitManager2 for the other flock
+		mpInputManager->update();
+
+		//update units
+		mpUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
+		//mpUnitManager2->update(LOOP_TARGET_TIME / 1000.0f);
+	}
 	
 	//draw background
 	Sprite* pBackgroundSprite = mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
@@ -269,6 +283,7 @@ void Game::processLoop()
 
 	//draw units
 	mpUnitManager->draw(GRAPHICS_SYSTEM->getBackBuffer(), mDebug);
+	mpUnitManager2->draw(GRAPHICS_SYSTEM->getBackBuffer(), mDebug);
 	mpWallManager->draw(mDebug);
 	//mpInputManager->draw();
 

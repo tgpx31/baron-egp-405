@@ -69,6 +69,7 @@ public:
 
 	inline UI* getUI() const { return mpUI; };
 	inline UnitManager* getUnitManager() { return mpUnitManager; };
+	inline UnitManager* getUnitManager2() { return mpUnitManager2; };
 	inline WallManager* getWallManager() { return mpWallManager; };
 
 	inline int getCohesionWeight() { return mCohesionWeight; };
@@ -100,7 +101,7 @@ private:
 	IDType mPlayerIconBufferID;
 	IDType mEnemyIconBufferID;
 	
-	UnitManager* mpUnitManager;
+	UnitManager *mpUnitManager, *mpUnitManager2;
 	InputManager* mpInputManager;
 	WallManager* mpWallManager;
 	UI* mpUI;
