@@ -26,7 +26,7 @@ public:
 	void init(State* prev, State** currentState);
 
 private:
-	int connectionSet, networkingSetup, isPlaying, isX;
+	int connectionSet, networkingSetup, isPlaying, isX, willSendState;
 
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
@@ -41,8 +41,8 @@ private:
 	void render() override;
 
 	void ArriveFromPreviousState(StateData *data) override;
-	int SerializeBoids(char* buffer);
-	void DeserializeBoids(char* buffer);
+	int SerializeBoids(char* buffer, bool andGlobals);
+	void DeserializeBoids(char* buffer, bool andGlobals);
 	int StartBoids();
 };
 

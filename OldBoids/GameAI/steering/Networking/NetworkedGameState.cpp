@@ -33,12 +33,14 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		RakNet::SocketDescriptor sd(DEFAULT_PORT_NUMBER, 0);
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 		peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
+		willSendState = 1; //Data coupled - For if it will be sending the state
 	}
 	else
 	{
 		RakNet::SocketDescriptor sd;
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 		peer->Connect("127.0.0.1", DEFAULT_PORT_NUMBER, 0, 0);
+		willSendState = 0; //Data coupled
 	}
 
 	connectionSet = 1;
@@ -71,6 +73,17 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 
 void NetworkedGameState::updateData()
 {
+	// 
+	if (!willSendState && mData.dataMethod == 3)
+		return;
+
+	gpGame->beginLoop();
+	gpGame->processLoop();
+	exit = gpGame->endLoop();
+
+	if (exit)
+		mData.running = 0;
+
 	//Update the state and gamestate data
 	if (!connectionSet)
 		State::updateData();
@@ -83,13 +96,22 @@ void NetworkedGameState::updateData()
 			int bytesWritten = 0;
 			buffer[0] = ID_BOID_DATA;
 			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten);
+			bytesWritten += SerializeBoids(buffer + bytesWritten, false);
 			if (bytesWritten != 5) //If it's not just ID plus number of boids
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 		}
-		else // Data coupled
+		else if (mData.dataMethod == 3 && willSendState)// Data coupled
 		{
-
+			char buffer[1024];
+			int bytesWritten = 0;
+			buffer[0] = ID_BOID_DATA_AND_GLOBALS;
+			++bytesWritten;
+			bytesWritten += SerializeBoids(buffer + bytesWritten, true);
+			if (bytesWritten != 5) //If it's not just ID plus number of boids
+			{
+				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+				willSendState = false;
+			}
 		}
 	}
 }
@@ -110,7 +132,12 @@ void NetworkedGameState::updateNetworking()
 		switch (packet->data[0])
 		{
 			case ID_BOID_DATA:
-				DeserializeBoids((char*)packet->data);
+				DeserializeBoids((char*)packet->data, false);
+				break;
+
+			case ID_BOID_DATA_AND_GLOBALS:
+				DeserializeBoids((char*)packet->data, true);
+				willSendState = true;
 				break;
 		}
 	}
@@ -118,41 +145,25 @@ void NetworkedGameState::updateNetworking()
 
 void NetworkedGameState::render()
 {
+	/*if (!willSendState)
+		return;
+
 	gpGame->beginLoop();
 	gpGame->processLoop();
 	exit = gpGame->endLoop();
 
+	willSendState = true;
+
 	if (exit)
-		mData.running = 0;
+		mData.running = 0;*/
 }
 
-int NetworkedGameState::SerializeBoids(char* buffer)
+int NetworkedGameState::SerializeBoids(char* buffer, bool andGlobals)
 {
 	std::vector<KinematicUnit*> boids = gpGame->getLocalUnitManager()->getEnemyUnits();
 	std::vector<KinematicUnit*>::iterator iter;
 	int bytesWritten = 0;
 	int size = boids.size();
-
-	// KinematicUnit Data 
-	// -> Kinematic
-	//		-> Position (Vector2D)
-	//			-> X (float)
-	//			-> Y (float)
-	//		-> Velocity (Vector2D)
-	//			-> X (float)
-	//			-> Y (float)
-	//		-> Orientation (float)
-	//		-> RotationVelocity (float)
-	// -> KinematicUnit
-	//		-> CurrentSteering (Steering)
-	//			-> Linear (Vector2D)
-	//				-> X (float)
-	//				-> Y (float)
-	//			-> Angular (float)
-	//			-> ApplyDirectly (bool)
-	//		-> Max Velocity (float)
-	//		-> Max Acceleration (float)
-	//		-> Max Angular Velocity (float)
 
 	// Data Push
 	// -> "Host" peer simulates flocking, pushes position/rotation data to "Client" peer
@@ -164,6 +175,36 @@ int NetworkedGameState::SerializeBoids(char* buffer)
 	memcpy(buffer, &size, sizeof(size));
 	buffer += sizeof(size);
 	bytesWritten += sizeof(int);
+
+	//And globals
+	if (andGlobals)
+	{
+		//Getting the current debug values for the boids
+		float velocity = gpGame->getMaxVelocity();
+		float accel = gpGame->getMaxAcceleration();
+		float angularVel = gpGame->getMaxAngularVelocity();
+
+		int cohesion = gpGame->getCohesionWeight();
+		int separation = gpGame->getSeparationWeight();
+		int alignment = gpGame->getAlignmentWeight();
+		int matching = gpGame->getVelocityMatchingWeight();
+
+		memcpy(buffer, &velocity, sizeof(velocity));
+		buffer += sizeof(float);
+		memcpy(buffer, &accel, sizeof(accel));
+		buffer += sizeof(float);
+		memcpy(buffer, &angularVel, sizeof(angularVel));
+		buffer += sizeof(float);
+
+		memcpy(buffer, &cohesion, sizeof(cohesion));
+		buffer += sizeof(int);
+		memcpy(buffer, &separation, sizeof(separation));
+		buffer += sizeof(int);
+		memcpy(buffer, &alignment, sizeof(alignment));
+		buffer += sizeof(int);
+		memcpy(buffer, &matching, sizeof(matching));
+		buffer += sizeof(int);
+	}
 
 	for (iter = boids.begin(); iter != boids.end(); ++iter)
 	{
@@ -186,7 +227,7 @@ int NetworkedGameState::SerializeBoids(char* buffer)
 	return bytesWritten;
 }
 
-void NetworkedGameState::DeserializeBoids(char* buffer)
+void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
 {
 	UnitManager* manager;
 	std::vector<KinematicUnit*> boids;
@@ -205,6 +246,45 @@ void NetworkedGameState::DeserializeBoids(char* buffer)
 
 	boids = manager->getEnemyUnits();
 	currentSize = boids.size();
+
+	//And globals
+	if (andGlobals)
+	{
+		//Getting the current debug values for the boids
+		float velocity;
+		float accel;
+		float angularVel;
+
+		int cohesion;
+		int separation;
+		int alignment;
+		int matching;
+
+		memcpy(&velocity, buffer, sizeof(velocity));
+		buffer += sizeof(float);
+		memcpy(&accel, buffer, sizeof(accel));
+		buffer += sizeof(float);
+		memcpy(&angularVel, buffer, sizeof(angularVel));
+		buffer += sizeof(float);
+
+		memcpy(&cohesion, buffer, sizeof(cohesion));
+		buffer += sizeof(int);
+		memcpy(&separation, buffer, sizeof(separation));
+		buffer += sizeof(int);
+		memcpy(&alignment, buffer, sizeof(alignment));
+		buffer += sizeof(int);
+		memcpy(&matching, buffer, sizeof(matching));
+		buffer += sizeof(int);
+
+		gpGame->setMaxVelocity(velocity);
+		gpGame->setMaxAcceleration(velocity);
+		gpGame->setMaxAngularVelocity(velocity);
+
+		gpGame->setCohesionWeight(cohesion);
+		gpGame->setSeparationWeight(separation);
+		gpGame->setAlignmentWeight(alignment);
+		gpGame->setVelocityMatchingWeight(matching);
+	}
 
 	if (currentSize < receivedSize)
 	{
