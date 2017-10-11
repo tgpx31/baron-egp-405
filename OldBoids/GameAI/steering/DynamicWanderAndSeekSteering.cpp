@@ -33,7 +33,7 @@ Steering* DynamicWanderAndSeekSteering::getSteering()
 		steering = mpSeekSteering->getSteering();
 	}
 
-	//return mpSeparationSteering->getSteering(steering, mpMover, gpGame->getUnitManager()->getEnemyUnits());
+	//return mpSeparationSteering->getSteering(steering, mpMover, gpGame->getLocalUnitManager()->getEnemyUnits());
 	//Fix this later
 	return nullptr;
 }

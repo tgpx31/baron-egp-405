@@ -22,7 +22,7 @@ void EditDebugValueMessage::process()
 			workingValue = gpGame->getMaxVelocity();
 			workingValue += mValue;
 			gpGame->setMaxVelocity(workingValue);
-			gpGame->getUnitManager()->updateMaxVelocity();
+			gpGame->getLocalUnitManager()->updateMaxVelocity();
 			break;
 		case RADIUS:
 			workingValue = gpGame->getReactionRadius();
@@ -33,13 +33,13 @@ void EditDebugValueMessage::process()
 			workingValue = gpGame->getMaxAcceleration();
 			workingValue += mValue;
 			gpGame->setMaxAcceleration(workingValue);
-			gpGame->getUnitManager()->updateMaxAcceleration();
+			gpGame->getLocalUnitManager()->updateMaxAcceleration();
 			break;
 		case ANGULAR:
 			workingValue = gpGame->getMaxAngularVelocity();
 			workingValue += mValue;
 			gpGame->setMaxAngularVelocity(workingValue);
-			gpGame->getUnitManager()->updateMaxAngularVelocity();
+			gpGame->getLocalUnitManager()->updateMaxAngularVelocity();
 			break;
 		case COHESION:
 			workingValue = gpGame->getCohesionWeight();

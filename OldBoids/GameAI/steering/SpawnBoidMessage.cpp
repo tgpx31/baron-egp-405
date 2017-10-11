@@ -20,5 +20,5 @@ void SpawnBoidMessage::process()
 	spawnPos.setX(center.getX() + std::cos(angle) * radius);
 	spawnPos.setY(center.getY() + std::sin(angle) * radius);
 
-	gpGame->getUnitManager()->createUnit(spawnPos, BOID);
+	gpGame->getLocalUnitManager()->createUnit(spawnPos, BOID);
 }

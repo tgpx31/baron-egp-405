@@ -26,10 +26,10 @@ Steering* BoidSteering::getSteering()
 	//Steering* baseWander = mpWanderSteering->getSteering(); //base steering to add everything to
 	
 	//update all steerings to be blended
-	Steering* cohesion = mpCohesionSteering->getSteering(gpGame->getUnitManager()->getEnemyUnits());
-	Steering* separation = mpSeparationSteering->getSteering(gpGame->getUnitManager()->getEnemyUnits());
-	Steering* veclocityMatching = mpVelocityMatchingSteering->getSteering(gpGame->getUnitManager()->getEnemyUnits());
-	Steering* alignment = mpAlignmentSteering->getSteering(gpGame->getUnitManager()->getEnemyUnits());
+	Steering* cohesion = mpCohesionSteering->getSteering(gpGame->getLocalUnitManager()->getEnemyUnits());
+	Steering* separation = mpSeparationSteering->getSteering(gpGame->getLocalUnitManager()->getEnemyUnits());
+	Steering* veclocityMatching = mpVelocityMatchingSteering->getSteering(gpGame->getLocalUnitManager()->getEnemyUnits());
+	Steering* alignment = mpAlignmentSteering->getSteering(gpGame->getLocalUnitManager()->getEnemyUnits());
 
 	/*
 	

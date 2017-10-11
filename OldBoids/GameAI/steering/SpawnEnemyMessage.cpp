@@ -31,5 +31,5 @@ void SpawnEnemyMessage::process()
 	spawnPos.setX(player->getPosition().getX() + std::cos(angle) * radius);
 	spawnPos.setY(player->getPosition().getY() + std::sin(angle) * radius);
 
-	gpGame->getUnitManager()->createUnit(spawnPos, mBehavior);
+	gpGame->getLocalUnitManager()->createUnit(spawnPos, mBehavior);
 }

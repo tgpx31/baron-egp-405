@@ -51,7 +51,7 @@ public:
 	inline Timer* getMasterTimer() const { return mpMasterTimer; };
 	inline double getCurrentTime() const { return mpMasterTimer->getElapsedTime(); };
 	inline ALLEGRO_FONT* getFont() const { return mpFont; };
-	inline KinematicUnit* getPlayerUnit() { return mpUnitManager->getUnit(PLAYER_ID); };//should be someplace else
+	inline KinematicUnit* getPlayerUnit() { return mpLocalUnitManager->getUnit(PLAYER_ID); };//should be someplace else
 
 	inline void endGame() { mShouldExit = true; };
 
@@ -68,8 +68,8 @@ public:
 	inline bool getDebug() const { return mDebug; };
 
 	inline UI* getUI() const { return mpUI; };
-	inline UnitManager* getUnitManager() { return mpUnitManager; };
-	inline UnitManager* getUnitManager2() { return mpUnitManager2; };
+	inline UnitManager* getLocalUnitManager() { return mpLocalUnitManager; };
+	inline UnitManager* getPeerUnitManager() { return mpPeerUnitManager; };
 	inline WallManager* getWallManager() { return mpWallManager; };
 
 	inline int getCohesionWeight() { return mCohesionWeight; };
@@ -101,7 +101,7 @@ private:
 	IDType mPlayerIconBufferID;
 	IDType mEnemyIconBufferID;
 	
-	UnitManager *mpUnitManager, *mpUnitManager2;
+	UnitManager *mpLocalUnitManager, *mpPeerUnitManager;
 	InputManager* mpInputManager;
 	WallManager* mpWallManager;
 	UI* mpUI;

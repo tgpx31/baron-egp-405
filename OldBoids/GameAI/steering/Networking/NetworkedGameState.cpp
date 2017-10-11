@@ -76,8 +76,8 @@ void NetworkedGameState::updateData()
 		State::updateData();
 	else if (connectionSet)
 	{
-		// clients in data push mode don't send packets
-		if (!(mData.dataMethod == 1 && !mData.mIsHost))
+		// clients in data push mode don't send packets, both data sharing peers send packets
+		if ((mData.dataMethod == 1 && !mData.mIsHost) || mData.dataMethod == 2)
 		{
 			char buffer[1024];
 			int bytesWritten = 0;
@@ -87,17 +87,9 @@ void NetworkedGameState::updateData()
 			if (bytesWritten != 1)
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 		}
-
-		//If the data method is data share and you are the host
-		else if (mData.dataMethod == 2 && mData.mIsHost)
+		else // Data coupled
 		{
-			char buffer[1024];
-			int bytesWritten = 0;
-			buffer[0] = ID_BOID_DATA;
-			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten);
-			if (bytesWritten != 1)
-				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+
 		}
 	}
 }
@@ -136,7 +128,7 @@ void NetworkedGameState::render()
 
 int NetworkedGameState::SerializeBoids(char* buffer)
 {
-	std::vector<KinematicUnit*> boids = gpGame->getUnitManager()->getEnemyUnits();
+	std::vector<KinematicUnit*> boids = gpGame->getLocalUnitManager()->getEnemyUnits();
 	std::vector<KinematicUnit*>::iterator iter;
 	int bytesWritten = 0;
 	int size = boids.size();
@@ -171,6 +163,7 @@ int NetworkedGameState::SerializeBoids(char* buffer)
 
 	memcpy(buffer, &size, sizeof(size));
 	buffer += sizeof(size);
+	bytesWritten += sizeof(int);
 
 	for (iter = boids.begin(); iter != boids.end(); ++iter)
 	{
@@ -195,99 +188,58 @@ int NetworkedGameState::SerializeBoids(char* buffer)
 
 void NetworkedGameState::DeserializeBoids(char* buffer)
 {
-	if (mData.dataMethod == 2)
-	{
-		std::vector<KinematicUnit*> boids = gpGame->getUnitManager2()->getEnemyUnits();
-		std::vector<KinematicUnit*>::iterator iter;
-		int currentSize = boids.size();
-		int receivedSize;
+	UnitManager* manager;
+	std::vector<KinematicUnit*> boids;
+	std::vector<KinematicUnit*>::iterator iter;
+	int currentSize;
+	int receivedSize;
 
-		++buffer; // jump past ID enum
-		receivedSize = *(int*)buffer;
-		buffer += sizeof(int);
-
-		if (currentSize < receivedSize)
-		{
-			// add units, re-get vector
-			for (; currentSize < receivedSize; ++currentSize)
-				gpGame->getUnitManager2()->createUnit(Vector2D(), BOID);
-
-			boids = gpGame->getUnitManager2()->getEnemyUnits();
-		}
-		else if (currentSize > receivedSize)
-		{
-			// remove units, re-get vector
-			for (; currentSize > receivedSize; --currentSize)
-				gpGame->getUnitManager2()->removeRandomEnemy();
-
-			boids = gpGame->getUnitManager2()->getEnemyUnits();
-		}
-
-
-		for (iter = boids.begin(); iter != boids.end(); ++iter)
-		{
-			KinematicUnit* unit = *iter;
-
-			float x, y, r;
-
-			memcpy(&x, buffer, sizeof(x));
-			buffer += sizeof(float);
-			memcpy(&y, buffer, sizeof(y));
-			buffer += sizeof(float);
-			memcpy(&r, buffer, sizeof(r));
-			buffer += sizeof(float);
-
-			unit->setPosition(x, y);
-			unit->setOrientation(r);
-		}
-	}
+	if (mData.dataMethod == 1)
+		manager = gpGame->getLocalUnitManager();
 	else
+		manager = gpGame->getPeerUnitManager();
+
+	++buffer; // jump past ID enum
+	receivedSize = *(int*)buffer;
+	buffer += sizeof(int); // jump past number of boids
+
+	boids = manager->getEnemyUnits();
+	currentSize = boids.size();
+
+	if (currentSize < receivedSize)
 	{
-		std::vector<KinematicUnit*> boids = gpGame->getUnitManager()->getEnemyUnits();
-		std::vector<KinematicUnit*>::iterator iter;
-		int currentSize = boids.size();
-		int receivedSize;
+		// add units, re-get vector
+		for (; currentSize < receivedSize; ++currentSize)
+			manager->createUnit(Vector2D(), BOID);
 
-		++buffer; // jump past ID enum
-		receivedSize = *(int*)buffer;
-		buffer += sizeof(int);
-
-		if (currentSize < receivedSize)
-		{
-			// add units, re-get vector
-			for (; currentSize < receivedSize; ++currentSize)
-				gpGame->getUnitManager()->createUnit(Vector2D(), BOID);
-
-			boids = gpGame->getUnitManager()->getEnemyUnits();
-		}
-		else if (currentSize > receivedSize)
-		{
-			// remove units, re-get vector
-			for (; currentSize > receivedSize; --currentSize)
-				gpGame->getUnitManager()->removeRandomEnemy();
-
-			boids = gpGame->getUnitManager()->getEnemyUnits();
-		}
-
-
-		for (iter = boids.begin(); iter != boids.end(); ++iter)
-		{
-			KinematicUnit* unit = *iter;
-
-			float x, y, r;
-
-			memcpy(&x, buffer, sizeof(x));
-			buffer += sizeof(float);
-			memcpy(&y, buffer, sizeof(y));
-			buffer += sizeof(float);
-			memcpy(&r, buffer, sizeof(r));
-			buffer += sizeof(float);
-
-			unit->setPosition(x, y);
-			unit->setOrientation(r);
-		}
+		boids = manager->getEnemyUnits();
 	}
-	
+	else if (currentSize > receivedSize)
+	{
+		// remove units, re-get vector
+		for (; currentSize > receivedSize; --currentSize)
+			manager->removeRandomEnemy();
+
+		boids = manager->getEnemyUnits();
+	}
+
+
+	for (iter = boids.begin(); iter != boids.end(); ++iter)
+	{
+		KinematicUnit* unit = *iter;
+
+		float x, y, r;
+
+		memcpy(&x, buffer, sizeof(x));
+		buffer += sizeof(float);
+		memcpy(&y, buffer, sizeof(y));
+		buffer += sizeof(float);
+		memcpy(&r, buffer, sizeof(r));
+		buffer += sizeof(float);
+
+		unit->setPosition(x, y);
+		unit->setOrientation(r);
+	}
 }
 
 int NetworkedGameState::StartBoids()
