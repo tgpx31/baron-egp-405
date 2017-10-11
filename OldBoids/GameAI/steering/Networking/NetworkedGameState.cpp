@@ -77,14 +77,14 @@ void NetworkedGameState::updateData()
 	else if (connectionSet)
 	{
 		// clients in data push mode don't send packets, both data sharing peers send packets
-		if ((mData.dataMethod == 1 && !mData.mIsHost) || mData.dataMethod == 2)
+		if ((mData.dataMethod == 1 && mData.mIsHost) || mData.dataMethod == 2)
 		{
 			char buffer[1024];
 			int bytesWritten = 0;
 			buffer[0] = ID_BOID_DATA;
 			++bytesWritten;
 			bytesWritten += SerializeBoids(buffer + bytesWritten);
-			if (bytesWritten != 1)
+			if (bytesWritten != 5) //If it's not just ID plus number of boids
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 		}
 		else // Data coupled

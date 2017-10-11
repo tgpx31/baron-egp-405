@@ -265,17 +265,17 @@ void Game::processLoop()
 		//update units
 		mpLocalUnitManager->update(LOOP_TARGET_TIME / 1000.0f); 
 	}
-	else if (mDataMode == 2)	// if data sharing
-	{
-		// each peer should simulate their own 
-		// sends change in state to the other
-		// use mpLocalUnitManager for your own flock, update mpPeerUnitManager for the other flock
-		mpInputManager->update();
+	//else if (mDataMode == 2)	// if data sharing
+	//{
+	//	// each peer should simulate their own 
+	//	// sends change in state to the other
+	//	// use mpLocalUnitManager for your own flock, update mpPeerUnitManager for the other flock
+	//	mpInputManager->update();
 
-		//update units
-		mpLocalUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
-		//mpPeerUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
-	}
+	//	//update units
+	//	mpLocalUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
+	//	//mpPeerUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
+	//}
 	
 	//draw background
 	Sprite* pBackgroundSprite = mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
