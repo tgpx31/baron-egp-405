@@ -1,3 +1,5 @@
+// This file wasmodified by Brian Baron, Colin Brady, and Justin Mulkin with permission from author.
+
 #include <stdio.h>
 #include <assert.h>
 #include <allegro5/allegro.h>

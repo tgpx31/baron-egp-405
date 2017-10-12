@@ -12,6 +12,9 @@
 //
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
+
+// This file wasmodified by Brian Baron, Colin Brady, and Justin Mulkin with permission from author.
+
 #ifndef MESSAGES_H
 #define MESSAGES_H
 
@@ -29,46 +32,5 @@ enum GameMessages
 	ID_BOID_DATA,
 	ID_BOID_DATA_AND_GLOBALS
 };
-
-/*
-#pragma pack (push, 1)
-struct UsernameMessage		// this structure can be used for multiple message ids
-{
-	char messageID;
-	char username[31];
-};
-
-struct ClientNumberMessage
-{
-	char messageID;
-	unsigned int clientNumber;
-};
-
-struct ClientChatMessage
-{
-	char messageID;
-	int uniqueID;
-	char destination[31];
-	char message[512];
-};
-
-struct ServerChatMessage
-{
-	char messageID;
-	int isWhisper;
-	char message[512];
-	char username[31];
-};
-#pragma pack (pop)
-*/
-
-#pragma pack (push, 1)
-//Structure for movement messages
-struct GameMoveMessage
-{
-	int id;
-	int placementIndex;
-};
-#pragma pack (pop)
 
 #endif

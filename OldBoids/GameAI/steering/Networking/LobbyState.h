@@ -12,6 +12,9 @@
 //
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
+
+// This file wasmodified by Brian Baron, Colin Brady, and Justin Mulkin with permission from author.
+
 #ifndef LOBBY_STATE_H
 #define LOBBY_STATE_H
 

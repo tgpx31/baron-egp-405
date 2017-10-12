@@ -12,6 +12,9 @@
 //
 // Repository Link: https://github.com/tgpx31/baron-egp-405
 //
+
+// This file wasmodified by Brian Baron, Colin Brady, and Justin Mulkin with permission from author.
+
 #include "LobbyState.h"
 
 void LobbyState::init(State * nextL, State * nextM, State * nextR, State** currentState)
