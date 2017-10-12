@@ -76,7 +76,6 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 
 void NetworkedGameState::updateData()
 {
-	// 
 	if (!willSendState && mData.dataMethod == 3)
 		return;
 
@@ -240,7 +239,7 @@ void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
 	int currentSize;
 	int receivedSize;
 
-	if (mData.dataMethod == 1)
+	if (mData.dataMethod == 3)
 		manager = gpGame->getLocalUnitManager();
 	else
 		manager = gpGame->getPeerUnitManager();
