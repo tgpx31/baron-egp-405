@@ -17,7 +17,7 @@ public:
 	// Erasing/Reseting
 	void Clear();
 	void FillWith(Event aEvent);
-	void Erase(size_type index, size_type deleteCount = 1);
+	void Erase(size_type index = 0, size_type deleteCount = 1);
 
 	// Add to the Queue
 	void Reserve(const size_type amount);
@@ -27,20 +27,12 @@ public:
 	void Prepend(Event* aEvent);
 
 	// Accessors
-	size_type Size() const;
+	inline size_type Size() const { return mCount; };
 
-	Event* Begin();
-	//const Event* Begin();
+	inline const Event** Begin() { return &mQueue[0]; };
+	inline const Event** End() { return mQueue + ((mCount + 1) * sizeof(Event*)); };
 
-	Event* End();
-	//const Event* End();
-
-	Event* operator[](size_type index);
-	//Event operator[](size_type index);
-
-	// Unecessary but nice to have
-	void Reverse();
-
+	inline Event* operator[](size_type index) { return mQueue[index]; };
 };
 
 #endif // _DEAN_QUEUE_H_
