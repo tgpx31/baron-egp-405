@@ -1,8 +1,4 @@
-#include "Event.h"
 #include "DeanQueue.h"
-
-#include <stdio.h>
-#include <Windows.h>
 
 void DeanQueue::Clear()
 {
@@ -49,7 +45,7 @@ void DeanQueue::Erase(size_type index, size_type deleteCount)
 void DeanQueue::Reserve(const size_type amount)
 {
 	// if shrinking the queue...
-	if (mCount > amount && amount > 0)
+	if (mCount > amount && amount >= 0)
 	{
 		mCount = amount;
 		printf("Queue shrunk for %i Events\n", mCount);
@@ -125,6 +121,15 @@ void DeanQueue::Append(Event * aEvent)
 void DeanQueue::Prepend(Event * aEvent)
 {
 	Insert(0, aEvent);
+}
+
+Event * DeanQueue::Pop()
+{
+	// grab the value, move the rest of the queue up an index
+
+	Event *ev = operator[](0);
+	Erase(0);
+	return ev;
 }
 
 

@@ -3,7 +3,8 @@
 
 class Event
 {
-
+	int id = 0;
+	char* msg = "";
 };
 
 #endif
