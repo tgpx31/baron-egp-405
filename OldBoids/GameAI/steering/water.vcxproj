@@ -21,6 +21,8 @@
     <ClInclude Include="GraphicsBufferManager.h" />
     <ClInclude Include="GraphicsSystem.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Networking\DeanQueue.h" />
+    <ClInclude Include="Networking\Event.h" />
     <ClInclude Include="Networking\GameState.h" />
     <ClInclude Include="Networking\LobbyState.h" />
     <ClInclude Include="Networking\Messages.h" />
@@ -42,6 +44,7 @@
     <ClCompile Include="GraphicsSystem.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Networking\DeanQueue.cpp" />
     <ClCompile Include="Networking\GameState.cpp" />
     <ClCompile Include="Networking\LobbyState.cpp" />
     <ClCompile Include="Networking\NetworkedGameState.cpp" />
