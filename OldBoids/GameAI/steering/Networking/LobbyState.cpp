@@ -26,7 +26,7 @@ void LobbyState::init(State * nextL, State * nextM, State * nextR, State** curre
 	mLobbyData.next3 = nextR;
 	mLobbyData.promptHost = 0;
 
-	strcpy(mData.promptBuffer, "The boids are back in town. \n\t(L)ocal boids\n\tNetworked Data (P)ush\n\tNetworked Data (S)haring\n\tNetworked Data (C)oupled\n\t(E)xit?\n");
+	strcpy(mData.promptBuffer, "Networking Zone \(Lab3\)	\n(S)tart	\n(E)xit?\n");
 
 	mData.doesUpdateInput = 1;
 	mData.doesUpdateState = 1;
@@ -40,28 +40,9 @@ void LobbyState::processBuffer()
 	{
 		switch (mData.buffer[0])
 		{
-		case 'L':
-			printf("\nLocal boids selected");
-			// load a local game
-			GoToNextState(mLobbyData.next1);
-			break;
-
-		case 'P':
-			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
-			mLobbyData.promptHost = 1;
-			mData.dataMethod = 1;
-			mData.doesDisplay = 1;
-			break;
 		case 'S':
 			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
 			mLobbyData.promptHost = 1;
-			mData.dataMethod = 2;
-			mData.doesDisplay = 1;
-			break;
-		case 'C':
-			strcpy(mData.promptBuffer, "(C)onnect or (H)ost?\n");
-			mLobbyData.promptHost = 1;
-			mData.dataMethod = 3;
 			mData.doesDisplay = 1;
 			break;
 

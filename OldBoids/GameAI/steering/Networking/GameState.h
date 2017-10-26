@@ -35,12 +35,12 @@ protected:
 
 	} mGameStateData;
 
-	bool initializedBoids, exit;
-
-	int StartBoids();
+	bool initializedGame, exit;
+	int initGame();
 
 	State *mPrev;
 
+	void updateInput() override;
 	void updateData() override;
 	void processBuffer() override;
 

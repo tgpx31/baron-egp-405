@@ -28,6 +28,7 @@
     <ClInclude Include="Networking\Messages.h" />
     <ClInclude Include="Networking\NetworkedGameState.h" />
     <ClInclude Include="Networking\State.h" />
+    <ClInclude Include="PlayerMoveToMessage.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="Wall.h" />
@@ -49,6 +50,7 @@
     <ClCompile Include="Networking\LobbyState.cpp" />
     <ClCompile Include="Networking\NetworkedGameState.cpp" />
     <ClCompile Include="Networking\State.cpp" />
+    <ClCompile Include="PlayerMoveToMessage.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="Wall.cpp" />

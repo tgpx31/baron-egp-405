@@ -26,7 +26,6 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 	{
 		// Are you a host or not?
 		mData.mIsHost = data->mIsHost;
-		mData.dataMethod = data->dataMethod;
 	}
 
 	mData.doesDisplay = 1;
@@ -76,9 +75,6 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 
 void NetworkedGameState::updateData()
 {
-	if (!willSendState && mData.dataMethod == 3)
-		return;
-
 	gpGame->beginLoop();
 	gpGame->processLoop();
 	exit = gpGame->endLoop();
@@ -92,29 +88,29 @@ void NetworkedGameState::updateData()
 	else if (connectionSet)
 	{
 		// clients in data push mode don't send packets, both data sharing peers send packets
-		if ((mData.dataMethod == 1 && mData.mIsHost) || mData.dataMethod == 2)
-		{
-			char buffer[1024];
-			int bytesWritten = 0;
-			buffer[0] = ID_BOID_DATA;
-			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten, false);
-			if (bytesWritten != 5) //If it's not just ID plus number of boids
-				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
-		}
-		else if (mData.dataMethod == 3 && willSendState)// Data coupled
-		{
-			char buffer[1024];
-			int bytesWritten = 0;
-			buffer[0] = ID_BOID_DATA_AND_GLOBALS;
-			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten, true);
-			if (bytesWritten != 33 || !mData.mIsHost) //If it's not just ID plus number of boids plus globals, and allows the client to send back data even if no new boids were added
-			{
-				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
-				willSendState = false;
-			}
-		}
+		//if ((mData.dataMethod == 1 && mData.mIsHost) || mData.dataMethod == 2)
+		//{
+		//	char buffer[1024];
+		//	int bytesWritten = 0;
+		//	buffer[0] = ID_BOID_DATA;
+		//	++bytesWritten;
+		//	bytesWritten += SerializeBoids(buffer + bytesWritten, false);
+		//	if (bytesWritten != 5) //If it's not just ID plus number of boids
+		//		peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+		//}
+		//else if (mData.dataMethod == 3 && willSendState)// Data coupled
+		//{
+		//	char buffer[1024];
+		//	int bytesWritten = 0;
+		//	buffer[0] = ID_BOID_DATA_AND_GLOBALS;
+		//	++bytesWritten;
+		//	bytesWritten += SerializeBoids(buffer + bytesWritten, true);
+		//	if (bytesWritten != 33 || !mData.mIsHost) //If it's not just ID plus number of boids plus globals, and allows the client to send back data even if no new boids were added
+		//	{
+		//		peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+		//		willSendState = false;
+		//	}
+		//}
 	}
 }
 
@@ -340,7 +336,7 @@ int NetworkedGameState::StartBoids()
 		/*gpGame->setDataMode(mData.dataMethod);
 		gpGame->setIsHost(mData.mIsHost);*/
 		
-		initializedBoids = true;
+		initializedGame = true;
 		return 1;
 	}
 }

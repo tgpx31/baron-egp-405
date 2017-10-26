@@ -14,6 +14,8 @@
 
 #include "Timer.h"
 #include "Game.h"
+#include "GameMessageManager.h"
+
 #include "GraphicsSystem.h"
 #include "GraphicsBuffer.h"
 #include "GraphicsBufferManager.h"
@@ -127,14 +129,6 @@ bool Game::init()
 		return false;
 	}
 
-	//load the sample
-	/*mpSample = al_load_sample( "clapping.wav" );
-	if (!mpSample)
-	{
-		printf( "Audio clip sample not loaded!\n" ); 
-		return false;
-	}*/
-
 	//load buffers
 	mBackgroundBufferID = mpGraphicsBufferManager->loadBuffer("wallpaper.bmp");
 	mPlayerIconBufferID = mpGraphicsBufferManager->loadBuffer("arrow.bmp");
@@ -206,40 +200,20 @@ void Game::beginLoop()
 void Game::processLoop()
 {
 	// If client on data push, do not do any updates
-	//if (!(mDataMode == 1 && !mIsHost))
-	//{
-	//	mpInputManager->update(); 
+	
+	//draw background
+	Sprite* pBackgroundSprite = mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
+	pBackgroundSprite->draw(*(mpGraphicsSystem->getBackBuffer()), 0, 0);
 
-	//	//update units
-	//	mpLocalUnitManager->update(LOOP_TARGET_TIME / 1000.0f); 
-	//}
-	////else if (mDataMode == 2)	// if data sharing
-	////{
-	////	// each peer should simulate their own 
-	////	// sends change in state to the other
-	////	// use mpLocalUnitManager for your own flock, update mpPeerUnitManager for the other flock
-	////	mpInputManager->update();
-
-	////	//update units
-	////	mpLocalUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
-	////	//mpPeerUnitManager->update(LOOP_TARGET_TIME / 1000.0f);
-	////}
-	//
-	////draw background
-	//Sprite* pBackgroundSprite = mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
-	//pBackgroundSprite->draw(*(mpGraphicsSystem->getBackBuffer()), 0, 0);
-
-	////draw units
+	//draw units
 	//mpLocalUnitManager->draw(GRAPHICS_SYSTEM->getBackBuffer(), mDebug);
 	//mpPeerUnitManager->draw(GRAPHICS_SYSTEM->getBackBuffer(), mDebug);
 	//mpWallManager->draw(mDebug);
-	////mpInputManager->draw();
 
-	//if (mDebug)
-	//	mpUI->draw(); 
+	//mpInputManager->draw();
 
-	//mpMessageManager->processMessagesForThisframe();
-	//mpGraphicsSystem->swap();
+	mpMessageManager->processMessagesForThisframe();
+	mpGraphicsSystem->swap();
 }
 
 bool Game::endLoop()

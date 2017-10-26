@@ -31,15 +31,26 @@ void GameState::init(State * prev = nullptr, State ** currentState = nullptr)
 	if (prev != nullptr)
 		mPrev = prev;
 
-	strcpy(mData.promptBuffer, "BOIDS\n");
+	strcpy(mData.promptBuffer, "Networking Zone\n");
 
-	initializedBoids = false;
+	initializedGame = false;
+	//initializedBoids = false;
 	exit = false;
+}
+
+void GameState::updateInput()
+{
+
 }
 
 void GameState::updateData()
 {
-	
+	gpGame->beginLoop();
+	gpGame->processLoop();
+	exit = gpGame->endLoop();
+
+	if (exit)
+		mData.running = 0;
 }
 
 void GameState::processBuffer()
@@ -49,34 +60,17 @@ void GameState::processBuffer()
 
 void GameState::render()
 {
-	/*gpPerformanceTracker->clearTracker("loop");
-	gpPerformanceTracker->startTracking("loop");*/
-
-	gpGame->beginLoop();
-	/*gpPerformanceTracker->clearTracker("draw");
-	gpPerformanceTracker->startTracking("draw");*/
-
-	gpGame->processLoop();
-	//gpPerformanceTracker->stopTracking("draw");
-
-	exit = gpGame->endLoop();
-
-	/*gpPerformanceTracker->stopTracking("loop");
-	std::cout << "loop took:" << gpPerformanceTracker->getElapsedTime("loop") << "ms";
-	std::cout << "draw took:" << gpPerformanceTracker->getElapsedTime("draw") << "ms\n";*/
-
-	if (exit)
-		mData.running = 0;
+	
 }
 
 void GameState::ArriveFromPreviousState(StateData *data)
 {
 	init();
 	mData.doesDisplay = 1;
-	StartBoids();
+	//StartBoids();
 }
 
-int GameState::StartBoids()
+int GameState::initGame()
 {
 	//gpGame = new Game();
 	gpPerformanceTracker->startTracking("init");
@@ -92,7 +86,7 @@ int GameState::StartBoids()
 		gpPerformanceTracker->stopTracking("init");
 		std::cout << "initialization took:" << gpPerformanceTracker->getElapsedTime("init") << "ms\n";
 
-		initializedBoids = true;
+		initializedGame = true;
 		return 1;
 	}
 }

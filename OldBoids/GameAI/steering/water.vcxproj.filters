@@ -49,14 +49,17 @@
     <ClCompile Include="Networking\State.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameMessage.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
-    <ClCompile Include="GameMessageManager.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="Networking\DeanQueue.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMessage.cpp">
+      <Filter>Source Files\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMessageManager.cpp">
+      <Filter>Source Files\Messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerMoveToMessage.cpp">
+      <Filter>Source Files\Messaging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,17 +114,20 @@
     <ClInclude Include="Networking\State.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameMessageManager.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="GameMessage.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="Networking\DeanQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Networking\Event.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMessageManager.h">
+      <Filter>Header Files\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMessage.h">
+      <Filter>Header Files\Messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerMoveToMessage.h">
+      <Filter>Header Files\Messaging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +160,12 @@
     </Filter>
     <Filter Include="Source Files\Collisions">
       <UniqueIdentifier>{8a73bd66-b5fe-4fcc-8ac7-fffde537f861}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Messaging">
+      <UniqueIdentifier>{ada5273d-ad0e-4c8f-ba2a-dd70129e9494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Messaging">
+      <UniqueIdentifier>{aeb166df-e2e7-40d0-9987-2ef2d89ec02f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
