@@ -19,6 +19,7 @@
 #define NETWORKED_GAME_STATE_H
 
 #include "GameState.h"
+#include "DeanQueue.h"
 
 #define DEFAULT_PORT_NUMBER 666
 #define MAX_PEER_CONNECTIONS 1
@@ -47,6 +48,8 @@ private:
 	int SerializeBoids(char* buffer, bool andGlobals);
 	void DeserializeBoids(char* buffer, bool andGlobals);
 	int StartBoids();
+
+	DeanQueue eventQueue;
 };
 
 #endif

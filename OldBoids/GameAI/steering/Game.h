@@ -86,6 +86,24 @@ public:
 	inline void setDataMode(int dataMode) { mDataMode = dataMode; };
 	inline void setIsHost(bool isHost) { mIsHost = isHost; };
 
+	inline int getWeight(DebugMode behavior)
+	{
+		switch (getUI()->getMode())
+		{
+		case 1:
+			return getCohesionWeight();
+			break;
+		case 2:
+			return getSeparationWeight();
+			break;
+
+		case 3:
+			return getAlignmentWeight();
+			break;
+
+		}
+	};
+
 private:
 	GraphicsSystem* mpGraphicsSystem;
 	GraphicsBufferManager* mpGraphicsBufferManager;
@@ -117,7 +135,7 @@ private:
 	int mAlignmentWeight;
 	int mVelocityMatchingWeight;
 
-	int mDataMode; // 1 = data push, 2 = data sharing, 3 = data coupled
+	int mDataMode; // 1 = data push, 2 = data sharing, 3 = data coupled, 0 is local
 	bool mIsHost;
 };
 

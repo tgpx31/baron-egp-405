@@ -58,98 +58,180 @@ void InputManager::update()
 	al_get_mouse_state(&mCurrentMouseState);
 	al_get_keyboard_state(&mCurrentKeyboardState);
 	
-	/*
-	//left mouse click
-	if (al_mouse_button_down(&mCurrentMouseState, 1) && !al_mouse_button_down(&mPreviousMouseState, 1))
+	// if local, use the message system from old boids
+	// if networked, use the event queue and management system
+	if (gpGame->getDataMode() == 0)
 	{
-		Vector2D pos(mCurrentMouseState.x, mCurrentMouseState.y);
-		GameMessage* pMessage = new PlayerMoveToMessage(pos);
-		MESSAGE_MANAGER->addMessage(pMessage, 0);
-	}
-	*/
-
-	//if escape key was down then exit the loop
-	if (keyPressed(ALLEGRO_KEY_ESCAPE))
-	{
-		GameMessage* pMessage = new EndGameMessage();
-		MESSAGE_MANAGER->addMessage(pMessage, 0);
-	}
-
-	if (keyPressed(ALLEGRO_KEY_I))
-	{
-		GameMessage* pMessage0 = new SpawnBoidMessage();
-		MESSAGE_MANAGER->addMessage(pMessage0, 0);
-		GameMessage* pMessage1 = new SpawnBoidMessage();
-		MESSAGE_MANAGER->addMessage(pMessage1, 0);
-		GameMessage* pMessage2 = new SpawnBoidMessage();
-		MESSAGE_MANAGER->addMessage(pMessage2, 0);
-		GameMessage* pMessage3 = new SpawnBoidMessage();
-		MESSAGE_MANAGER->addMessage(pMessage3, 0);
-		GameMessage* pMessage4 = new SpawnBoidMessage();
-		MESSAGE_MANAGER->addMessage(pMessage4, 0);
-	}
-	if (keyPressed(ALLEGRO_KEY_D))
-	{
-		GameMessage* pMessage = new DeleteEnemyMessage();
-		MESSAGE_MANAGER->addMessage(pMessage, 0);
-	}
-
-	//Debug Mode inputs
-	if (keyPressed(ALLEGRO_KEY_TILDE))
-	{
-		GameMessage* pMesssage = new ToggleDebugMessage();
-		MESSAGE_MANAGER->addMessage(pMesssage, 0);
-	}
-
-	//Only do this if in debug state
-	if (gpGame->getDebug())
-	{
-		if (keyPressed(ALLEGRO_KEY_V))
+		//if escape key was down then exit the loop
+		if (keyPressed(ALLEGRO_KEY_ESCAPE))
 		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_L))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(ACCELERATION);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_U))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(ANGULAR);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_C))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(COHESION);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_S))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(SEPARATION);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_A))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(ALIGNMENT);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_M))
-		{
-			GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY_MATCHING);
-			MESSAGE_MANAGER->addMessage(pMesssage, 0);
-		}
-		if (keyPressed(ALLEGRO_KEY_EQUALS))
-		{
-			GameMessage* pMessage = new EditDebugValueMessage(5.0f);
+			GameMessage* pMessage = new EndGameMessage();
 			MESSAGE_MANAGER->addMessage(pMessage, 0);
 		}
-		if (keyPressed(ALLEGRO_KEY_MINUS))
+
+		if (keyPressed(ALLEGRO_KEY_I))
 		{
-			GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
+			GameMessage* pMessage0 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage0, 0);
+			GameMessage* pMessage1 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage1, 0);
+			GameMessage* pMessage2 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage2, 0);
+			GameMessage* pMessage3 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage3, 0);
+			GameMessage* pMessage4 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage4, 0);
+		}
+		if (keyPressed(ALLEGRO_KEY_D))
+		{
+			GameMessage* pMessage = new DeleteEnemyMessage();
 			MESSAGE_MANAGER->addMessage(pMessage, 0);
 		}
+
+		//Debug Mode inputs
+		if (keyPressed(ALLEGRO_KEY_TILDE))
+		{
+			GameMessage* pMesssage = new ToggleDebugMessage();
+			MESSAGE_MANAGER->addMessage(pMesssage, 0);
+		}
+
+		//Only do this if in debug state
+		if (gpGame->getDebug())
+		{
+			if (keyPressed(ALLEGRO_KEY_V))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_L))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ACCELERATION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_U))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ANGULAR);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_C))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(COHESION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_S))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(SEPARATION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_A))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ALIGNMENT);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_M))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY_MATCHING);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_EQUALS))
+			{
+				GameMessage* pMessage = new EditDebugValueMessage(5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_MINUS))
+			{
+				GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);
+			}
+		}
 	}
+	else
+	{
+		//if escape key was down then exit the loop
+		if (keyPressed(ALLEGRO_KEY_ESCAPE))
+		{
+			GameMessage* pMessage = new EndGameMessage();
+			MESSAGE_MANAGER->addMessage(pMessage, 0);
+		}
+
+		if (keyPressed(ALLEGRO_KEY_I))
+		{
+			GameMessage* pMessage0 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage0, 0);
+			GameMessage* pMessage1 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage1, 0);
+			GameMessage* pMessage2 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage2, 0);
+			GameMessage* pMessage3 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage3, 0);
+			GameMessage* pMessage4 = new SpawnBoidMessage();
+			MESSAGE_MANAGER->addMessage(pMessage4, 0);
+		}
+		if (keyPressed(ALLEGRO_KEY_D))
+		{
+			GameMessage* pMessage = new DeleteEnemyMessage();
+			MESSAGE_MANAGER->addMessage(pMessage, 0);
+		}
+
+		//Debug Mode inputs
+		if (keyPressed(ALLEGRO_KEY_TILDE))
+		{
+			GameMessage* pMesssage = new ToggleDebugMessage();
+			MESSAGE_MANAGER->addMessage(pMesssage, 0);
+		}
+
+		//Only do this if in debug state
+		if (gpGame->getDebug())
+		{
+			if (keyPressed(ALLEGRO_KEY_V))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_L))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ACCELERATION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_U))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ANGULAR);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_C))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(COHESION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_S))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(SEPARATION);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_A))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(ALIGNMENT);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_M))
+			{
+				GameMessage* pMesssage = new ChangeDebugModeMessage(VELOCITY_MATCHING);
+				MESSAGE_MANAGER->addMessage(pMesssage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_EQUALS))
+			{
+				GameMessage* pMessage = new EditDebugValueMessage(5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);
+			}
+			if (keyPressed(ALLEGRO_KEY_MINUS))
+			{
+				GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);
+			}
+		}
+	}
+
+	
 
 	mPreviousKeyboardState = mCurrentKeyboardState;
 	mPreviousMouseState = mCurrentMouseState;

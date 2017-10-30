@@ -20,6 +20,8 @@
 #include "../KinematicUnit.h"
 #include <vector>
 
+#include "ModifyWeightEvent.h"
+
 void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 {
 	if (data != nullptr)
@@ -72,6 +74,8 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 
 	//Default prompt for the host
 	strcpy(mData.promptBuffer, "Boids Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
+
+	eventQueue = DeanQueue();
 }
 
 void NetworkedGameState::updateData()
@@ -115,18 +119,54 @@ void NetworkedGameState::updateData()
 				willSendState = false;
 			}
 		}
+
+		// execute all events in the queue
+		if (eventQueue.Size() > 0)
+		{
+			for (unsigned int i = 0; i < eventQueue.Size(); ++i)
+			{
+				eventQueue[i]->Execute();
+			}
+
+			// clear the Queue
+			eventQueue.Clear();
+		}
 	}
 }
 
 void NetworkedGameState::processBuffer()
 {
+	switch (mData.buffer[0])
+	{
+		case 'Q':
+		{
+			// Create event, send it 
+			ModifyWeightEvent newEvent = ModifyWeightEvent(ID_MODIFY_WEIGHTS, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) - 1);
 
+			peer->Send((char*)&newEvent, sizeof(newEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+
+			break;
+		}
+		case 'E':
+		{
+			// Create event, send it 
+			ModifyWeightEvent newEvent = ModifyWeightEvent(ID_MODIFY_WEIGHTS, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) + 1);
+
+			peer->Send((char*)&newEvent, sizeof(newEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+
+			break;
+		}
+
+		// Clear the buffer
+		clearBuffer();
+	}
 }
 
 void NetworkedGameState::updateNetworking()
 {
 	if (!networkingSetup)
 		return;
+
 
 	// message loop
 	for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
@@ -140,6 +180,13 @@ void NetworkedGameState::updateNetworking()
 			case ID_BOID_DATA_AND_GLOBALS:
 				DeserializeBoids((char*)packet->data, true);
 				willSendState = true;
+				break;
+
+			case ID_MODIFY_WEIGHTS:
+				ModifyWeightEvent* pEvent = (ModifyWeightEvent*)packet->data;
+				// add to the queue
+				eventQueue.Push(pEvent);
+
 				break;
 		}
 	}

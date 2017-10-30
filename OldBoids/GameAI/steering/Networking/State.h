@@ -57,7 +57,7 @@ class State abstract
 		State **mCurrentState;
 
 		// Update loop component functions
-		void updateInput();
+		virtual void updateInput();
 		virtual void updateData();
 		virtual void updateNetworking() {};
 		virtual void processBuffer();

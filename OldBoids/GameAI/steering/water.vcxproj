@@ -36,9 +36,13 @@
     <ClInclude Include="KinematicSeekSteering.h" />
     <ClInclude Include="KinematicUnit.h" />
     <ClInclude Include="KinematicWanderSteering.h" />
+    <ClInclude Include="Networking\DeanQueue.h" />
+    <ClInclude Include="Networking\Event.h" />
+    <ClInclude Include="Networking\ExitGameEvent.h" />
     <ClInclude Include="Networking\GameState.h" />
     <ClInclude Include="Networking\LobbyState.h" />
     <ClInclude Include="Networking\Messages.h" />
+    <ClInclude Include="Networking\ModifyWeightEvent.h" />
     <ClInclude Include="Networking\NetworkedGameState.h" />
     <ClInclude Include="Networking\State.h" />
     <ClInclude Include="PlayerMoveToMessage.h" />
@@ -82,8 +86,11 @@
     <ClCompile Include="KinematicUnit.cpp" />
     <ClCompile Include="KinematicWanderSteering.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Networking\DeanQueue.cpp" />
+    <ClCompile Include="Networking\Event.cpp" />
     <ClCompile Include="Networking\GameState.cpp" />
     <ClCompile Include="Networking\LobbyState.cpp" />
+    <ClCompile Include="Networking\ModifyWeightEvent.cpp" />
     <ClCompile Include="Networking\NetworkedGameState.cpp" />
     <ClCompile Include="Networking\State.cpp" />
     <ClCompile Include="PlayerMoveToMessage.cpp" />
