@@ -1,9 +1,12 @@
+#include "Networking\NetworkedGameState.h"
+
 #include "InputManager.h"
 #include "GameMessage.h"
 #include "GameMessageManager.h"
 #include "PlayerMoveToMessage.h"
 #include "EndGameMessage.h"
 #include "SpawnEnemyMessage.h"
+
 #include "DeleteEnemyMessage.h"
 #include "ToggleDebugMessage.h"
 #include "ChangeDebugModeMessage.h"
@@ -14,6 +17,9 @@
 #include "Game.h"
 #include "GraphicsSystem.h"
 #include "Behaviors.h"
+
+#include "Networking\DeanQueue.h"
+#include "Networking\ModifyWeightEvent.h"
 
 InputManager::InputManager()
 {
@@ -143,6 +149,7 @@ void InputManager::update()
 				GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
 				MESSAGE_MANAGER->addMessage(pMessage, 0);
 			}
+
 		}
 	}
 	else
@@ -227,6 +234,20 @@ void InputManager::update()
 			{
 				GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
 				MESSAGE_MANAGER->addMessage(pMessage, 0);
+			}
+
+			if (keyPressed(ALLEGRO_KEY_Q))
+			{
+				/*GameMessage* pMessage = new EditDebugValueMessage(5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);*/
+				ModifyWeightEvent* newEvent = new ModifyWeightEvent(138, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) - 1);
+				//sentEvent = &newEvent;
+				gpGame->getQueue()->Push(newEvent);
+			}
+			if (keyPressed(ALLEGRO_KEY_E))
+			{
+				/*GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
+				MESSAGE_MANAGER->addMessage(pMessage, 0);*/
 			}
 		}
 	}

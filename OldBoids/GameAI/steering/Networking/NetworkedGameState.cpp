@@ -16,11 +16,13 @@
 // This file wasmodified by Brian Baron, Colin Brady, and Justin Mulkin with permission from author.
 
 #include "NetworkedGameState.h"
-#include "Messages.h"
 #include "../KinematicUnit.h"
 #include <vector>
 
 #include "ModifyWeightEvent.h"
+
+DeanQueue eventQueue;// = DeanQueue();
+Event *sentEvent = NULL;
 
 void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 {
@@ -117,6 +119,21 @@ void NetworkedGameState::updateData()
 			{
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 				willSendState = false;
+			}
+		}
+
+		//if (sentEvent != NULL)
+		//{
+		//	//eventQueue.Push(sentEvent);
+		//	peer->Send((char*)&(*sentEvent), sizeof(*sentEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+		//	sentEvent = NULL;
+		//}
+
+		if (gpGame->getQueue()->Size() > 0)
+		{
+			for (unsigned int i = 0; i < gpGame->getQueue()->Size(); ++i)
+			{
+				gpGame->getQueue()->operator[](i)->Execute();
 			}
 		}
 

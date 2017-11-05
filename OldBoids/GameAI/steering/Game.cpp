@@ -22,6 +22,7 @@
 #include "Timer.h"
 #include "KinematicUnit.h"
 #include "PlayerMoveToMessage.h"
+#include "Networking\DeanQueue.h"
 
 
 
@@ -187,6 +188,8 @@ bool Game::init()
 
 	// Unit manager for Data Sharing
 	mpPeerUnitManager = new UnitManager(pArrowSprite);
+
+	mpQueue = new DeanQueue();
 	
 	/*
 	Vector2D pos(500.0f, 500.0f);

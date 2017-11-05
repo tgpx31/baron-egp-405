@@ -20,6 +20,8 @@
 
 #include "GameState.h"
 #include "DeanQueue.h"
+#include "Messages.h"
+
 
 #define DEFAULT_PORT_NUMBER 666
 #define MAX_PEER_CONNECTIONS 1
@@ -49,7 +51,7 @@ private:
 	void DeserializeBoids(char* buffer, bool andGlobals);
 	int StartBoids();
 
-	DeanQueue eventQueue;
 };
-
+	extern DeanQueue eventQueue;
+	extern Event *sentEvent;
 #endif

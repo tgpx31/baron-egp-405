@@ -19,6 +19,7 @@ class SpriteManager;
 class KinematicUnit;
 class GameMessageManager;
 class Timer;
+class DeanQueue;
 
 const IDType BACKGROUND_SPRITE_ID = 0;
 const IDType PLAYER_ICON_SPRITE_ID = 1;
@@ -86,6 +87,8 @@ public:
 	inline void setDataMode(int dataMode) { mDataMode = dataMode; };
 	inline void setIsHost(bool isHost) { mIsHost = isHost; };
 
+	inline DeanQueue* getQueue() { return mpQueue; };
+
 	inline int getWeight(DebugMode behavior)
 	{
 		switch (getUI()->getMode())
@@ -137,6 +140,8 @@ private:
 
 	int mDataMode; // 1 = data push, 2 = data sharing, 3 = data coupled, 0 is local
 	bool mIsHost;
+
+	DeanQueue* mpQueue;
 };
 
 float genRandomBinomial();//range -1:1 from "Artificial Intelligence for Games", Millington and Funge
