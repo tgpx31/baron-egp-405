@@ -37,6 +37,7 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 		peer->SetMaximumIncomingConnections(MAX_PEER_CONNECTIONS);
 		willSendState = 1; //Data coupled - For if it will be sending the state
+		isX = 0;
 	}
 	else
 	{
@@ -44,6 +45,7 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 		peer->Startup(MAX_PEER_CONNECTIONS, &sd, 1);
 		peer->Connect("127.0.0.1", DEFAULT_PORT_NUMBER, 0, 0);
 		willSendState = 0; //Data coupled
+		isX = 1;
 	}
 
 	connectionSet = 1;
@@ -169,27 +171,44 @@ void NetworkedGameState::updateInput()
 		// walk left
 		mGameState.mpLocalPlayer->setXVelocity(-1);
 		//****TODO: have this event sent out to connected other, and do the local here
-		/*MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, -1, mGameState.mpLocalPlayer, 0);
-		peer->Send((char*)moveEv, sizeof(MovePlayerEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);*/
-		//eventQueue.Push(moveEv);
+		MovePlayerMessage message;
+		message.ID = ID_MOVE_PLAYER;
+		message.xVel = -1, message.yVel = 0;
+		message.playerID = isX;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
 	else if (keyUp(ALLEGRO_KEY_A))
 	{
 		mGameState.mpLocalPlayer->setXVelocity(0);
+		MovePlayerMessage message;
+		message.ID = ID_MOVE_PLAYER;
+		message.xVel = 0, message.yVel = 0;
+		message.playerID = isX;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
 
 	if (keyPressed(ALLEGRO_KEY_D))
 	{
 		// walk right
 		mGameState.mpLocalPlayer->setXVelocity(+1);
-		/*MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, +1, mGameState.mpLocalPlayer, 0);
-		peer->Send((char*)moveEv, sizeof(MovePlayerEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);*/
+		MovePlayerMessage message;
+		message.ID = ID_MOVE_PLAYER;
+		message.xVel = +1, message.yVel = 0;
+		message.playerID = isX;
 
-		//eventQueue.Push(moveEv);
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
 	else if (keyUp(ALLEGRO_KEY_D))
 	{
 		mGameState.mpLocalPlayer->setXVelocity(0);
+		MovePlayerMessage message;
+		message.ID = ID_MOVE_PLAYER;
+		message.xVel = 0, message.yVel = 0;
+		message.playerID = isX;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
 
 	mGameState.mPreviousKeyboardState = mGameState.mCurrentKeyboardState;
@@ -241,8 +260,14 @@ void NetworkedGameState::updateNetworking()
 			break;
 
 		case ID_MOVE_PLAYER:
-			MovePlayerEvent* pEvent = (MovePlayerEvent*)packet->data;
-			eventQueue.Push(pEvent);
+			MovePlayerMessage *pMsg = (MovePlayerMessage*)packet->data;
+
+			// get player obj associated with id
+			if (pMsg->playerID == isX)
+			{
+				MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, Vector2D(pMsg->xVel, pMsg->yVel), mGameState.mpLocalPlayer, 0);
+				eventQueue.Push(moveEv);
+			}
 			break;
 		}
 	}
@@ -258,117 +283,3 @@ void NetworkedGameState::render()
 		player->draw(mGameState.mpGraphicsSystem->getBackBuffer());
 	}
 }
-
-//void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
-//{
-//	UnitManager* manager;
-//	std::vector<KinematicUnit*> boids;
-//	std::vector<KinematicUnit*>::iterator iter;
-//	int currentSize;
-//	int receivedSize;
-//
-//	if (mData.dataMethod == 3)
-//		manager = gpGame->getLocalUnitManager();
-//	else
-//		manager = gpGame->getPeerUnitManager();
-//
-//	++buffer; // jump past ID enum
-//	receivedSize = *(int*)buffer;
-//	buffer += sizeof(int); // jump past number of boids
-//
-//	boids = manager->getEnemyUnits();
-//	currentSize = boids.size();
-//
-//	//And globals
-//	if (andGlobals)
-//	{
-//		//Getting the current debug values for the boids
-//		float velocity;
-//		float accel;
-//		float angularVel;
-//
-//		int cohesion;
-//		int separation;
-//		int alignment;
-//		int matching;
-//
-//		memcpy(&velocity, buffer, sizeof(velocity));
-//		buffer += sizeof(float);
-//		memcpy(&accel, buffer, sizeof(accel));
-//		buffer += sizeof(float);
-//		memcpy(&angularVel, buffer, sizeof(angularVel));
-//		buffer += sizeof(float);
-//
-//		memcpy(&cohesion, buffer, sizeof(cohesion));
-//		buffer += sizeof(int);
-//		memcpy(&separation, buffer, sizeof(separation));
-//		buffer += sizeof(int);
-//		memcpy(&alignment, buffer, sizeof(alignment));
-//		buffer += sizeof(int);
-//		memcpy(&matching, buffer, sizeof(matching));
-//		buffer += sizeof(int);
-//
-//		gpGame->setMaxVelocity(velocity);
-//		gpGame->setMaxAcceleration(accel);
-//		gpGame->setMaxAngularVelocity(angularVel);
-//
-//		gpGame->setCohesionWeight(cohesion);
-//		gpGame->setSeparationWeight(separation);
-//		gpGame->setAlignmentWeight(alignment);
-//		gpGame->setVelocityMatchingWeight(matching);
-//	}
-//
-//	if (currentSize < receivedSize)
-//	{
-//		// add units, re-get vector
-//		for (; currentSize < receivedSize; ++currentSize)
-//			manager->createUnit(Vector2D(), BOID);
-//
-//		boids = manager->getEnemyUnits();
-//	}
-//	else if (currentSize > receivedSize)
-//	{
-//		// remove units, re-get vector
-//		for (; currentSize > receivedSize; --currentSize)
-//			manager->removeRandomEnemy();
-//
-//		boids = manager->getEnemyUnits();
-//	}
-//
-//
-//	for (iter = boids.begin(); iter != boids.end(); ++iter)
-//	{
-//		KinematicUnit* unit = *iter;
-//
-//		float x, y, r;
-//
-//		memcpy(&x, buffer, sizeof(x));
-//		buffer += sizeof(float);
-//		memcpy(&y, buffer, sizeof(y));
-//		buffer += sizeof(float);
-//		memcpy(&r, buffer, sizeof(r));
-//		buffer += sizeof(float);
-//
-//		unit->setPosition(x, y);
-//		unit->setOrientation(r);
-//	}
-//}
-//
-//int NetworkedGameState::StartBoids()
-//{
-//	bool goodGame = gpGame->init();
-//	
-//	if (!goodGame)
-//	{
-//		fprintf(stderr, "failed to initialize Game object!\n");
-//		return -1;
-//	}
-//	else
-//	{
-//		gpGame->setDataMode(mData.dataMethod);
-//		gpGame->setIsHost(mData.mIsHost);
-//		
-//		initializedBoids = true;
-//		return 1;
-//	}
-//}

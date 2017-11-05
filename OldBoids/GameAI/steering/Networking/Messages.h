@@ -35,4 +35,16 @@ enum GameMessages
 	ID_MOVE_PLAYER
 };
 
+#pragma pack (push, 1)
+struct MovePlayerMessage
+{
+	int ID;
+	int playerID;
+
+	float xVel;
+	float yVel;
+
+};
+#pragma pack (pop)
+
 #endif
