@@ -17,13 +17,11 @@
 
 #include "NetworkedGameState.h"
 #include "Messages.h"
-#include "../KinematicUnit.h"
-#include <vector>
-
-#include "ModifyWeightEvent.h"
 
 void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 {
+	GameState::ArriveFromPreviousState(data);
+
 	if (data != nullptr)
 	{
 		// Are you a host or not?
@@ -53,7 +51,8 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 	//Set it to update the networking
 	mData.doesUpdateNetworking = 1;
 
-	StartBoids();
+	GraphicsBuffer* pAIBuffer = mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID);
+	remotePlayerSprite = mGameState.mpSpriteManager->createAndManageSprite(2, pAIBuffer, 0, 0, pAIBuffer->getWidth(), pAIBuffer->getHeight());
 }
 
 void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nullptr)
@@ -76,89 +75,153 @@ void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nu
 	strcpy(mData.promptBuffer, "Boids Online: Hosting\nMake sure to give your friend your IP address!\n(You can get your IP by opening a cmd and entering ipconfig)\nAwaiting connection...\n");
 
 	eventQueue = DeanQueue();
+	eventQueue.Clear();
+}
+
+int NetworkedGameState::SerializePlayer(char * buffer)
+{
+	int bytesWritten = 0;
+	int size = 1;
+
+	// pass number of players
+	bytesWritten += Write(buffer, &size);
+
+	//for each (Player* player in otherPlayers)
+	{
+		// Save off info
+		float posX = mGameState.mpLocalPlayer->getPosition().getX();
+		float posY = mGameState.mpLocalPlayer->getPosition().getY();
+
+		bytesWritten += Write(buffer, &posX);
+		bytesWritten += Write(buffer, &posY);
+	}
+
+	return bytesWritten;
+}
+
+void NetworkedGameState::DeserializePlayers(char * buffer)
+{
+	// avoid the identifier
+	++buffer;
+
+	int remotePlayerCount = *(int*)buffer, prevRemoteCount = otherPlayers.size();
+	buffer += sizeof(int);
+
+	// check num players recieved
+	if (remotePlayerCount > prevRemoteCount)
+	{
+		// more players, add to list
+		for (; prevRemoteCount < remotePlayerCount; ++prevRemoteCount)
+		{
+			Player* newPlayer = new Player(remotePlayerSprite, Vector2D(0, 0), 0, 1);
+			otherPlayers.push_back(newPlayer);
+		}
+	}
+	else if (remotePlayerCount < prevRemoteCount)
+	{
+		// less players, remove from list
+		for (; prevRemoteCount > remotePlayerCount; --prevRemoteCount)
+		{
+			//delete otherPlayers[prevRemoteCount];
+			otherPlayers.pop_back();
+		}
+	}
+
+	for each (Player* player in otherPlayers)
+	{
+		float posX, posY;
+
+		memcpy(&posX, buffer, sizeof(float));
+		buffer += sizeof(float);
+		memcpy(&posY, buffer, sizeof(float));
+		buffer += sizeof(float);
+
+		player->setPosition(posX, posY);
+		player->setSprite(remotePlayerSprite);
+	}
+}
+
+//****TODO: Add event queue system
+void NetworkedGameState::updateInput()
+{
+	//Get Input
+	al_get_mouse_state(&mGameState.mCurrentMouseState);
+	al_get_keyboard_state(&mGameState.mCurrentKeyboardState);
+
+	// Exit
+	if (keyPressed(ALLEGRO_KEY_ESCAPE))
+	{
+		// Stop updating
+		mData.doesUpdateInput = mData.doesUpdateState = mData.doesUpdateNetworking = mData.doesDisplay = 0;
+
+		// Cleanup
+		cleanup();
+
+		// Exit state to lobby
+		// for now exit everything
+		mData.running = 0;
+		return;
+	}
+
+	// Movement
+	if (keyPressed(ALLEGRO_KEY_A))
+	{
+		// walk left
+		mGameState.mpLocalPlayer->setXVelocity(-1);
+		//****TODO: have this event sent out to connected other, and do the local here
+		/*MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, -1, mGameState.mpLocalPlayer, 0);
+		peer->Send((char*)moveEv, sizeof(MovePlayerEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);*/
+		//eventQueue.Push(moveEv);
+	}
+	else if (keyUp(ALLEGRO_KEY_A))
+	{
+		mGameState.mpLocalPlayer->setXVelocity(0);
+	}
+
+	if (keyPressed(ALLEGRO_KEY_D))
+	{
+		// walk right
+		mGameState.mpLocalPlayer->setXVelocity(+1);
+		/*MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, +1, mGameState.mpLocalPlayer, 0);
+		peer->Send((char*)moveEv, sizeof(MovePlayerEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);*/
+
+		//eventQueue.Push(moveEv);
+	}
+	else if (keyUp(ALLEGRO_KEY_D))
+	{
+		mGameState.mpLocalPlayer->setXVelocity(0);
+	}
+
+	mGameState.mPreviousKeyboardState = mGameState.mCurrentKeyboardState;
+	mGameState.mPreviousMouseState = mGameState.mCurrentMouseState;
 }
 
 void NetworkedGameState::updateData()
 {
-	if (!willSendState && mData.dataMethod == 3)
-		return;
-
-	gpGame->beginLoop();
-	gpGame->processLoop();
-	exit = gpGame->endLoop();
-
-	if (exit)
-		mData.running = 0;
-
 	//Update the state and gamestate data
 	if (!connectionSet)
 		State::updateData();
 	else if (connectionSet)
 	{
+		// base update
+		// updates your local player right now
+		GameState::updateData();
+
 		// clients in data push mode don't send packets, both data sharing peers send packets
 		if ((mData.dataMethod == 1 && mData.mIsHost) || mData.dataMethod == 2)
 		{
 			char buffer[1024];
 			int bytesWritten = 0;
-			buffer[0] = ID_BOID_DATA;
+			//****TODO: Serialize data and send it
+
+			buffer[0] = ID_PLAYERS_DATA;
 			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten, false);
-			if (bytesWritten != 5) //If it's not just ID plus number of boids
+			bytesWritten += SerializePlayer(buffer + bytesWritten);
+			if (bytesWritten >= 5) //If it's not just ID plus number of list size
 				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 		}
-		else if (mData.dataMethod == 3 && willSendState)// Data coupled
-		{
-			char buffer[1024];
-			int bytesWritten = 0;
-			buffer[0] = ID_BOID_DATA_AND_GLOBALS;
-			++bytesWritten;
-			bytesWritten += SerializeBoids(buffer + bytesWritten, true);
-			if (bytesWritten != 33 || !mData.mIsHost) //If it's not just ID plus number of boids plus globals, and allows the client to send back data even if no new boids were added
-			{
-				peer->Send(buffer, bytesWritten, HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
-				willSendState = false;
-			}
-		}
 
-		// execute all events in the queue
-		if (eventQueue.Size() > 0)
-		{
-			for (unsigned int i = 0; i < eventQueue.Size(); ++i)
-			{
-				eventQueue[i]->Execute();
-			}
-
-			// clear the Queue
-			eventQueue.Clear();
-		}
-	}
-}
-
-void NetworkedGameState::processBuffer()
-{
-	switch (mData.buffer[0])
-	{
-		case 'Q':
-		{
-			// Create event, send it 
-			ModifyWeightEvent newEvent = ModifyWeightEvent(ID_MODIFY_WEIGHTS, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) - 1);
-
-			peer->Send((char*)&newEvent, sizeof(newEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
-
-			break;
-		}
-		case 'E':
-		{
-			// Create event, send it 
-			ModifyWeightEvent newEvent = ModifyWeightEvent(ID_MODIFY_WEIGHTS, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) + 1);
-
-			peer->Send((char*)&newEvent, sizeof(newEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
-
-			break;
-		}
-
-		// Clear the buffer
-		clearBuffer();
+		eventQueue.ExecuteAllEvents();
 	}
 }
 
@@ -173,221 +236,139 @@ void NetworkedGameState::updateNetworking()
 	{
 		switch (packet->data[0])
 		{
-			case ID_BOID_DATA:
-				DeserializeBoids((char*)packet->data, false);
-				break;
+		case ID_PLAYERS_DATA:
+			DeserializePlayers((char*)packet->data);
+			break;
 
-			case ID_BOID_DATA_AND_GLOBALS:
-				DeserializeBoids((char*)packet->data, true);
-				willSendState = true;
-				break;
-
-			case ID_MODIFY_WEIGHTS:
-				ModifyWeightEvent* pEvent = (ModifyWeightEvent*)packet->data;
-				// add to the queue
-				eventQueue.Push(pEvent);
-
-				break;
+		case ID_MOVE_PLAYER:
+			MovePlayerEvent* pEvent = (MovePlayerEvent*)packet->data;
+			eventQueue.Push(pEvent);
+			break;
 		}
 	}
 }
 
+
+//****TODO: Update this to accomodate networked stuff
 void NetworkedGameState::render()
 {
-	/*if (!willSendState)
-		return;
-
-	gpGame->beginLoop();
-	gpGame->processLoop();
-	exit = gpGame->endLoop();
-
-	willSendState = true;
-
-	if (exit)
-		mData.running = 0;*/
-}
-
-int NetworkedGameState::SerializeBoids(char* buffer, bool andGlobals)
-{
-	std::vector<KinematicUnit*> boids = gpGame->getLocalUnitManager()->getEnemyUnits();
-	std::vector<KinematicUnit*>::iterator iter;
-	int bytesWritten = 0;
-	int size = boids.size();
-
-	// Data Push
-	// -> "Host" peer simulates flocking, pushes position/rotation data to "Client" peer
-	// Data Sharing
-	// -> Each peer has it's own flock, sends position/rotation data to each other
-	// Data coupled
-	// -> Peer simulates, then sends position/rotation data AS WELL AS all global steering weight variables
-
-	memcpy(buffer, &size, sizeof(size));
-	buffer += sizeof(size);
-	bytesWritten += sizeof(int);
-
-	//And globals
-	if (andGlobals)
+	GameState::render();
+	for each (Player* player in otherPlayers)
 	{
-		//Getting the current debug values for the boids
-		float velocity = gpGame->getMaxVelocity();
-		float accel = gpGame->getMaxAcceleration();
-		float angularVel = gpGame->getMaxAngularVelocity();
-
-		int cohesion = gpGame->getCohesionWeight();
-		int separation = gpGame->getSeparationWeight();
-		int alignment = gpGame->getAlignmentWeight();
-		int matching = gpGame->getVelocityMatchingWeight();
-
-		memcpy(buffer, &velocity, sizeof(velocity));
-		buffer += sizeof(float);
-		memcpy(buffer, &accel, sizeof(accel));
-		buffer += sizeof(float);
-		memcpy(buffer, &angularVel, sizeof(angularVel));
-		buffer += sizeof(float);
-
-		memcpy(buffer, &cohesion, sizeof(cohesion));
-		buffer += sizeof(int);
-		memcpy(buffer, &separation, sizeof(separation));
-		buffer += sizeof(int);
-		memcpy(buffer, &alignment, sizeof(alignment));
-		buffer += sizeof(int);
-		memcpy(buffer, &matching, sizeof(matching));
-		buffer += sizeof(int);
-
-		bytesWritten += sizeof(velocity) + sizeof(accel) + sizeof(angularVel) + sizeof(cohesion) + sizeof(separation) + sizeof(alignment) + sizeof(matching);
-	}
-
-	for (iter = boids.begin(); iter != boids.end(); ++iter)
-	{
-		KinematicUnit* unit = *iter;
-
-		float x = unit->getPosition().getX();
-		float y = unit->getPosition().getY();
-		float r = unit->getOrientation();
-
-		memcpy(buffer, &x, sizeof(x));
-		buffer += sizeof(float);
-		memcpy(buffer, &y, sizeof(y));
-		buffer += sizeof(float);
-		memcpy(buffer, &r, sizeof(r));
-		buffer += sizeof(float);
-
-		bytesWritten += sizeof(x) + sizeof(y) + sizeof(r);
-	}
-
-	return bytesWritten;
-}
-
-void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
-{
-	UnitManager* manager;
-	std::vector<KinematicUnit*> boids;
-	std::vector<KinematicUnit*>::iterator iter;
-	int currentSize;
-	int receivedSize;
-
-	if (mData.dataMethod == 3)
-		manager = gpGame->getLocalUnitManager();
-	else
-		manager = gpGame->getPeerUnitManager();
-
-	++buffer; // jump past ID enum
-	receivedSize = *(int*)buffer;
-	buffer += sizeof(int); // jump past number of boids
-
-	boids = manager->getEnemyUnits();
-	currentSize = boids.size();
-
-	//And globals
-	if (andGlobals)
-	{
-		//Getting the current debug values for the boids
-		float velocity;
-		float accel;
-		float angularVel;
-
-		int cohesion;
-		int separation;
-		int alignment;
-		int matching;
-
-		memcpy(&velocity, buffer, sizeof(velocity));
-		buffer += sizeof(float);
-		memcpy(&accel, buffer, sizeof(accel));
-		buffer += sizeof(float);
-		memcpy(&angularVel, buffer, sizeof(angularVel));
-		buffer += sizeof(float);
-
-		memcpy(&cohesion, buffer, sizeof(cohesion));
-		buffer += sizeof(int);
-		memcpy(&separation, buffer, sizeof(separation));
-		buffer += sizeof(int);
-		memcpy(&alignment, buffer, sizeof(alignment));
-		buffer += sizeof(int);
-		memcpy(&matching, buffer, sizeof(matching));
-		buffer += sizeof(int);
-
-		gpGame->setMaxVelocity(velocity);
-		gpGame->setMaxAcceleration(accel);
-		gpGame->setMaxAngularVelocity(angularVel);
-
-		gpGame->setCohesionWeight(cohesion);
-		gpGame->setSeparationWeight(separation);
-		gpGame->setAlignmentWeight(alignment);
-		gpGame->setVelocityMatchingWeight(matching);
-	}
-
-	if (currentSize < receivedSize)
-	{
-		// add units, re-get vector
-		for (; currentSize < receivedSize; ++currentSize)
-			manager->createUnit(Vector2D(), BOID);
-
-		boids = manager->getEnemyUnits();
-	}
-	else if (currentSize > receivedSize)
-	{
-		// remove units, re-get vector
-		for (; currentSize > receivedSize; --currentSize)
-			manager->removeRandomEnemy();
-
-		boids = manager->getEnemyUnits();
-	}
-
-
-	for (iter = boids.begin(); iter != boids.end(); ++iter)
-	{
-		KinematicUnit* unit = *iter;
-
-		float x, y, r;
-
-		memcpy(&x, buffer, sizeof(x));
-		buffer += sizeof(float);
-		memcpy(&y, buffer, sizeof(y));
-		buffer += sizeof(float);
-		memcpy(&r, buffer, sizeof(r));
-		buffer += sizeof(float);
-
-		unit->setPosition(x, y);
-		unit->setOrientation(r);
+		player->draw(mGameState.mpGraphicsSystem->getBackBuffer());
 	}
 }
 
-int NetworkedGameState::StartBoids()
-{
-	bool goodGame = gpGame->init();
-	
-	if (!goodGame)
-	{
-		fprintf(stderr, "failed to initialize Game object!\n");
-		return -1;
-	}
-	else
-	{
-		gpGame->setDataMode(mData.dataMethod);
-		gpGame->setIsHost(mData.mIsHost);
-		
-		initializedBoids = true;
-		return 1;
-	}
-}
+//void NetworkedGameState::DeserializeBoids(char* buffer, bool andGlobals)
+//{
+//	UnitManager* manager;
+//	std::vector<KinematicUnit*> boids;
+//	std::vector<KinematicUnit*>::iterator iter;
+//	int currentSize;
+//	int receivedSize;
+//
+//	if (mData.dataMethod == 3)
+//		manager = gpGame->getLocalUnitManager();
+//	else
+//		manager = gpGame->getPeerUnitManager();
+//
+//	++buffer; // jump past ID enum
+//	receivedSize = *(int*)buffer;
+//	buffer += sizeof(int); // jump past number of boids
+//
+//	boids = manager->getEnemyUnits();
+//	currentSize = boids.size();
+//
+//	//And globals
+//	if (andGlobals)
+//	{
+//		//Getting the current debug values for the boids
+//		float velocity;
+//		float accel;
+//		float angularVel;
+//
+//		int cohesion;
+//		int separation;
+//		int alignment;
+//		int matching;
+//
+//		memcpy(&velocity, buffer, sizeof(velocity));
+//		buffer += sizeof(float);
+//		memcpy(&accel, buffer, sizeof(accel));
+//		buffer += sizeof(float);
+//		memcpy(&angularVel, buffer, sizeof(angularVel));
+//		buffer += sizeof(float);
+//
+//		memcpy(&cohesion, buffer, sizeof(cohesion));
+//		buffer += sizeof(int);
+//		memcpy(&separation, buffer, sizeof(separation));
+//		buffer += sizeof(int);
+//		memcpy(&alignment, buffer, sizeof(alignment));
+//		buffer += sizeof(int);
+//		memcpy(&matching, buffer, sizeof(matching));
+//		buffer += sizeof(int);
+//
+//		gpGame->setMaxVelocity(velocity);
+//		gpGame->setMaxAcceleration(accel);
+//		gpGame->setMaxAngularVelocity(angularVel);
+//
+//		gpGame->setCohesionWeight(cohesion);
+//		gpGame->setSeparationWeight(separation);
+//		gpGame->setAlignmentWeight(alignment);
+//		gpGame->setVelocityMatchingWeight(matching);
+//	}
+//
+//	if (currentSize < receivedSize)
+//	{
+//		// add units, re-get vector
+//		for (; currentSize < receivedSize; ++currentSize)
+//			manager->createUnit(Vector2D(), BOID);
+//
+//		boids = manager->getEnemyUnits();
+//	}
+//	else if (currentSize > receivedSize)
+//	{
+//		// remove units, re-get vector
+//		for (; currentSize > receivedSize; --currentSize)
+//			manager->removeRandomEnemy();
+//
+//		boids = manager->getEnemyUnits();
+//	}
+//
+//
+//	for (iter = boids.begin(); iter != boids.end(); ++iter)
+//	{
+//		KinematicUnit* unit = *iter;
+//
+//		float x, y, r;
+//
+//		memcpy(&x, buffer, sizeof(x));
+//		buffer += sizeof(float);
+//		memcpy(&y, buffer, sizeof(y));
+//		buffer += sizeof(float);
+//		memcpy(&r, buffer, sizeof(r));
+//		buffer += sizeof(float);
+//
+//		unit->setPosition(x, y);
+//		unit->setOrientation(r);
+//	}
+//}
+//
+//int NetworkedGameState::StartBoids()
+//{
+//	bool goodGame = gpGame->init();
+//	
+//	if (!goodGame)
+//	{
+//		fprintf(stderr, "failed to initialize Game object!\n");
+//		return -1;
+//	}
+//	else
+//	{
+//		gpGame->setDataMode(mData.dataMethod);
+//		gpGame->setIsHost(mData.mIsHost);
+//		
+//		initializedBoids = true;
+//		return 1;
+//	}
+//}

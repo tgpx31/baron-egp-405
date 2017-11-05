@@ -132,4 +132,14 @@ Event * DeanQueue::Pop()
 	return ev;
 }
 
+void DeanQueue::ExecuteAllEvents()
+{
+	// iterate through the list of events, run all execute functions, pop from list
+	while (Size() > 0)
+	{
+		Event* ev = Pop();
+		ev->Execute();
+	}
+}
+
 

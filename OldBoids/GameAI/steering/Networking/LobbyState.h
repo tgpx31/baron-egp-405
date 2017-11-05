@@ -25,12 +25,12 @@ class LobbyState : public State
 {
 public:
 	// Local, Host, Client
-	void init(State* nextL, State* nextM, State* nextR, State** currentState);
+	void init(State* nextL, State* nextR, State** currentState);
 private:
 	// Data for the lobby state
 	struct LobbyData
 	{
-		State *next1, *next2, *next3;
+		State *next1, *next2;
 		int promptHost;
 	} mLobbyData;
 

@@ -45,6 +45,7 @@
     <ClInclude Include="Networking\ModifyWeightEvent.h" />
     <ClInclude Include="Networking\NetworkedGameState.h" />
     <ClInclude Include="Networking\State.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerMoveToMessage.h" />
     <ClInclude Include="SeparationSteering.h" />
     <ClInclude Include="SpawnBoidMessage.h" />
@@ -93,6 +94,7 @@
     <ClCompile Include="Networking\ModifyWeightEvent.cpp" />
     <ClCompile Include="Networking\NetworkedGameState.cpp" />
     <ClCompile Include="Networking\State.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerMoveToMessage.cpp" />
     <ClCompile Include="SeparationSteering.cpp" />
     <ClCompile Include="SpawnBoidMessage.cpp" />

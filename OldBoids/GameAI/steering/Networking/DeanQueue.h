@@ -38,6 +38,9 @@ public:
 	inline Event** End() { return mQueue + ((mCount + 1) * sizeof(Event*)); };
 
 	inline Event* operator[](size_type index) { return mQueue[index]; };
+
+	// Do all events
+	void ExecuteAllEvents();
 };
 
 #endif // _DEAN_QUEUE_H_

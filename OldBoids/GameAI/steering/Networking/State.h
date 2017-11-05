@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include "RakNet\RakPeerInterface.h"
 
-
 #define STR_MAX 256
 
 class State abstract

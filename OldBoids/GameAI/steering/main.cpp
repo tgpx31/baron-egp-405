@@ -15,15 +15,8 @@
 #include "Networking\LobbyState.h"
 #include "Networking\NetworkedGameState.h"
 
-#include "../DeanLib/MemoryTracker.h"
-#include "../DeanLib/PerformanceTracker.h"
-
-PerformanceTracker* gpPerformanceTracker = NULL;
-
 int main(int argc, char **argv)
 {
-	gpPerformanceTracker = new PerformanceTracker();
-	gpGame = new Game();
 
 	// We should still have a lobby state structure like in our previous project/lab
 	State *CurrentState;	// Starts in the Lobby State by default
@@ -31,7 +24,7 @@ int main(int argc, char **argv)
 	GameState localGame[1];
 	NetworkedGameState networkedGame[1];	// Can get away with using only one instance of this
 
-	lobby->init(localGame, networkedGame, nullptr, &CurrentState);
+	lobby->init(localGame, networkedGame, &CurrentState);
 	localGame->init(lobby, &CurrentState);
 	networkedGame->init(lobby, &CurrentState);
 
@@ -43,11 +36,5 @@ int main(int argc, char **argv)
 	}
 	system("pause");
 
-	gpGame->cleanup();
-	delete gpGame;
-	gpGame = NULL;
-
-	delete gpPerformanceTracker;
-	gMemoryTracker.reportAllocations( std::cout );
 	return 0;
 }

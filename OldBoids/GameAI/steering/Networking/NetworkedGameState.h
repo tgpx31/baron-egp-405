@@ -32,24 +32,27 @@ public:
 private:
 	int connectionSet, networkingSetup, isPlaying, isX, willSendState;
 
+	std::vector<Player*> otherPlayers;	// list of all connected players
+	Sprite *remotePlayerSprite;
+
 	RakNet::RakPeerInterface *peer;
 	RakNet::Packet *packet;
 	char connectionAddress[STR_MAX];
 
 	RakNet::SystemAddress address;
+	DeanQueue eventQueue;
 
-	void processBuffer() override;
+	inline int Write(char* buffer, void* data) { const char *const start = buffer; memcpy(buffer, data, sizeof(data)); buffer += sizeof(data); return (buffer - start); };
+	int SerializePlayer(char* buffer);
+	void DeserializePlayers(char *buffer);
+
+	void updateInput() override;
 	void updateData() override;
 	void updateNetworking() override;
-
+	
 	void render() override;
 
 	void ArriveFromPreviousState(StateData *data) override;
-	int SerializeBoids(char* buffer, bool andGlobals);
-	void DeserializeBoids(char* buffer, bool andGlobals);
-	int StartBoids();
 
-	DeanQueue eventQueue;
 };
-
 #endif
