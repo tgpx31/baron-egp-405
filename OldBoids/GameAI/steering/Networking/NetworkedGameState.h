@@ -22,7 +22,7 @@
 #include "DeanQueue.h"
 
 #define DEFAULT_PORT_NUMBER 666
-#define MAX_PEER_CONNECTIONS 1
+#define MAX_PEER_CONNECTIONS 2
 
 class NetworkedGameState : public GameState
 {

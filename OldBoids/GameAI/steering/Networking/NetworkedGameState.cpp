@@ -106,7 +106,8 @@ void NetworkedGameState::DeserializePlayers(char * buffer)
 	// avoid the identifier
 	++buffer;
 
-	int remotePlayerCount = *(int*)buffer, prevRemoteCount = otherPlayers.size();
+	//*(int*)buffer
+	int remotePlayerCount = 1, prevRemoteCount = otherPlayers.size();
 	buffer += sizeof(int);
 
 	// check num players recieved
