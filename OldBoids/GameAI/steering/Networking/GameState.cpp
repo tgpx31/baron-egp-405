@@ -21,10 +21,6 @@ const int WIDTH = 1024;
 const int HEIGHT = 768;
 const float LOOP_TARGET_TIME = 33.3f;
 
-const IDType BACKGROUND_SPRITE_ID = 0;
-const IDType PLAYER_ICON_SPRITE_ID = 1;
-const IDType AI_ICON_SPRITE_ID = 2;
-
 const std::string PLAYER_ID = "player";
 const std::string ENEMY_ID = "enemy";
 

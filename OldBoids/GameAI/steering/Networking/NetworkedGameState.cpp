@@ -53,8 +53,10 @@ void NetworkedGameState::ArriveFromPreviousState(StateData * data)
 	//Set it to update the networking
 	mData.doesUpdateNetworking = 1;
 
-	GraphicsBuffer* pAIBuffer = mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID);
-	remotePlayerSprite = mGameState.mpSpriteManager->createAndManageSprite(2, pAIBuffer, 0, 0, pAIBuffer->getWidth(), pAIBuffer->getHeight());
+	//GraphicsBuffer* pAIBuffer = mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID);
+	remotePlayerSprite = mGameState.mpSpriteManager->getSprite(2);
+	//remotePlayerSprite = mGameState.mpSpriteManager->createAndManageSprite(2, mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID), 0, 0, mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID)->getWidth(), mGameState.mpGraphicsBufferManager->getBuffer(mGameState.mEnemyIconBufferID)->getHeight());
+	//remotePlayerSprite = mGameState.mpSpriteManager->createAndManageSprite(2, pAIBuffer, 0, 0, pAIBuffer->getWidth(), pAIBuffer->getHeight());
 }
 
 void NetworkedGameState::init(State * prev = nullptr, State ** currentState = nullptr)
@@ -116,7 +118,8 @@ void NetworkedGameState::DeserializePlayers(char * buffer)
 		// more players, add to list
 		for (; prevRemoteCount < remotePlayerCount; ++prevRemoteCount)
 		{
-			Player* newPlayer = new Player(remotePlayerSprite, Vector2D(0, 0), 0, 1);
+			Sprite* tmp = mGameState.mpSpriteManager->getSprite(1);
+			Player* newPlayer = new Player(tmp, gZeroVector2D, 0, 1);
 			otherPlayers.push_back(newPlayer);
 		}
 	}
@@ -170,7 +173,7 @@ void NetworkedGameState::updateInput()
 	if (keyPressed(ALLEGRO_KEY_A))
 	{
 		// walk left
-		mGameState.mpLocalPlayer->setXVelocity(-1);
+		//mGameState.mpLocalPlayer->setXVelocity(-1);
 		//****TODO: have this event sent out to connected other, and do the local here
 		MovePlayerMessage message;
 		message.ID = ID_MOVE_PLAYER;
@@ -181,7 +184,7 @@ void NetworkedGameState::updateInput()
 	}
 	else if (keyUp(ALLEGRO_KEY_A))
 	{
-		mGameState.mpLocalPlayer->setXVelocity(0);
+		//mGameState.mpLocalPlayer->setXVelocity(0);
 		MovePlayerMessage message;
 		message.ID = ID_MOVE_PLAYER;
 		message.xVel = 0, message.yVel = 0;
@@ -193,7 +196,7 @@ void NetworkedGameState::updateInput()
 	if (keyPressed(ALLEGRO_KEY_D))
 	{
 		// walk right
-		mGameState.mpLocalPlayer->setXVelocity(+1);
+		//mGameState.mpLocalPlayer->setXVelocity(+1);
 		MovePlayerMessage message;
 		message.ID = ID_MOVE_PLAYER;
 		message.xVel = +1, message.yVel = 0;
@@ -203,7 +206,7 @@ void NetworkedGameState::updateInput()
 	}
 	else if (keyUp(ALLEGRO_KEY_D))
 	{
-		mGameState.mpLocalPlayer->setXVelocity(0);
+		//mGameState.mpLocalPlayer->setXVelocity(0);
 		MovePlayerMessage message;
 		message.ID = ID_MOVE_PLAYER;
 		message.xVel = 0, message.yVel = 0;
@@ -261,15 +264,19 @@ void NetworkedGameState::updateNetworking()
 			break;
 
 		case ID_MOVE_PLAYER:
+		{
 			MovePlayerMessage *pMsg = (MovePlayerMessage*)packet->data;
 
 			// get player obj associated with id
-			if (pMsg->playerID == isX)
+			if (!pMsg->playerID == isX)
 			{
 				MovePlayerEvent *moveEv = new MovePlayerEvent(ID_MOVE_PLAYER, Vector2D(pMsg->xVel, pMsg->yVel), mGameState.mpLocalPlayer, 0);
 				eventQueue.Push(moveEv);
+				std::cout << "Received Move Player Message";
 			}
+
 			break;
+		}
 		}
 	}
 }
@@ -278,9 +285,26 @@ void NetworkedGameState::updateNetworking()
 //****TODO: Update this to accomodate networked stuff
 void NetworkedGameState::render()
 {
-	GameState::render();
-	for each (Player* player in otherPlayers)
+	if (!initialized)
+		return;
+
+	// draw bg
+	Sprite* pBackgroundSprite = mGameState.mpSpriteManager->getSprite(BACKGROUND_SPRITE_ID);
+	pBackgroundSprite->draw(*(mGameState.mpGraphicsSystem->getBackBuffer()), 0, 0);
+
+	// draw your player
+	mGameState.mpLocalPlayer->draw(mGameState.mpGraphicsSystem->getBackBuffer());
+
+	/*for each (Player* player in otherPlayers)
 	{
 		player->draw(mGameState.mpGraphicsSystem->getBackBuffer());
+	}*/
+	if (otherPlayers.size() >= 1)
+	{
+		otherPlayers.at(0)->draw(mGameState.mpGraphicsSystem->getBackBuffer());
+
 	}
+
+	// flip the buffers
+	mGameState.mpGraphicsSystem->swap();
 }

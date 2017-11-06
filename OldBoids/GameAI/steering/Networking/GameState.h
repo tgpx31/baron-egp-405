@@ -47,6 +47,10 @@
 #include "../Defines.h"
 #include <vector>
 
+const IDType BACKGROUND_SPRITE_ID = 0;
+const IDType PLAYER_ICON_SPRITE_ID = 1;
+const IDType AI_ICON_SPRITE_ID = 2;
+
 class GameState : public State
 {
 public:
