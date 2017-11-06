@@ -20,6 +20,8 @@
 
 #include "Networking\DeanQueue.h"
 #include "Networking\ModifyWeightEvent.h"
+//#include "Networking\AddBoidEvent.h"
+#include "AddBoidEvent.h"
 
 InputManager::InputManager()
 {
@@ -163,7 +165,7 @@ void InputManager::update()
 
 		if (keyPressed(ALLEGRO_KEY_I))
 		{
-			GameMessage* pMessage0 = new SpawnBoidMessage();
+			/*GameMessage* pMessage0 = new SpawnBoidMessage();
 			MESSAGE_MANAGER->addMessage(pMessage0, 0);
 			GameMessage* pMessage1 = new SpawnBoidMessage();
 			MESSAGE_MANAGER->addMessage(pMessage1, 0);
@@ -172,7 +174,11 @@ void InputManager::update()
 			GameMessage* pMessage3 = new SpawnBoidMessage();
 			MESSAGE_MANAGER->addMessage(pMessage3, 0);
 			GameMessage* pMessage4 = new SpawnBoidMessage();
-			MESSAGE_MANAGER->addMessage(pMessage4, 0);
+			MESSAGE_MANAGER->addMessage(pMessage4, 0);*/
+			Vector2D center(512, 384);
+
+			AddBoidEvent* newEvent = new AddBoidEvent(139, center, center);
+			gpGame->getQueue()->Push(newEvent);
 		}
 		if (keyPressed(ALLEGRO_KEY_D))
 		{
@@ -248,6 +254,8 @@ void InputManager::update()
 			{
 				/*GameMessage* pMessage = new EditDebugValueMessage(-5.0f);
 				MESSAGE_MANAGER->addMessage(pMessage, 0);*/
+				ModifyWeightEvent* newEvent = new ModifyWeightEvent(138, (int)gpGame->getUI()->getMode(), gpGame->getWeight(gpGame->getUI()->getMode()) + 1);
+				gpGame->getQueue()->Push(newEvent);
 			}
 		}
 	}

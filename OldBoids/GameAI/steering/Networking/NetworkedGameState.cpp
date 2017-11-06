@@ -20,6 +20,8 @@
 #include <vector>
 
 #include "ModifyWeightEvent.h"
+//#include "AddBoidEvent.h"
+#include "../AddBoidEvent.h"
 
 DeanQueue eventQueue;// = DeanQueue();
 Event *sentEvent = NULL;
@@ -143,6 +145,7 @@ void NetworkedGameState::updateData()
 			for (unsigned int i = 0; i < eventQueue.Size(); ++i)
 			{
 				eventQueue[i]->Execute();
+				eventQueue.Erase(i, 1);
 			}
 
 			// clear the Queue
@@ -200,11 +203,22 @@ void NetworkedGameState::updateNetworking()
 				break;
 
 			case ID_MODIFY_WEIGHTS:
+			{
 				ModifyWeightEvent* pEvent = (ModifyWeightEvent*)packet->data;
+				// add to the queue
+				eventQueue.Push(pEvent);
+				peer->Send((char*)&pEvent, sizeof(pEvent), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+
+				break;
+			}
+			case ID_ADD_BOID:
+			{
+				AddBoidEvent* pEvent = (AddBoidEvent*)packet->data;
 				// add to the queue
 				eventQueue.Push(pEvent);
 
 				break;
+			}
 		}
 	}
 }

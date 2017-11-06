@@ -29,6 +29,8 @@ void DeanQueue::Erase(size_type index, size_type deleteCount)
 			else
 			{
 				mQueue[i] = 0;
+				delete mQueue[i];
+				mQueue[i] = NULL;
 			}
 		}
 

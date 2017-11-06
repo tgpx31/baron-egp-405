@@ -14,7 +14,6 @@ private:
 	typedef int size_type;
 	size_type mCount = 0;
 
-	void Erase(size_type index = 0, size_type deleteCount = 1);
 
 	void Insert(size_type index, Event* aEvent);
 	void Append(Event* aEvent);
@@ -38,6 +37,9 @@ public:
 	inline Event** End() { return mQueue + ((mCount + 1) * sizeof(Event*)); };
 
 	inline Event* operator[](size_type index) { return mQueue[index]; };
+
+	void Erase(size_type index = 0, size_type deleteCount = 1);
+
 };
 
 #endif // _DEAN_QUEUE_H_

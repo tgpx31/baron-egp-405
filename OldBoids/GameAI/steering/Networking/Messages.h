@@ -31,7 +31,8 @@ enum GameMessages
 	// New messages
 	ID_BOID_DATA,
 	ID_BOID_DATA_AND_GLOBALS,
-	ID_MODIFY_WEIGHTS
+	ID_MODIFY_WEIGHTS,
+	ID_ADD_BOID
 };
 
 #endif

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddBoidEvent.h" />
     <ClInclude Include="AlightmentSteering.h" />
     <ClInclude Include="Behaviors.h" />
     <ClInclude Include="BoidSteering.h" />
@@ -61,6 +62,7 @@
     <ClInclude Include="WallManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddBoidEvent.cpp" />
     <ClCompile Include="AlightmentSteering.cpp" />
     <ClCompile Include="BoidSteering.cpp" />
     <ClCompile Include="BoxCollider2D.cpp" />
