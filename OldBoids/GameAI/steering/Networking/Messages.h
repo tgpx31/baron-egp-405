@@ -32,7 +32,11 @@ enum GameMessages
 	ID_PLAYERS_DATA,
 	ID_BOID_DATA_AND_GLOBALS,
 	ID_MODIFY_WEIGHTS,
-	ID_MOVE_PLAYER
+	ID_MOVE_PLAYER,
+	ID_EXIT_GAME,
+	ID_FLIP_SPRITE,
+	ID_CHANGE_SCALE,
+	ID_CHANGE_ORIENTATION
 };
 
 #pragma pack (push, 1)
@@ -44,6 +48,35 @@ struct MovePlayerMessage
 	float xVel;
 	float yVel;
 
+};
+
+struct ExitGameMessage
+{
+	int ID;
+};
+
+struct FlipSpriteMessage
+{
+	int ID;
+	int playerID;
+
+	int spriteID;
+};
+
+struct ChangeScaleMessage
+{
+	int ID;
+	int playerID;
+
+	float scale;
+};
+
+struct ChangeOrientationMessage
+{
+	int ID;
+	int playerID;
+
+	float orienatation;
 };
 #pragma pack (pop)
 

@@ -38,7 +38,6 @@
     <ClInclude Include="KinematicWanderSteering.h" />
     <ClInclude Include="Networking\DeanQueue.h" />
     <ClInclude Include="Networking\Event.h" />
-    <ClInclude Include="Networking\ExitGameEvent.h" />
     <ClInclude Include="Networking\GameState.h" />
     <ClInclude Include="Networking\LobbyState.h" />
     <ClInclude Include="Networking\Messages.h" />

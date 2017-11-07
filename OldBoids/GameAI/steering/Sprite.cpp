@@ -40,18 +40,19 @@ void Sprite::draw( GraphicsBuffer& dest, float dx, float dy, float rotationInRad
 	}
 }
 
-/*void Sprite::drawScaled( GraphicsBuffer& dest, float dx, float dy, float dw, float dh, int flags )
+void Sprite::drawScaled( GraphicsBuffer& dest, float dx, float dy, float rot, float dw, float dh, int flags )
 {
 	if( mpBitmap != NULL && dest.getBitmap() != NULL )
 	{
 		//set new target
 		ALLEGRO_BITMAP* pOldTarget = GraphicsSystem::switchTargetBitmap( dest.getBitmap() );
 		//draw
-		al_draw_scaled_bitmap( mpBitmap, 0, 0, mWidth, mHeight, dx, dy, dw, dh, flags );
+		//al_draw_scaled_bitmap( mpBitmap, 0, 0, mWidth, mHeight, dx, dy, dw, dh, flags );
+		al_draw_scaled_rotated_bitmap(mpBitmap, 0, 0, dx, dy, dw, dh, rot, flags);
 		//restore old target
 		GraphicsSystem::switchTargetBitmap( pOldTarget );
 	}
-}*/
+}
 
 
 

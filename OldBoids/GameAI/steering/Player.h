@@ -41,6 +41,12 @@ public:
 
 	inline void setSprite(Sprite* spr) { mpSprite = spr; };
 
+	inline void setOrientation(float or) { mOrientation = or ; };
+	inline void setScale(float scale) { mLocalScale = scale ; };
+
+	inline float getOrientation() { return mOrientation; };
+	inline float getScale() { return mLocalScale; };
+
 private:
 	Sprite* mpSprite;
 

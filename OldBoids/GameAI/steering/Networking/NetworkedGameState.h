@@ -28,6 +28,7 @@ class NetworkedGameState : public GameState
 {
 public:
 	void init(State* prev, State** currentState);
+	void endGame();
 
 private:
 	int connectionSet, networkingSetup, isPlaying, isX, willSendState;

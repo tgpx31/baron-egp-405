@@ -32,5 +32,5 @@ void Player::update(float dt)
 
 void Player::draw(GraphicsBuffer * pBuffer)
 {
-	mpSprite->draw(*pBuffer, mPosition.getX(), mPosition.getY(), mOrientation);
+	mpSprite->drawScaled(*pBuffer, mPosition.getX(), mPosition.getY(), mOrientation, mLocalScale, mLocalScale);
 }

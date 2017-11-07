@@ -154,19 +154,26 @@ void NetworkedGameState::updateInput()
 	al_get_mouse_state(&mGameState.mCurrentMouseState);
 	al_get_keyboard_state(&mGameState.mCurrentKeyboardState);
 
-	// Exit
+	//// Exit
+	//if (keyPressed(ALLEGRO_KEY_ESCAPE))
+	//{
+	//	// Stop updating
+	//	mData.doesUpdateInput = mData.doesUpdateState = mData.doesUpdateNetworking = mData.doesDisplay = 0;
+
+	//	// Cleanup
+	//	cleanup();
+
+	//	// Exit state to lobby
+	//	// for now exit everything
+	//	mData.running = 0;
+	//	return;
+	//}
 	if (keyPressed(ALLEGRO_KEY_ESCAPE))
 	{
-		// Stop updating
-		mData.doesUpdateInput = mData.doesUpdateState = mData.doesUpdateNetworking = mData.doesDisplay = 0;
+		ExitGameMessage message;
+		message.ID = ID_EXIT_GAME;
 
-		// Cleanup
-		cleanup();
-
-		// Exit state to lobby
-		// for now exit everything
-		mData.running = 0;
-		return;
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
 
 	// Movement
@@ -211,6 +218,42 @@ void NetworkedGameState::updateInput()
 		message.ID = ID_MOVE_PLAYER;
 		message.xVel = 0, message.yVel = 0;
 		message.playerID = isX;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+	}
+	if (keyPressed(ALLEGRO_KEY_Z))
+	{
+		ChangeScaleMessage message;
+		message.ID = ID_CHANGE_SCALE;
+		message.playerID = isX;
+		message.scale = 2.0;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+	}
+	if (keyPressed(ALLEGRO_KEY_X))
+	{
+		ChangeScaleMessage message;
+		message.ID = ID_CHANGE_SCALE;
+		message.playerID = isX;
+		message.scale = 1.0;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+	}
+	if (keyPressed(ALLEGRO_KEY_C))
+	{
+		ChangeOrientationMessage message;
+		message.ID = ID_CHANGE_ORIENTATION;
+		message.playerID = isX;
+		message.orienatation = .2;
+
+		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
+	}
+	if (keyPressed(ALLEGRO_KEY_V))
+	{
+		ChangeOrientationMessage message;
+		message.ID = ID_CHANGE_ORIENTATION;
+		message.playerID = isX;
+		message.orienatation = -.2;
 
 		peer->Send((char*)&message, sizeof(message), HIGH_PRIORITY, RELIABLE_ORDERED, 0, peer->GetSystemAddressFromIndex(0), false);
 	}
@@ -277,6 +320,49 @@ void NetworkedGameState::updateNetworking()
 
 			break;
 		}
+		case ID_EXIT_GAME:
+		{
+			ExitGameMessage *pMsg = (ExitGameMessage*)packet->data;
+
+			if (!pMsg->ID == isX)
+			{
+				ExitGameEvent *exitEv = new ExitGameEvent(ID_EXIT_GAME, this);
+				eventQueue.Push(exitEv);
+				std::cout << "Received Kill Game Message";
+			}
+
+			break;
+		}
+		case ID_FLIP_SPRITE:
+		{
+
+		}
+		case ID_CHANGE_SCALE:
+		{
+			ChangeScaleMessage *pMsg = (ChangeScaleMessage*)packet->data;
+
+			if (!pMsg->ID == isX)
+			{
+				ChangeScaleEvent *scaleEv = new ChangeScaleEvent(ID_CHANGE_SCALE, 2.0, mGameState.mpLocalPlayer);
+				eventQueue.Push(scaleEv);
+				std::cout << "Received Change Scale Message";
+			}
+
+			break;
+		}
+		case ID_CHANGE_ORIENTATION:
+		{
+			ChangeOrientationMessage *pMsg = (ChangeOrientationMessage*)packet->data;
+
+			if (!pMsg->ID == isX)
+			{
+				ChangeOrientationEvent *orienEv = new ChangeOrientationEvent(ID_CHANGE_ORIENTATION, 1.0, mGameState.mpLocalPlayer);
+				eventQueue.Push(orienEv);
+				std::cout << "Received Change Orientation Message";
+			}
+
+			break;
+		}
 		}
 	}
 }
@@ -307,4 +393,17 @@ void NetworkedGameState::render()
 
 	// flip the buffers
 	mGameState.mpGraphicsSystem->swap();
+}
+
+void NetworkedGameState::endGame()
+{
+	// Stop updating
+	mData.doesUpdateInput = mData.doesUpdateState = mData.doesUpdateNetworking = mData.doesDisplay = 0;
+
+	// Cleanup
+	cleanup();
+
+	// Exit state to lobby
+	// for now exit everything
+	mData.running = 0;
 }
