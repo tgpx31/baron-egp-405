@@ -14,16 +14,13 @@
 #include "egpNet/egpApplicationState.h"
 #include "egpNet/client/egpWindowState.h"
 
-#include "egpNet/utils/egpTimer.h"
-
-
 class egpClientApplicationState : public egpApplicationState
 {
 
 	const egpWindowState *mpk_windowState;
 
 	// throttles
-	egpTimer m_networkTimer[1];
+	//egpTimer m_networkTimer[1];
 	egpTimer m_renderTimer[1];
 
 

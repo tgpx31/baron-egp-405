@@ -1,29 +1,27 @@
 #include "egpNet\utils\egpThread.h"
 #include <Windows.h>
 
-unsigned long __stdcall threadLunchInternal(void *param)
+unsigned long __stdcall threadLaunchInternal(void *params)
 {
-	egpThread* theThread = (egpThread*)param;
-	theThread->flag = 0;
+	EGPThread* theThread = (EGPThread*)params;
 	theThread->result = theThread->func(theThread->params);
-	theThread->flag = 1;
+	theThread->flag = 1;	// about to start
 
 	return theThread->result;
 }
 
-
-int threadLaunch(egpThread* thread_out, egpThreadFunc func, void* params)
+int threadLaunch(EGPThread *threadOut, EGPThreadFunc func, void *params)
 {
-	if (thread_out && !thread_out->handle && func)
+	if (threadOut && !threadOut->handle && func)
 	{
-		thread_out->func = func;
-		thread_out->params = params;
-		thread_out->flag = -1;
-		thread_out->result = -1;
+		threadOut->func = func;
+		threadOut->params = params;
+		threadOut->flag = -1;	// not started yet
+		threadOut->result = -1;
 
-		thread_out->handle = CreateThread(0, 0, threadLunchInternal, thread_out, 0, thread_out->id);
-		return thread_out->id;
+		threadOut->handle = CreateThread(0, 0, threadLaunchInternal, threadOut, 0, &threadOut->id);
+
+		return threadOut->id;
 	}
-
 	return -1;
 }

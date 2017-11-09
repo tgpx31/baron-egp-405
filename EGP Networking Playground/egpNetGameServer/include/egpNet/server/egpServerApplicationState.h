@@ -15,6 +15,10 @@
 
 class egpServerApplicationState : public egpApplicationState
 {
+	// networking throttle
+	//egpTimer m_networkTimer[1];
+
+
 	// internal updates
 	virtual int UpdateNetworking();
 	virtual int ProcessPacket(const RakNet::Packet *packet);

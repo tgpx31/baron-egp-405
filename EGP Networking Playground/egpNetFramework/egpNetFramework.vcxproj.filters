@@ -45,7 +45,7 @@
     <ClCompile Include="src\egpNet\egpGameState.cpp">
       <Filter>Source Files\egpNet</Filter>
     </ClCompile>
-    <ClCompile Include="src\egpNet\utils\egpThread.c">
+    <ClCompile Include="src\egpNet\Utils\egpThread.c">
       <Filter>Source Files\egpNet\utils</Filter>
     </ClCompile>
   </ItemGroup>

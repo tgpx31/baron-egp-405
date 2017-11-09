@@ -1,33 +1,31 @@
-#ifndef EGP_THREAD_H
-#define EGP_THREAD_H
+#ifndef _EGP_THREAD_H
+#define _EGP_THREAD_H
 
 #ifdef __cplusplus
 extern "C"
 {
-#else // !__cplusplus
-typedef struct egpThread egpThread;
-#endif // __cplusplus
+#else	// !c++
+typedef struct EGPThread EGPThread;
+#endif	// c++
 
-typedef int(__stdcall *egpThreadFunc)(void *);
+typedef int(*EGPThreadFunc)(void *);
 
-struct egpThread
+struct EGPThread
 {
 	void *handle;
 	unsigned long id;
 
 	int flag;
 	long result;
-	egpThreadFunc func;
-	void* params;
+	EGPThreadFunc func;
+	void *params;
 };
 
-int threadLaunch(egpThread* thread_out, egpThreadFunc func, void* params);
-
+int threadLaunch(EGPThread *threadOut, EGPThreadFunc func, void *params);
+//unsigned long __stdcall threadLaunchInternal(void *params);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif	// c++
 
-
-#endif // MY_THREAD_H
-
+#endif //_EGP_THREAD_H

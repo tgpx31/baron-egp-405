@@ -186,8 +186,8 @@ int egpApplicationState::SendPacket(const char *buffer, const unsigned int buffe
 		// ****TO-DO: make it faster
 		const int singleDst = connectionIndex >= 0;
 		const bool broadcastFlag = broadcast != 0;
-		const PacketPriority priorityFlag = IMMEDIATE_PRIORITY;
-		const PacketReliability reliableFlag = reliable ? RELIABLE_SEQUENCED : UNRELIABLE_SEQUENCED;
+		const PacketPriority priorityFlag = IMMEDIATE_PRIORITY; // HIGH_PRIORITY
+		const PacketReliability reliableFlag = reliable ? RELIABLE_SEQUENCED : UNRELIABLE_SEQUENCED;	// RELIABLE_ORDERED
 		const RakNet::SystemAddress address = singleDst ? mp_connection[connectionIndex].m_address : RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 
 		// send raw data
@@ -203,8 +203,8 @@ int egpApplicationState::SendPacket(const RakNet::BitStream *bs, const int conne
 		// ****TO-DO: make it faster
 		const int singleDst = connectionIndex >= 0;
 		const bool broadcastFlag = broadcast != 0;
-		const PacketPriority priorityFlag = HIGH_PRIORITY;
-		const PacketReliability reliableFlag = RELIABLE_ORDERED;
+		const PacketPriority priorityFlag = IMMEDIATE_PRIORITY; // HIGH_PRIORITY
+		const PacketReliability reliableFlag = reliable ? RELIABLE_SEQUENCED : UNRELIABLE_SEQUENCED;	// RELIABLE_ORDERED
 		const RakNet::SystemAddress address = singleDst ? mp_connection[connectionIndex].m_address : RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 
 		// send bit stream
@@ -371,14 +371,21 @@ int egpApplicationState::OnMouseMove(int cursorX, int cursorY)
 	return 0;
 }
 
+
+// threading
 int egpApplicationNetworkingThread(void *param)
 {
-	egpApplicationState* appState = (egpApplicationState*)param;
-	if (egpTimerUpdate(appState->m_networkTimer))
-		appState->UpdateNetworking();
+	egpApplicationState *appState = (egpApplicationState*)param;
+
+	while (appState->mp_peer)
+	{
+		if (egpTimerUpdate(appState->m_networkTimer))
+			appState->UpdateNetworking();
+	}
 
 	return 0;
 }
+
 
 // common networking features
 int egpApplicationState::InitializePeer(const unsigned int maxIncomingConnections, const int doesConnect, const unsigned short portIncoming)
@@ -409,8 +416,10 @@ int egpApplicationState::InitializePeer(const unsigned int maxIncomingConnection
 		mp_peer->Startup(totalConnections, &sd, 1);
 		mp_peer->SetMaximumIncomingConnections(maxIncomingConnections);
 
+
 		// new thread for networking
 		threadLaunch(m_thread, egpApplicationNetworkingThread, this);
+
 
 		// done
 		return 1;

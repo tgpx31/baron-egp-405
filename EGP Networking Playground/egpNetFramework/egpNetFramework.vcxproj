@@ -22,7 +22,7 @@
     <ClCompile Include="src\egpNetFW_main.c" />
     <ClCompile Include="src\egpNet\egpApplicationState.cpp" />
     <ClCompile Include="src\egpNet\egpGameState.cpp" />
-    <ClCompile Include="src\egpNet\utils\egpThread.c" />
+    <ClCompile Include="src\egpNet\Utils\egpThread.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\egpNet\egpApplicationState.h" />
@@ -39,7 +39,7 @@
     <ProjectGuid>{D2A2F72F-78D2-4BAC-B3F2-97927DC77684}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>egpNetFramework</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

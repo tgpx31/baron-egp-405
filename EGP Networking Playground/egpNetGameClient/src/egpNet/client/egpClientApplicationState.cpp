@@ -31,49 +31,51 @@ int egpClientApplicationState::ProcessPacket(const RakNet::Packet *packet)
 		{
 			// ****TO-DO: 
 			// handle time-stamped messages
-		case ID_TIMESTAMP: {
-			RakNet::Time readTime_local = RakNet::GetTime(), sentTime_local, sentTime_remote, sentToReadDiff_local;
-			
-			const unsigned char* userData = packet->data + ReadTimeStamp((char*)packet->data, sentTime_local, sentTime_remote);
-			const int lastPing = mp_peer->GetLastPing(packet->systemAddress);
-
-			sentToReadDiff_local = readTime_local - sentTime_local;
-
-			printf("Read time (local) = %I64d (last ping = %d)\n", readTime_local, lastPing);
-			printf("Sent time (local) = %I64d, Sent time (remote) = %I64d\n", sentTime_local, sentTime_remote);
-			printf("Sent -> Read difff = %I64d, Clock diff = %I64d\n\n", sentToReadDiff_local, sentTime_local - sentTime_remote);
-
-			switch (userData[0])
+			case ID_TIMESTAMP:
 			{
-			case egpID_currentTime:
-				// read the time diff from the server AND th other client
-				// forward it in a new time-stamped packet to all other clients
-				RakNet::Time sentToRead_remote, sentToRead_other;
-				userData += ReadTimeStamp((char*)userData, sentToRead_remote, sentToRead_other);
-				int otherID = *((int*)userData);
-				userData += sizeof(int);
+				// get your read time
+				RakNet::Time readTime_local = RakNet::GetTime(),
+					sentTime_local, sentTime_remote, sentToReadDiff_local;
 
-				printf("Other (%d) -> Server = %I64d\n\n", otherID, sentToReadDiff_local);
+				// offset to get to user data
+				const unsigned char *userData = packet->data + ReadTimeStamp((char*)packet->data, sentTime_local, sentTime_remote);
+				const int lastPing = mp_peer->GetLastPing(packet->systemAddress);
 
-				// forward
-				RakNet::Time packetTime_local = readTime_local;
-				char msg[64];
-				char* msgPtrTmp = msg + WriteTimeStamp(msg, packetTime_local, packetTime_local);
-				char* msgPtr = msgPtrTmp + WriteTimeStamp(msgPtrTmp, sentToReadDiff_local, sentToRead_remote);
-				*msgPtrTmp = (char)egpID_currentTime;
-				msgPtr += sizeof(int);
+				// get local time diff
+				sentToReadDiff_local = (readTime_local - sentTime_local);
 
-				SendPacket(msg, (int)(msgPtr - msg), otherID, true, false);
-				printf("Broadcast update message from (%d) at time %I64d\n\n", otherID, packetTime_local);
+				// display
+				printf("Read Time Local:\t%I64d\tLast Ping:\t%d\n", readTime_local, lastPing);
+				printf("Sent Time Local:\t%I64d\tSent Time Remote:\t%I64d\n", sentTime_local, sentTime_remote);
+				printf("Sent -> Read Diff:\t%I64d\t\tClock Diff:\t%I64d\n\n", sentToReadDiff_local, (sentTime_local - sentTime_remote));
 
-				break;
-			}
+				switch (userData[0])
+				{
 
-		}	return 1;
+					case egpID_currentTime:
+					{
+						// read time diff from the server and other client
+						// display the time diff from the originator
+						RakNet::Time sentToRead_remote, sentToRead_other;
+						userData += ReadTimeStamp((char*)userData, sentToRead_remote, sentToRead_other);
 
-	//	default:
-	//		printf("Message with identifier %i has arrived.\n", packet->data[0]);
-	//		break;
+						int remoteID = *((int*)userData);
+						userData += sizeof(int);
+
+						printf("Other (%d) -> Server:\t%I64d\nServer - > Local (%d):\t%I64d\n\n", remoteID, sentToRead_remote, m_myConnectionIndex, sentToReadDiff_local);
+
+						break;
+					}
+
+				}
+
+
+			}	return 1;
+
+
+		//	default:
+		//		printf("Message with identifier %i has arrived.\n", packet->data[0]);
+		//		break;
 		}
 	}
 
@@ -183,11 +185,14 @@ int egpClientApplicationState::OnKeyPress(unsigned char key)
 			//	-> user data
 			const RakNet::Time packetTime_local = RakNet::GetTime();
 
-			char msg[64] = { 0 };
-			char *msgPtrTmp = msg + WriteTimeStamp(msg, packetTime_local, packetTime_local);
-			char *msgPtr = msgPtrTmp + WriteTimeStamp(msgPtrTmp, 0, 0);
+			// all messages have a time stamp now
+			char msg[64] = { 0 }, *msgPtrTmp = msg + WriteTimeStamp(msg, packetTime_local, packetTime_local),
+			*msgPtr = msgPtrTmp + WriteTimeStamp(msgPtrTmp, 0, 0);
+
+			// User data after sync data
 			*msgPtrTmp = (char)egpID_currentTime;
-			*(int *)msgPtr = m_myConnectionIndex;
+
+			*((int*)msgPtr) = m_myConnectionIndex;
 			msgPtr += sizeof(int);
 
 			SendPacket(msg, (int)(msgPtr - msg), 0, 0, 0);

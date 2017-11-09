@@ -18,10 +18,10 @@
 #include "RakNet/GetTime.h"
 
 #include "utils/egpInput.h"
-#include "utils/egpThread.h"
-#include "utils/egpTimer.h"
 
 #include "egpGameState.h"
+#include "egpNet/utils/egpTimer.h"
+#include "egpNet\utils\egpThread.h"
 
 
 class egpApplicationState abstract
@@ -78,9 +78,9 @@ protected:
 		egpID_currentTime,
 	};
 
-	// threading
+	// Threading
 	egpTimer m_networkTimer[1];
-	egpThread m_thread[1];
+	EGPThread m_thread[1];
 	friend int egpApplicationNetworkingThread(void *param);
 
 public: 
