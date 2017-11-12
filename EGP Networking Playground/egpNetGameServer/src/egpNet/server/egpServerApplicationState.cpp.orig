@@ -20,6 +20,20 @@ int egpServerApplicationState::UpdateNetworking()
 {
 	unsigned int i = egpApplicationState::UpdateNetworking();
 
+	// ****TO-DO: SERVER IDLE: 
+	//	-> process inputs
+	//		-> devices
+	//		-> remote state(s)
+	//		-> local state
+	
+	// send time-stamped message
+//	const RakNet::Time sendTime_local = RakNet::GetTime();
+//	char msg[32] = { 0 }, *msgPtr = msg + WriteTimeStamp(msg, sendTime_local, sendTime_local);
+//	*(msgPtr++) = 0;
+
+//	SendPacket(msg, (int)(msgPtr - msg), m_maxOutgoingConnections ? m_maxIncomingConnections : -1, 1, 0);
+//	printf("Broadcast message at time %I64d\n", sendTime_local);
+
 	// done
 	return i;
 }
@@ -80,10 +94,10 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				const egpMouse *mouse = (egpMouse *)userData;
 				userData += sizeof(egpMouse);
 
-				// ****TO-DO: 
-				// process input
 				if (mp_state)
 				{
+					const double delay_s = (double)(sentToReadDiff_local + sentToReadDiff_remote)*0.001;
+					mp_state->ProcessInput(keyboard, mouse, otherID, delay_s);
 				}
 			} break;
 
@@ -94,11 +108,15 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				int otherID = *((int *)userData);
 				userData += sizeof(otherID);
 
-				// ****TO-DO: 
 				// state decodes data
 				if (mp_state)
 				{
+					const double delay_s = (double)(sentToReadDiff_local + sentToReadDiff_remote)*0.001;
+					userData += mp_state->DeserializeData((char *)userData, 4096, 0, delay_s);
 				}
+
+				// here we would send anything that needs to be sent right now
+			//	SendStateUpdate(sentToReadDiff_local, otherID, 1, 0);
 			} break;
 
 			case 0:
@@ -162,8 +180,10 @@ int egpServerApplicationState::OnIdle()
 		if (mp_state)
 		{
 			// ****TO-DO: simulate state given all inputs
+			mp_state->UpdateState(m_updateTimer->secondsPerTick);
 
 			// ****TO-DO: send complete set of updated data
+			SendStateUpdate(0, -1, 1, 0);
 		}
 	}
 

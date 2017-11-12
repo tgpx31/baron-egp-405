@@ -13,15 +13,17 @@
 
 #include "egpNet/egpApplicationState.h"
 
+
 class egpServerApplicationState : public egpApplicationState
 {
-	// networking throttle
-	//egpTimer m_networkTimer[1];
-
-
+	
 	// internal updates
 	virtual int UpdateNetworking();
 	virtual int ProcessPacket(const RakNet::Packet *packet);
+
+
+	// state update timer
+	egpTimer m_updateTimer[1];
 
 
 public:
@@ -29,8 +31,7 @@ public:
 	egpServerApplicationState();
 	virtual ~egpServerApplicationState();
 
-
-	// overloaded callbacks
+	// callbacks
 	virtual int OnIdle();
 
 };

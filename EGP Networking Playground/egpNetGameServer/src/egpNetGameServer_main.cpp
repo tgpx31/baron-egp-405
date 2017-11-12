@@ -22,21 +22,16 @@
 // MAIN
 //-----------------------------------------------------------------------------
 
-int main(int argc, char **argv)
+int ServerApp(void *)
 {
-	printf("\n----------------------------------------");
-	printf("\n--     EGP NET GAME ****SERVER****    --");
-	printf("\n----------------------------------------");
-	printf("\n\n");
-
-
 	// create application interface
 	egpServerApplicationState appState_server[1];
 
-	const unsigned int terminateKey = 27;	// esc
+	// esc
+	const unsigned int terminateKey = 27;
 
 	// start networking
-	appState_server->InitializePeer(4, 0, appState_server->GetDefaultPort());
+	appState_server->StartupNetworking(4, 0, appState_server->GetDefaultPort());
 
 	// console persists until told to stop
 	int running = 1;
@@ -53,7 +48,30 @@ int main(int argc, char **argv)
 	}
 
 	// stop networking
-	appState_server->TerminatePeer();
+	appState_server->ShutdownNetworking();
+
+	return 0;
+}
+
+
+int main(int argc, char **argv)
+{
+	printf("\n----------------------------------------");
+	printf("\n--     EGP NET GAME ****SERVER****    --");
+	printf("\n----------------------------------------");
+	printf("\n\n");
+
+	// launch app thread
+	void *args[2] = { &argc, argv };
+
+	ServerApp(args);
+
+//	egpThread appThread[1] = { 0 };
+//	egpCreateThread(appThread, ServerApp, args);
+
+	// wait for thread to begin and end
+//	while (!appThread->running);
+//	while (appThread->running);
 }
 
 

@@ -1,31 +1,45 @@
-#ifndef _EGP_THREAD_H
-#define _EGP_THREAD_H
+/*
+	egpThread.h
+	By Dan Buckstein (c) 2017
+
+	Simple thread structure and functions for Windows.
+*/
+
+#ifndef __EGP_THREAD_H_
+#define __EGP_THREAD_H_
+
 
 #ifdef __cplusplus
 extern "C"
 {
-#else	// !c++
-typedef struct EGPThread EGPThread;
-#endif	// c++
+#else
+typedef struct egpThread egpThread;
+#endif	// __cplusplus
 
-typedef int(*EGPThreadFunc)(void *);
 
-struct EGPThread
+// thread launcher function pointer
+typedef int(*egpThreadFunc)(void *);
+
+// thread descriptor
+struct egpThread
 {
 	void *handle;
-	unsigned long id;
-
-	int flag;
-	long result;
-	EGPThreadFunc func;
-	void *params;
+	unsigned long threadID;
+	int result;
+	int running;
+	void *args;
+	egpThreadFunc func;
 };
 
-int threadLaunch(EGPThread *threadOut, EGPThreadFunc func, void *params);
-//unsigned long __stdcall threadLaunchInternal(void *params);
+
+int egpCreateThread(egpThread *thread_out, const egpThreadFunc func, void *args);
+
+int egpTerminateThread(egpThread *thread);
+
 
 #ifdef __cplusplus
 }
-#endif	// c++
+#endif	// __cplusplus
 
-#endif //_EGP_THREAD_H
+
+#endif	// !__EGP_THREAD_H_

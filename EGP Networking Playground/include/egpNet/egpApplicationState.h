@@ -18,10 +18,10 @@
 #include "RakNet/GetTime.h"
 
 #include "utils/egpInput.h"
+#include "utils/egpTimer.h"
+#include "utils/egpThread.h"
 
 #include "egpGameState.h"
-#include "egpNet/utils/egpTimer.h"
-#include "egpNet\utils\egpThread.h"
 
 
 class egpApplicationState abstract
@@ -59,8 +59,8 @@ protected:
 	virtual int ProcessPacket(const RakNet::Packet *packet);
 
 	// send packet
-	int SendPacket(const char *buffer, const unsigned int bufferLength, const int connectionIndex, const int broadcast, const int reliable);
-	int SendPacket(const RakNet::BitStream *bs, const int connectionIndex, const int broadcast, const int reliable);
+	int SendPacket(const char *buffer, const unsigned int bufferLength, const int connectionIndex, const int broadcast, const int reliable) const;
+	int SendPacket(const RakNet::BitStream *bs, const int connectionIndex, const int broadcast, const int reliable) const;
 
 	// write time stamp message ID and precise system time to buffer or bit stream
 	static int WriteTimeStamp(char *buffer, const RakNet::Time &t, const RakNet::Time &t0);
@@ -76,12 +76,34 @@ protected:
 		egpID_packetBegin = ID_USER_PACKET_ENUM,
 		egpID_connectionIndex,
 		egpID_currentTime,
+		egpID_stateInput,
+		egpID_stateUpdate,
 	};
 
-	// Threading
+
+	// current game state
+	// this should be contained in a state manager
+	egpGameState *mp_state;
+
+	// utility to send raw input
+	int SendStateInput(const RakNet::Time delay, const int connectionIndex, const int broadcast, const int reliable) const;
+
+	// utility to tell the state to package up its data and 
+	//	send if there is any data to be packaged
+	int SendStateUpdate(const RakNet::Time delay, const int connectionIndex, const int broadcast, const int reliable) const;
+
+
+private:
+
+	// networking management with thread
+	egpThread m_networkThread[1];
 	egpTimer m_networkTimer[1];
-	EGPThread m_thread[1];
-	friend int egpApplicationNetworkingThread(void *param);
+	int m_networkThreadAllowed;
+
+	static int NetworkingThread(void *);
+	void InitializePeer();
+	void TerminatePeer();
+
 
 public: 
 
@@ -97,11 +119,12 @@ public:
 	virtual int OnMouseMove(int cursorX, int cursorY);
 
 	// common networking features
-	virtual int InitializePeer(const unsigned int maxIncomingConnections, const int doesConnect, const unsigned short portIncoming);
-	virtual int TerminatePeer();
+	virtual int StartupNetworking(const unsigned int maxIncomingConnections, const int doesConnect, const unsigned short portIncoming);
+	virtual int ShutdownNetworking();
 	virtual int ConnectPeer(const char address[16], const unsigned short port);
 
 	static unsigned short GetDefaultPort();
+	static unsigned short GetUserPort();
 
 };
 

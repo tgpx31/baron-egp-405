@@ -1,27 +1,72 @@
-#include "egpNet\utils\egpThread.h"
+/*
+	egpThread.c
+	By Dan Buckstein (c) 2017
+
+	Simple thread for Windows.
+*/
+
+#include "egpNet/utils/egpThread.h"
+
+
 #include <Windows.h>
 
-unsigned long __stdcall threadLaunchInternal(void *params)
-{
-	EGPThread* theThread = (EGPThread*)params;
-	theThread->result = theThread->func(theThread->params);
-	theThread->flag = 1;	// about to start
 
-	return theThread->result;
+//-----------------------------------------------------------------------------
+// internal thread launcher
+
+long __stdcall egpThreadLaunch_internal(void *param)
+{
+	egpThread *thread = (egpThread *)param;
+
+	thread->running = 1;
+	thread->result = thread->func(thread->args);
+	thread->running = 0;
+
+	return (thread->result);
 }
 
-int threadLaunch(EGPThread *threadOut, EGPThreadFunc func, void *params)
+
+//-----------------------------------------------------------------------------
+// thread functions
+
+int egpCreateThread(egpThread *thread_out, const egpThreadFunc func, void *args)
 {
-	if (threadOut && !threadOut->handle && func)
+	if (thread_out && !thread_out->handle && func)
 	{
-		threadOut->func = func;
-		threadOut->params = params;
-		threadOut->flag = -1;	// not started yet
-		threadOut->result = -1;
+		thread_out->result = 0;
+		thread_out->running = 0;
+		thread_out->args = args;
+		thread_out->func = func;
 
-		threadOut->handle = CreateThread(0, 0, threadLaunchInternal, threadOut, 0, &threadOut->id);
+		// launch thread
+		thread_out->handle = CreateThread(0, 0, egpThreadLaunch_internal, thread_out, 0, &thread_out->threadID);
 
-		return threadOut->id;
+		return (thread_out->threadID);
 	}
 	return -1;
 }
+
+
+int egpTerminateThread(egpThread *thread)
+{
+	if (thread && thread->handle)
+	{
+		int success = TerminateThread(thread->handle, (unsigned long)(-1));
+		if (success)
+		{
+			success = CloseHandle(thread->handle);
+			if (success)
+			{
+				thread->handle = 0;
+				thread->threadID = 0;
+				thread->result = 0;
+				thread->running = 0;
+				return 1;
+			}
+		}
+	}
+	return -1;
+}
+
+
+//-----------------------------------------------------------------------------

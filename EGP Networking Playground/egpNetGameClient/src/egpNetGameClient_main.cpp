@@ -21,6 +21,7 @@
 
 
 #include "GL/glew.h"
+#include "GL/wglew.h"
 
 
 //-----------------------------------------------------------------------------
@@ -185,7 +186,7 @@ void egpMouseMove(int cursorX, int cursorY)
 int egpInitGraphicsState()
 {
 	const float lineWidth = 2.0f;
-	const float pointSize = 4.0f;
+	const float pointSize = 10.0f;
 
 	// lines and points
 	glLineWidth(lineWidth);
@@ -210,6 +211,14 @@ int egpInitGraphicsState()
 	// background
 	glClearColor(0.0f, 0.0f, 0.0, 0.0f);
 
+
+	// extensions
+	glewInit();
+
+	// set vsync
+	wglSwapIntervalEXT(1);
+
+
 	return 1;
 }
 
@@ -219,13 +228,12 @@ int egpInitGraphicsState()
 // MAIN
 //-----------------------------------------------------------------------------
 
-int main(int argc, char **argv)
+int ClientApp(void *params)
 {
-	printf("\n----------------------------------------");
-	printf("\n--     EGP NET GAME ****CLIENT****    --");
-	printf("\n----------------------------------------");
-	printf("\n\n");
-
+	// reinterpret command line arguments
+	void **args = (void **)params;
+	int *argcp = (int *)(args[0]);
+	char **argv = (char **)(args[1]);
 
 	// allocate window
 	egpWindowState *windowState = egpGlobalWindowState(1);
@@ -246,7 +254,7 @@ int main(int argc, char **argv)
 
 
 	// initialize graphics window with context
-	if (egpInitGraphicsWindow(windowState, &argc, argv))
+	if (egpInitGraphicsWindow(windowState, argcp, argv))
 	{
 		// other initializations
 		egpInitGraphicsState();
@@ -260,6 +268,27 @@ int main(int argc, char **argv)
 	// end
 	windowState = egpGlobalWindowState(0);
 	return 0;
+}
+
+
+int main(int argc, char **argv)
+{
+	printf("\n----------------------------------------");
+	printf("\n--     EGP NET GAME ****CLIENT****    --");
+	printf("\n----------------------------------------");
+	printf("\n\n");
+
+	// launch app thread
+	void *args[2] = { &argc, argv };
+
+	ClientApp(args);
+
+//	egpThread appThread[1] = { 0 };
+//	egpCreateThread(appThread, ClientApp, args);
+
+	// wait for thread to begin and end
+//	while (!appThread->running);
+//	while (appThread->running);
 }
 
 

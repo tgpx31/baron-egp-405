@@ -22,11 +22,15 @@
     <ClCompile Include="src\egpNetFW_main.c" />
     <ClCompile Include="src\egpNet\egpApplicationState.cpp" />
     <ClCompile Include="src\egpNet\egpGameState.cpp" />
-    <ClCompile Include="src\egpNet\Utils\egpThread.c" />
+    <ClCompile Include="src\egpNet\states\egpNetPlaygroundGameState.cpp" />
+    <ClCompile Include="src\egpNet\states\egpNetPlaygroundGameStateDrawable.cpp" />
+    <ClCompile Include="src\egpNet\utils\egpThread.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\egpNet\egpApplicationState.h" />
     <ClInclude Include="..\include\egpNet\egpGameState.h" />
+    <ClInclude Include="..\include\egpNet\states\egpNetPlaygroundGameState.h" />
+    <ClInclude Include="..\include\egpNet\states\egpNetPlaygroundGameStateDrawable.h" />
     <ClInclude Include="..\include\egpNet\utils\egpInput.h" />
     <ClInclude Include="..\include\egpNet\utils\egpThread.h" />
     <ClInclude Include="..\include\egpNet\utils\egpTimer.h" />

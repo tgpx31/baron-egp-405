@@ -184,10 +184,11 @@ int egpApplicationState::SendPacket(const char *buffer, const unsigned int buffe
 {
 	if (mp_peer && mp_connection && buffer && bufferLength)
 	{
+		// ****TO-DO: make it faster
 		const int singleDst = connectionIndex >= 0;
 		const bool broadcastFlag = broadcast != 0;
-		const PacketPriority priorityFlag = IMMEDIATE_PRIORITY; // HIGH_PRIORITY;
-		const PacketReliability reliableFlag = reliable ? RELIABLE_SEQUENCED : UNRELIABLE_SEQUENCED; // RELIABLE_ORDERED;
+		const PacketPriority priorityFlag = HIGH_PRIORITY;
+		const PacketReliability reliableFlag = RELIABLE_ORDERED;
 		const RakNet::SystemAddress address = singleDst ? mp_connection[connectionIndex].m_address : RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 
 		// send raw data
@@ -200,10 +201,11 @@ int egpApplicationState::SendPacket(const RakNet::BitStream *bs, const int conne
 {
 	if (mp_peer && mp_connection)
 	{
+		// ****TO-DO: make it faster
 		const int singleDst = connectionIndex >= 0;
 		const bool broadcastFlag = broadcast != 0;
-		const PacketPriority priorityFlag = IMMEDIATE_PRIORITY;
-		const PacketReliability reliableFlag = reliable ? RELIABLE_SEQUENCED : UNRELIABLE_SEQUENCED;
+		const PacketPriority priorityFlag = HIGH_PRIORITY;
+		const PacketReliability reliableFlag = RELIABLE_ORDERED;
 		const RakNet::SystemAddress address = singleDst ? mp_connection[connectionIndex].m_address : RakNet::UNASSIGNED_SYSTEM_ADDRESS;
 
 		// send bit stream
