@@ -84,6 +84,8 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				// process input
 				if (mp_state)
 				{
+					const double delay_s = (sentToReadDiff_local + sentToReadDiff_remote) * 0.001;
+					mp_state->ProcessInput(keyboard, mouse, otherID, delay_s);
 				}
 			} break;
 
@@ -162,8 +164,10 @@ int egpServerApplicationState::OnIdle()
 		if (mp_state)
 		{
 			// ****TO-DO: simulate state given all inputs
+			mp_state->UpdateState(m_updateTimer->secondsPerTick);
 
 			// ****TO-DO: send complete set of updated data
+			SendStateUpdate(0, -1, 1, 0);
 		}
 	}
 

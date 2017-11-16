@@ -66,6 +66,8 @@ int egpClientApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				// state decodes data
 				if (mp_state)
 				{
+					const double delay_s = (sentToReadDiff_local + sentToReadDiff_remote) * 0.001;
+					userData += mp_state->DeserializeData((char*)userData, 4096, 0, delay_s);
 				}
 			}	break;
 
@@ -155,10 +157,13 @@ int egpClientApplicationState::OnIdle()
 		if (mp_state)
 		{
 			// ****TO-DO: send input to server
+			SendStateInput(0, m_maxIncomingConnections, 0, 0);
 
 			// ****TO-DO: process input locally
+			mp_state->ProcessInput(m_keyboard, m_mouse, m_myConnectionIndex, 0);
 
 			// ****TO-DO: update state
+			mp_state->UpdateState(m_updateRenderTimer->secondsPerTick);
 		}
 
 		// display state

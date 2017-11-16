@@ -22,7 +22,7 @@
     <ProjectGuid>{CAB7E309-45C2-4BD9-A3E3-570922CD376E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>egpNetGameServer</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
