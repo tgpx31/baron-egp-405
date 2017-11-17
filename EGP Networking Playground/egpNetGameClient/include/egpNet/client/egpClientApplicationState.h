@@ -17,7 +17,7 @@
 
 class egpClientApplicationState : public egpApplicationState
 {
-
+	int isLocal;
 	const egpWindowState *mpk_windowState;
 
 	// throttles

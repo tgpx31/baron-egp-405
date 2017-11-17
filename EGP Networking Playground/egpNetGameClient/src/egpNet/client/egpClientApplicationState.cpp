@@ -202,6 +202,14 @@ int egpClientApplicationState::OnKeyPress(unsigned char key)
 			delete mp_state;
 			mp_state = 0;
 		}
+
+	case 'L':
+		{
+			// Start a local game
+			m_myConnectionIndex = 0;
+			mp_state = new egpNetPlaygroundGameStateDrawable(m_myConnectionIndex);
+
+		}
 		break;
 
 
