@@ -13,10 +13,17 @@
 
 #include "egpNet/egpApplicationState.h"
 
+struct InputData
+{
+	const egpKeyboard *keyboard;
+	const egpMouse *mouse;
+	int ctrlID;
+	double dt;
+};
 
 class egpServerApplicationState : public egpApplicationState
 {
-	
+private:
 	// internal updates
 	virtual int UpdateNetworking();
 	virtual int ProcessPacket(const RakNet::Packet *packet);
@@ -25,6 +32,9 @@ class egpServerApplicationState : public egpApplicationState
 	// state update timer
 	egpTimer m_updateTimer[1];
 
+	// Input storage
+	InputData m_Inputs[256];
+	unsigned int m_InputCount;
 
 public:
 

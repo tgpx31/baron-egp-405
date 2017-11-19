@@ -85,7 +85,8 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				if (mp_state)
 				{
 					const double delay_s = (sentToReadDiff_local + sentToReadDiff_remote) * 0.001;
-					mp_state->ProcessInput(keyboard, mouse, otherID, delay_s);
+					//mp_state->ProcessInput(keyboard, mouse, otherID, delay_s);
+					m_Inputs[m_InputCount++] = { keyboard, mouse, otherID, delay_s };
 				}
 			} break;
 
@@ -149,6 +150,8 @@ egpServerApplicationState::egpServerApplicationState()
 	// testing: create game state
 	// normally this would be handled by a manager
 	mp_state = new egpNetPlaygroundGameState(-1);
+
+	m_InputCount = 0;
 }
 
 egpServerApplicationState::~egpServerApplicationState()
@@ -163,6 +166,13 @@ int egpServerApplicationState::OnIdle()
 	{
 		if (mp_state)
 		{
+			for (unsigned int i = 0; i < m_InputCount; ++i)
+			{
+				mp_state->ProcessInput(m_Inputs[i].keyboard, m_Inputs[i].mouse, m_Inputs[i].ctrlID, m_Inputs[i].dt);
+			}
+
+			m_InputCount = 0;
+
 			// ****TO-DO: simulate state given all inputs
 			mp_state->UpdateState(m_updateTimer->secondsPerTick);
 
