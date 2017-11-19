@@ -86,7 +86,12 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				{
 					const double delay_s = (sentToReadDiff_local + sentToReadDiff_remote) * 0.001;
 					//mp_state->ProcessInput(keyboard, mouse, otherID, delay_s);
-					m_Inputs[m_InputCount++] = { keyboard, mouse, otherID, delay_s };
+
+					m_Inputs[m_InputCount].keyboard = *keyboard;
+					m_Inputs[m_InputCount].mouse = *mouse;
+					m_Inputs[m_InputCount].ctrlID = otherID;
+					m_Inputs[m_InputCount].dt = delay_s;
+					m_InputCount++;
 				}
 			} break;
 
@@ -168,7 +173,7 @@ int egpServerApplicationState::OnIdle()
 		{
 			for (unsigned int i = 0; i < m_InputCount; ++i)
 			{
-				mp_state->ProcessInput(m_Inputs[i].keyboard, m_Inputs[i].mouse, m_Inputs[i].ctrlID, m_Inputs[i].dt);
+				mp_state->ProcessInput(&m_Inputs[i].keyboard, &m_Inputs[i].mouse, m_Inputs[i].ctrlID, m_Inputs[i].dt);
 			}
 
 			m_InputCount = 0;

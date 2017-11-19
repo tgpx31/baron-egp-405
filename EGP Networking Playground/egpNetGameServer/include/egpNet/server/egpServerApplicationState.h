@@ -15,8 +15,8 @@
 
 struct InputData
 {
-	const egpKeyboard *keyboard;
-	const egpMouse *mouse;
+	egpKeyboard keyboard;
+	egpMouse mouse;
 	int ctrlID;
 	double dt;
 };
