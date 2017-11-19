@@ -119,7 +119,8 @@ int egpNetPlaygroundGameState::ProcessInput(const egpKeyboard *keyboard, const e
 			agentPtr->velY = agentMoveSpeed * (float)(egpKeyboardKeyIsDown(keyboard, 'w') - egpKeyboardKeyIsDown(keyboard, 's'));
 
 			// debug print
-			printf(" vel (%d) = %f, %f \n\n", ctrlID, agentPtr->velX, agentPtr->velY);
+			printf(" vel (%d) = %f, %f \n", ctrlID, agentPtr->velX, agentPtr->velY);
+			printf(" dt: %f\n\n", dt);
 		}
 		if (mouse)
 		{
