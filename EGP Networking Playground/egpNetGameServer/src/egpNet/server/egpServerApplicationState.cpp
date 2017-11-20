@@ -42,9 +42,9 @@ int egpServerApplicationState::ProcessPacket(const RakNet::Packet *packet)
 			const int lastPing = mp_peer->GetLastPing(packet->systemAddress);
 			sentToReadDiff_local = (readTime_local - sentTime_local);
 
-			//printf(" Read time (local) = %I64d (last ping = %d) \n", readTime_local, lastPing);
-			//printf(" Sent time (local) = %I64d;  Sent time (remote) = %I64d \n", sentTime_local, sentTime_remote);
-			//printf(" Sent -> Read diff = %I64d;  Clock diff = %I64d \n\n", sentToReadDiff_local, (sentTime_local - sentTime_remote));
+			printf(" Read time (local) = %I64d (last ping = %d) \n", readTime_local, lastPing);
+			printf(" Sent time (local) = %I64d;  Sent time (remote) = %I64d \n", sentTime_local, sentTime_remote);
+			printf(" Sent -> Read diff = %I64d;  Clock diff = %I64d \n\n", sentToReadDiff_local, (sentTime_local - sentTime_remote));
 
 			switch (userData[0])
 			{

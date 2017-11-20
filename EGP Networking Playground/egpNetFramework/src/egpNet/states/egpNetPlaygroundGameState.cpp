@@ -123,21 +123,8 @@ int egpNetPlaygroundGameState::ProcessInput(const egpKeyboard *keyboard, const e
 			// debug print
 			//printf(" vel (%d) = %f, %f \n", ctrlID, agentPtr->velX, agentPtr->velY);
 
-			printf("PrevAgentVel(%d): %f %f\n", status->objID, agentPrev->velX, agentPrev->velY);
-			printf("AgentVel(%d): %f %f\n", status->objID, agentPtr->velX, agentPtr->velY);
-
-			// check for changes, raise flag if changes occur
-			if (agentPrev->velX != agentPtr->velX || agentPrev->velY != agentPtr->velY)
-			{
-				status->flags |= objFlag_change;
-				printf("Send updated\n");
-			}
-			// lower changed flags so objects don't automatically get serialized next update
-			else
-			{
-				status->flags &= ~(objFlag_change);
-				printf("Don't send update\n");
-			}
+			//printf("PrevAgentVel(%d): %f %f\n", status->objID, agentPrev->velX, agentPrev->velY);
+			//printf("AgentVel(%d): %f %f\n", status->objID, agentPtr->velX, agentPtr->velY);
 		}
 		if (mouse)
 		{
@@ -166,21 +153,12 @@ int egpNetPlaygroundGameState::UpdateState(double dt)
 			agentPtr->posX += (float)dt * agentPtr->velX;
 			agentPtr->posY += (float)dt * agentPtr->velY;
 
-			printf("PrevAgentVel(%d): %f %f\n", agentStatusPtr->objID, agentPrev->velX, agentPrev->velY);
-			printf("AgentVel(%d): %f %f\n", agentStatusPtr->objID, agentPtr->velX, agentPtr->velY);
-			printf("PrevAgentPos(%d): %f %f\n", agentStatusPtr->objID, agentPrev->posX, agentPrev->posY);
-			printf("AgentPos(%d): %f %f\n", agentStatusPtr->objID, agentPtr->posX, agentPtr->posY);
+			//printf("PrevAgentVel(%d): %f %f\n", agentStatusPtr->objID, agentPrev->velX, agentPrev->velY);
+			//printf("AgentVel(%d): %f %f\n", agentStatusPtr->objID, agentPtr->velX, agentPtr->velY);
+			//printf("PrevAgentPos(%d): %f %f\n", agentStatusPtr->objID, agentPrev->posX, agentPrev->posY);
+			//printf("AgentPos(%d): %f %f\n", agentStatusPtr->objID, agentPtr->posX, agentPtr->posY);
 
-			// check for changes, raise flag if changes occur
-			if (!(agentStatusPtr->flags & objFlag_change))
-			{
-				//if (memcmp(agentPrev, agentPtr, sizeof(NetPlaygroundAgent)))
-				if (agentPrev->posX != agentPtr->posX || agentPrev->posY != agentPtr->posY)
-					agentStatusPtr->flags |= objFlag_change;
-				// lower changed flags so objects don't automatically get serialized next update
-				else
-					agentStatusPtr->flags &= ~(objFlag_change);
-			}
+			agentStatusPtr->flags |= objFlag_change;
 		}
 	}
 
