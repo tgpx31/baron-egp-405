@@ -149,7 +149,7 @@ egpServerApplicationState::egpServerApplicationState()
 	: egpApplicationState()
 {
 	// set timer
-	egpTimerSet(m_updateTimer, 30.0);
+	egpTimerSet(m_updateTimer, 10.0);
 
 	// start timer
 	egpTimerStart(m_updateTimer);
@@ -176,6 +176,7 @@ int egpServerApplicationState::OnIdle()
 		{
 			for (unsigned int i = 0; i < m_InputCount; ++i)
 			{
+				// PROJECT 3: Add a little extra velocity based on dt
 				mp_state->ProcessInput(&m_Inputs[i].keyboard, &m_Inputs[i].mouse, m_Inputs[i].ctrlID, m_Inputs[i].dt);
 			}
 
@@ -185,6 +186,7 @@ int egpServerApplicationState::OnIdle()
 			mp_state->UpdateState(m_updateTimer->secondsPerTick);
 
 			// ****TO-DO: send complete set of updated data
+			// PROJECT 3: Send based on networking
 			SendStateUpdate(0, -1, 1, 0);
 		}
 	}

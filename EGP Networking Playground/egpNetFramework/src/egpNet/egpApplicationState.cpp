@@ -253,7 +253,11 @@ int egpApplicationState::ReadTimeStamp(const char *buffer, RakNet::Time &t, RakN
 		t = *(tPtr++);
 		t0 = *(tPtr++);
 		if (*(buffer + 4) < 0)
+		{
 			t += 4311744512;	// raknet seems to be subtracting this number for some stupid reason... and only half the time... what is it doing
+			//if (t > (unsigned)(-1))
+			//	t -= (unsigned)(-1) + 65535;
+		}
 		return ret;
 	}
 	return 0;

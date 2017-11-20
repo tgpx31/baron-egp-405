@@ -67,6 +67,7 @@ int egpClientApplicationState::ProcessPacket(const RakNet::Packet *packet)
 				if (mp_state)
 				{
 					const double delay_s = (sentToReadDiff_local + sentToReadDiff_remote) * 0.001;
+					// PROJECT 3: Add a little extra positin based on dt
 					userData += mp_state->DeserializeData((char*)userData, 4096, 0, delay_s);
 				}
 			}	break;
@@ -130,7 +131,7 @@ egpClientApplicationState::egpClientApplicationState()
 	, mpk_windowState(0)
 {
 	// set timers
-	egpTimerSet(m_updateRenderTimer, 30.0);
+	egpTimerSet(m_updateRenderTimer, 10.0);
 
 	// start timers
 	egpTimerStart(m_updateRenderTimer);
@@ -157,6 +158,7 @@ int egpClientApplicationState::OnIdle()
 		if (mp_state)
 		{
 			// ****TO-DO: send input to server
+			// PROJECT 3: send based on networking
 			SendStateInput(0, m_maxIncomingConnections, 0, 0);
 
 			// ****TO-DO: process input locally
