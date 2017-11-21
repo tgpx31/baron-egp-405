@@ -20,6 +20,10 @@ int egpClientApplicationState::UpdateNetworking()
 {
 	unsigned int i = egpApplicationState::UpdateNetworking();
 
+	// ****TO-DO: send input to server
+	// PROJECT 3: send based on networking
+	SendStateInput(0, m_maxIncomingConnections, 0, 0);
+
 	// done
 	return i;
 }
@@ -157,10 +161,6 @@ int egpClientApplicationState::OnIdle()
 	{
 		if (mp_state)
 		{
-			// ****TO-DO: send input to server
-			// PROJECT 3: send based on networking
-			SendStateInput(0, m_maxIncomingConnections, 0, 0);
-
 			// ****TO-DO: process input locally
 			mp_state->ProcessInput(m_keyboard, m_mouse, m_myConnectionIndex, 0);
 

@@ -95,6 +95,11 @@ int egpNetPlaygroundGameState::DeserializeData(const char *buffer, const unsigne
 				*agentStatusPtr = *objectStatusPtr;
 				*agentPtr = *((NetPlaygroundAgent *)buffer);
 				buffer += sizeof(NetPlaygroundAgent);
+
+				// Dead Reckoning
+				agentPtr->posX += agentPtr->velX * dt;
+				agentPtr->posY += agentPtr->velY * dt;
+
 				break;
 			}
 		}
@@ -119,6 +124,10 @@ int egpNetPlaygroundGameState::ProcessInput(const egpKeyboard *keyboard, const e
 		{
 			agentPtr->velX = agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'd') - egpKeyboardKeyIsDown(keyboard, 'a')));
 			agentPtr->velY = agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'w') - egpKeyboardKeyIsDown(keyboard, 's')));
+
+			// Dead Reckoning
+			agentPtr->velX += agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'd') - egpKeyboardKeyIsDown(keyboard, 'a'))) * dt;
+			agentPtr->velY += agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'w') - egpKeyboardKeyIsDown(keyboard, 's'))) * dt;
 
 			// debug print
 			//printf(" vel (%d) = %f, %f \n", ctrlID, agentPtr->velX, agentPtr->velY);

@@ -20,6 +20,10 @@ int egpServerApplicationState::UpdateNetworking()
 {
 	unsigned int i = egpApplicationState::UpdateNetworking();
 
+	// ****TO-DO: send complete set of updated data
+	// PROJECT 3: Send based on networking
+	SendStateUpdate(0, -1, 1, 0);
+
 	// done
 	return i;
 }
@@ -184,10 +188,6 @@ int egpServerApplicationState::OnIdle()
 
 			// ****TO-DO: simulate state given all inputs
 			mp_state->UpdateState(m_updateTimer->secondsPerTick);
-
-			// ****TO-DO: send complete set of updated data
-			// PROJECT 3: Send based on networking
-			SendStateUpdate(0, -1, 1, 0);
 		}
 	}
 
