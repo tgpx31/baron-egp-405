@@ -111,7 +111,7 @@ int egpNetPlaygroundGameState::DeserializeData(const char *buffer, const unsigne
 
 int egpNetPlaygroundGameState::ProcessInput(const egpKeyboard *keyboard, const egpMouse *mouse, const unsigned int ctrlID, const double dt)
 {
-	if (ctrlID >= 0)
+	if ((int)ctrlID >= 0)
 	{
 		NetPlaygroundObjectStatus *status = m_data->m_agentStatus + ctrlID;
 		NetPlaygroundAgent *agentPtr = m_data->m_agent + ctrlID, agentPrev[1];

@@ -369,7 +369,7 @@ void egpApplicationState::InitializePeer()
 	mp_peer->SetMaximumIncomingConnections(m_maxIncomingConnections);
 
 	// ****TO-DO: set networking timer
-	egpTimerSet(m_networkTimer, 10.0);
+	egpTimerSet(m_networkTimer, 30.0);
 	egpTimerStart(m_networkTimer);
 }
 

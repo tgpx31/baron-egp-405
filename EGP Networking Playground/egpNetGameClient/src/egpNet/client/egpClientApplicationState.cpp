@@ -135,7 +135,7 @@ egpClientApplicationState::egpClientApplicationState()
 	, mpk_windowState(0)
 {
 	// set timers
-	egpTimerSet(m_updateRenderTimer, 10.0);
+	egpTimerSet(m_updateRenderTimer, 30.0);
 
 	// start timers
 	egpTimerStart(m_updateRenderTimer);
