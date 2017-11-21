@@ -13,10 +13,18 @@
 #include <GL/glew.h>
 
 
-egpNetPlaygroundGameStateDrawable::egpNetPlaygroundGameStateDrawable(int ownerID)
-	: egpNetPlaygroundGameState(ownerID)
+egpNetPlaygroundGameStateDrawable::egpNetPlaygroundGameStateDrawable(int ownerID, int local)
+	: egpNetPlaygroundGameState(ownerID, local)
 {
-
+	if (local)
+	{
+		// activate a second agent
+		// agent at our index is owned by us
+		// this may not always be the case, e.g. if one player has multiple agents
+		m_data->m_agentStatus[1].ownerID = 1;
+		m_data->m_agentStatus[1].flags = objFlag_active;
+		m_data->m_localGame = local;
+	}
 }
 
 

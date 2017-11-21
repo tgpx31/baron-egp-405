@@ -157,7 +157,7 @@ egpServerApplicationState::egpServerApplicationState()
 
 	// testing: create game state
 	// normally this would be handled by a manager
-	mp_state = new egpNetPlaygroundGameState(-1);
+	mp_state = new egpNetPlaygroundGameState(-1, 0);
 
 	m_InputCount = 0;
 }

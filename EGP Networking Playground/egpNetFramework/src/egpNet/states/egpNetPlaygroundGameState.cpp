@@ -15,7 +15,7 @@
 #include <string.h>
 
 
-egpNetPlaygroundGameState::egpNetPlaygroundGameState(int ownerID)
+egpNetPlaygroundGameState::egpNetPlaygroundGameState(int ownerID, int local )
 	: egpGameState(ownerID)
 {
 	memset(m_data, 0, sizeof(m_data));
@@ -33,6 +33,8 @@ egpNetPlaygroundGameState::egpNetPlaygroundGameState(int ownerID)
 	// this may not always be the case, e.g. if one player has multiple agents
 	m_data->m_agentStatus[ownerID].ownerID = ownerID;
 	m_data->m_agentStatus[ownerID].flags = objFlag_active;
+
+	m_data->m_localGame = local;
 }
 
 egpNetPlaygroundGameState::~egpNetPlaygroundGameState()
@@ -129,6 +131,35 @@ int egpNetPlaygroundGameState::ProcessInput(const egpKeyboard *keyboard, const e
 		if (mouse)
 		{
 
+		}
+
+		// new scope
+		if (m_data->m_localGame)
+		{
+			NetPlaygroundObjectStatus *status = m_data->m_agentStatus + 1;
+			NetPlaygroundAgent *agentPtr = m_data->m_agent + 1, agentPrev[1];
+			const float agentMoveSpeed = 100.0f;
+
+			status->ownerID = 1;
+			status->flags |= objFlag_active;
+
+			*agentPrev = *agentPtr;
+
+			if (keyboard)
+			{
+				agentPtr->velX = agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'l') - egpKeyboardKeyIsDown(keyboard, 'j')));
+				agentPtr->velY = agentMoveSpeed * ((float)(egpKeyboardKeyIsDown(keyboard, 'i') - egpKeyboardKeyIsDown(keyboard, 'k')));
+
+				// debug print
+				//printf(" vel (%d) = %f, %f \n", ctrlID, agentPtr->velX, agentPtr->velY);
+
+				//printf("PrevAgentVel(%d): %f %f\n", status->objID, agentPrev->velX, agentPrev->velY);
+				//printf("AgentVel(%d): %f %f\n", status->objID, agentPtr->velX, agentPtr->velY);
+			}
+			if (mouse)
+			{
+
+			}
 		}
 	}
 	return 0;

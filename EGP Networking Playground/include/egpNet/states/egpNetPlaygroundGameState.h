@@ -66,7 +66,7 @@ protected:
 	{
 		// test data
 	//	double m_t;
-
+		unsigned int m_localGame;
 		NetPlaygroundAgent m_agent[objLimit_agent];
 		NetPlaygroundObjectStatus m_agentStatus[objLimit_agent];
 
@@ -74,7 +74,7 @@ protected:
 
 public: 
 
-	egpNetPlaygroundGameState(int ownerID);
+	egpNetPlaygroundGameState(int ownerID, int local = 0);
 	virtual ~egpNetPlaygroundGameState();
 
 	virtual int SerializeData(char *buffer, const unsigned int bufferCapacity, const unsigned int serializeCount, const double dt) const;

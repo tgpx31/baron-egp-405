@@ -18,7 +18,7 @@ class egpNetPlaygroundGameStateDrawable : public egpNetPlaygroundGameState
 	virtual int RenderState(int canvasWidth, int canvasHeight, int canvasPosX, int canvasPosY) const;
 public: 
 	static void ClearBuffers();
-	egpNetPlaygroundGameStateDrawable(int ownerID);
+	egpNetPlaygroundGameStateDrawable(int ownerID, int local = 0);
 };
 
 
