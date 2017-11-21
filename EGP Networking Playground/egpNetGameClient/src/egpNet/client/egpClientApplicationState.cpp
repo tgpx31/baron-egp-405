@@ -209,8 +209,7 @@ int egpClientApplicationState::OnKeyPress(unsigned char key)
 		{
 			// Start a local game
 			m_myConnectionIndex = 0;
-			mp_state = new egpNetPlaygroundGameStateDrawable(m_myConnectionIndex);
-
+			mp_state = new egpNetPlaygroundGameStateDrawable(m_myConnectionIndex, 1);
 		}
 		break;
 
