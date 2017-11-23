@@ -1,3 +1,5 @@
+//This file was modified by Brian Barion, Justin Mulkin, and Colin Brady with permission from author.
+
 /*
 	egpNetPlaygroundGameState.cpp
 	By Dan Buckstein
